@@ -24,3 +24,11 @@ flutter:
 
   assets:
     - assets/images/
+
+  fonts:
+    - family: DelaGothicOne
+      fonts:
+        - asset: assets/fonts/DelaGothicOne-Regular.ttf
+    - family: Chivo
+      fonts:
+        - asset: assets/fonts/Chivo-Regular.ttf

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import 'search_screen.dart';
 import 'item_form_screen.dart';
 import 'home_screen.dart';
@@ -82,11 +83,7 @@ class NoResultsScreen extends StatelessWidget {
                 ),
                 child: const Text(
                   'CHANGER LA RECHERCHE',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black,
-                  ),
+                  style: TextStyle(fontFamily: 'DelaGothicOne', color: Colors.black, fontSize: 16),
                 ),
               ),
             ),
@@ -118,11 +115,7 @@ class NoResultsScreen extends StatelessWidget {
                 ),
                 child: const Text(
                   'CRÉER UN NOUVEL OBJET',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black,
-                  ),
+                  style: TextStyle(fontFamily: 'DelaGothicOne', color: Colors.black, fontSize: 16),
                 ),
               ),
             ),

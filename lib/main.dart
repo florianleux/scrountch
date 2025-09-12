@@ -6,7 +6,7 @@ import 'screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase with generated options
   try {
     await Firebase.initializeApp(
@@ -17,7 +17,7 @@ void main() async {
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
   }
-  
+
   runApp(const ScrountchApp());
 }
 
@@ -36,7 +36,7 @@ class ScrountchApp extends StatelessWidget {
           background: Color(0xFFF7FAFC),
         ),
         useMaterial3: true,
-        fontFamily: 'System',
+        fontFamily: 'Chivo',
         textTheme: const TextTheme(
           displayLarge: TextStyle(
             fontSize: 32,
@@ -75,13 +75,13 @@ class ScrountchApp extends StatelessWidget {
             height: 1.4,
           ),
           bodyLarge: TextStyle(
-            fontSize: 16,
+            fontSize: 22,
             fontWeight: FontWeight.w400,
             color: Color(0xFF4A5568),
             height: 1.5,
           ),
           bodyMedium: TextStyle(
-            fontSize: 14,
+            fontSize: 22,
             fontWeight: FontWeight.w400,
             color: Color(0xFF718096),
             height: 1.5,
@@ -114,23 +114,33 @@ class ScrountchApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             textStyle: const TextStyle(
-              fontSize: 16,
+              fontSize: 22,
+              fontFamily: 'DelaGothicOne',
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 25, // Padding vertical pour TOUS les inputs
+            horizontal: 20, // Padding horizontal pour TOUS les inputs
+          ),
           labelStyle: const TextStyle(
-            fontWeight: FontWeight.w700,
+            fontFamily: 'Chivo', // ICI pour la police des labels
+            fontSize: 22, // ICI pour la taille des labels
+            fontWeight: FontWeight.w300,
             color: Colors.black,
           ),
           hintStyle: const TextStyle(
-            fontWeight: FontWeight.w700,
-            color: Colors.black54,
+            fontFamily: 'Chivo', // ICI pour la police des labels
+            fontSize: 22, // ICI pour la taille des labels
+            fontWeight: FontWeight.w300,
+            color: Colors.black,
           ),
+
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.black, width: 2),
+            borderSide: const BorderSide(color: Colors.black, width: 3),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),

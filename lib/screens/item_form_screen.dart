@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/item.dart';
 import '../services/firebase_service.dart';
 import '../constants/app_constants.dart';
+import '../theme/app_theme.dart';
 import '../constants/location_data.dart';
 import 'item_detail_screen.dart';
 
@@ -288,11 +289,11 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Rester'),
+                  child: const Text('Rester', style: TextStyle(fontFamily: 'DelaGothicOne', color: Colors.black, fontSize: 16)),
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Quitter'),
+                  child: const Text('Quitter', style: TextStyle(fontFamily: 'DelaGothicOne', color: Colors.black, fontSize: 16)),
                 ),
               ],
             ),
@@ -743,10 +744,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                           ),
                           child: const Text(
                             'ANNULER',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: TextStyle(fontFamily: 'DelaGothicOne', color: Colors.black, fontSize: 16),
                           ),
                         ),
                       ),
@@ -778,11 +776,12 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                                       ),
                                     ),
                                     SizedBox(width: 8),
-                                    Text(
+                                    const Text(
                                       'CHARGEMENT...',
                                       style: TextStyle(
+                                        fontFamily: 'DelaGothicOne',
                                         color: Color(0xFFFFEF99),
-                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16,
                                       ),
                                     ),
                                   ],
@@ -790,8 +789,9 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                               : const Text(
                                   'ENREGISTRER',
                                   style: TextStyle(
-                                    color: Color(0xFFFFEF99), // Couleur du fond
-                                    fontWeight: FontWeight.w700,
+                                    fontFamily: 'DelaGothicOne',
+                                    color: Color(0xFFFFEF99),
+                                    fontSize: 16,
                                   ),
                                 ),
                         ),

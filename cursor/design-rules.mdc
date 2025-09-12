@@ -235,8 +235,58 @@ Cette direction artistique peut évoluer en gardant les principes de base :
 
 ---
 
+## 🔤 RÈGLES DES POLICES - MISE À JOUR CRITIQUE
+
+### ⚠️ SEULES 2 POLICES AUTORISÉES
+
+Cette règle remplace toutes les précédentes règles typographiques.
+
+#### 1. **Dela Gothic One**
+
+- **Usage** : TITRES DE PAGES + TOUS LES BOUTONS (en CAPITALES)
+- **Fichier** : `assets/fonts/DelaGothicOne-Regular.ttf`
+- **Style** : Bold naturellement, moderne et distinctif
+- **Exemples** : "TROUVER", "RANGER", "RECHERCHER", "NOUVEL OBJET", "ANNULER", "ENREGISTRER"
+
+#### 2. **Chivo Regular**
+
+- **Usage** : TOUT LE RESTE (texte courant, champs, labels, hints)
+- **Fichier** : `assets/fonts/Chivo-Regular.ttf`
+- **Style** : Regular uniquement, lisible et élégant
+- **Exemples** : Champs de texte, descriptions, labels de formulaires, texte courant
+
+### 🚫 INTERDICTIONS ABSOLUES
+
+- **AUCUNE AUTRE POLICE** n'est acceptée
+- Pas de polices système (System, San Francisco, Roboto, etc.)
+- Pas d'autres Google Fonts
+- Pas de mélange avec d'autres familles
+
+### 📝 Implémentation
+
+```dart
+// Configuration pubspec.yaml
+fonts:
+  - family: DelaGothicOne
+    fonts:
+      - asset: assets/fonts/DelaGothicOne-Regular.ttf
+  - family: Chivo
+    fonts:
+      - asset: assets/fonts/Chivo-Regular.ttf
+
+// Usage dans le code
+// Titres et boutons
+TextStyle(fontFamily: 'DelaGothicOne', fontSize: 24, color: Colors.black)
+
+// Tout le reste
+TextStyle(fontFamily: 'Chivo', fontSize: 16, color: Colors.black)
+```
+
+---
+
 _Dernière mise à jour : Septembre 2025_
-_Version : 2.0 - Migration vers palette jaune_
+_Version : 2.1 - Polices locales Dela Gothic One + Chivo_
+
 # Direction Artistique - Scrountch App
 
 ## 🎨 Philosophie Design
@@ -470,5 +520,54 @@ Cette direction artistique peut évoluer en gardant les principes de base :
 
 ---
 
+## 🔤 RÈGLES DES POLICES - MISE À JOUR CRITIQUE
+
+### ⚠️ SEULES 2 POLICES AUTORISÉES
+
+Cette règle remplace toutes les précédentes règles typographiques.
+
+#### 1. **Dela Gothic One**
+
+- **Usage** : TITRES DE PAGES + TOUS LES BOUTONS (en CAPITALES)
+- **Fichier** : `assets/fonts/DelaGothicOne-Regular.ttf`
+- **Style** : Bold naturellement, moderne et distinctif
+- **Exemples** : "TROUVER", "RANGER", "RECHERCHER", "NOUVEL OBJET", "ANNULER", "ENREGISTRER"
+
+#### 2. **Chivo Regular**
+
+- **Usage** : TOUT LE RESTE (texte courant, champs, labels, hints)
+- **Fichier** : `assets/fonts/Chivo-Regular.ttf`
+- **Style** : Regular uniquement, lisible et élégant
+- **Exemples** : Champs de texte, descriptions, labels de formulaires, texte courant
+
+### 🚫 INTERDICTIONS ABSOLUES
+
+- **AUCUNE AUTRE POLICE** n'est acceptée
+- Pas de polices système (System, San Francisco, Roboto, etc.)
+- Pas d'autres Google Fonts
+- Pas de mélange avec d'autres familles
+
+### 📝 Implémentation
+
+```dart
+// Configuration pubspec.yaml
+fonts:
+  - family: DelaGothicOne
+    fonts:
+      - asset: assets/fonts/DelaGothicOne-Regular.ttf
+  - family: Chivo
+    fonts:
+      - asset: assets/fonts/Chivo-Regular.ttf
+
+// Usage dans le code
+// Titres et boutons
+TextStyle(fontFamily: 'DelaGothicOne', fontSize: 24, color: Colors.black)
+
+// Tout le reste
+TextStyle(fontFamily: 'Chivo', fontSize: 16, color: Colors.black)
+```
+
+---
+
 _Dernière mise à jour : Septembre 2025_
-_Version : 2.0 - Migration vers palette jaune_
+_Version : 2.1 - Polices locales Dela Gothic One + Chivo_

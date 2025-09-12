@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/item.dart';
+import '../theme/app_theme.dart';
 import 'item_form_screen.dart';
 import 'home_screen.dart';
 
@@ -213,7 +214,7 @@ class ItemDetailScreen extends StatelessWidget {
                       (route) => false,
                     );
                   },
-                  child: const Text('Retour Accueil'),
+                  child: const Text('Retour Accueil', style: TextStyle(fontFamily: 'DelaGothicOne', color: Colors.black, fontSize: 16)),
                 ),
               ),
             ] else ...[
@@ -223,7 +224,7 @@ class ItemDetailScreen extends StatelessWidget {
                   Expanded(
                     child: TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Précédent'),
+                      child: const Text('Précédent', style: TextStyle(fontFamily: 'DelaGothicOne', color: Colors.black, fontSize: 16)),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -261,7 +262,7 @@ class ItemDetailScreen extends StatelessWidget {
                       (route) => false,
                     );
                   },
-                  child: const Text('Retour Accueil'),
+                  child: const Text('Retour Accueil', style: TextStyle(fontFamily: 'DelaGothicOne', color: Colors.black, fontSize: 16)),
                 ),
               ),
             ],

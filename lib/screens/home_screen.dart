@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'search_screen.dart';
 import 'manage_screen.dart';
+import '../theme/app_theme.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  // Constantes de couleurs et dimensions
-  static const Color _primaryYellow = Color(0xFFFFDD00);
-  static const double _buttonWidth = 297;
-  static const double _buttonHeight = 75;
-  static const double _iconSize = 65;
-  static const double _fontSize = 30;
-  static const double _borderWidth = 3;
+  // Constantes de dimensions spécifiques à l'écran d'accueil
+  static const double _buttonWidth = AppTheme.buttonWidth;
+  static const double _buttonHeight = AppTheme.buttonHeight;
+  static const double _iconSize = AppTheme.iconSize;
   static const double _logoTop = 30;
-  static const double _logoHeight = 200;
   static const double _buttonSpacing = 24;
   static const int _topSpacerFlex = 55;
   static const int _bottomSpacerFlex = 45;
@@ -21,7 +18,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _primaryYellow,
+      backgroundColor: AppTheme.primaryYellow,
       body: Stack(
         children: [
           _buildBackground(),
@@ -95,29 +92,21 @@ class HomeScreen extends StatelessWidget {
       height: _buttonHeight,
       child: OutlinedButton(
         onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Colors.black, width: _borderWidth),
-          backgroundColor: _primaryYellow,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
+        style: AppTheme.primaryButtonStyle,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
           children: [
             Image.asset(
               iconPath,
               width: _iconSize,
               height: _iconSize,
             ),
-            const SizedBox(width: 16),
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: _fontSize,
-                fontWeight: FontWeight.w700,
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                label,
+                style: AppTheme.buttonTextStyle,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
