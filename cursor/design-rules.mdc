@@ -1,0 +1,474 @@
+---
+alwaysApply: true
+---
+
+# Direction Artistique - Scrountch App
+
+## 🎨 Philosophie Design
+
+L'application Scrountch suit une direction artistique **"Jaune Bold"** caractérisée par :
+
+- Des nuances de jaune comme couleur dominante
+- Une typographie ultra-grasse et impactante
+- Des interfaces minimalistes sans fioritures
+- Une cohérence visuelle forte entre tous les écrans
+- Des contrastes forts entre éléments noirs et fonds jaunes
+
+## 🌈 Palette de Couleurs
+
+### Couleurs Principales (Fonds d'écrans)
+
+```css
+Jaune Principal:     #FFDD00  /* Accueil, Détail, Aucun résultat */
+Jaune Clair:         #FFE333  /* Recherche */
+Jaune Moyen:         #FFE966  /* Ranger/Manage */
+Jaune Très Clair:    #FFEF99  /* Formulaire/Édition */
+Jaune Très Pâle:     #FFF6CC  /* Résultats */
+```
+
+### Couleurs Secondaires
+
+```css
+Noir:        #000000  /* Texte, bordures, icônes */
+Transparent: transparent /* Fonds de boutons et inputs */
+Noir 54%:    Colors.black54 /* Placeholders */
+Blanc:       #FFFFFF  /* Texte sur cartes colorées */
+```
+
+## 🔤 Typographie
+
+### Règles Générales
+
+- **Famille** : `System` (police système)
+- **Style dominant** : Ultra-gras (`FontWeight.w900`)
+- **Casse** : MAJUSCULES pour tous les titres et labels importants
+- **Contraste** : Texte noir sur fonds fluo pour maximum lisibilité
+
+### Hiérarchie Typographique
+
+```dart
+// Titres principaux (écrans)
+fontSize: 32px, fontWeight: w900, color: Colors.black
+
+// Titres d'AppBar
+fontSize: 18px, fontWeight: w900, color: Colors.black
+
+// Boutons
+fontSize: 16px, fontWeight: w700, color: Colors.black
+
+// Labels et placeholders
+fontWeight: w700, color: Colors.black / Colors.black54
+```
+
+## 🎯 Composants UI
+
+### Boutons
+
+**Style unique** : Transparent avec bordure noire
+
+```dart
+OutlinedButton.styleFrom(
+  side: BorderSide(color: Colors.black, width: 2),
+  backgroundColor: Colors.transparent,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(8),
+  ),
+)
+```
+
+### Inputs/Formulaires
+
+**Style** : Fond transparent avec bordure noire
+
+```dart
+InputDecorationTheme(
+  border: OutlineInputBorder(
+    borderSide: BorderSide(color: Colors.black, width: 2),
+  ),
+  fillColor: Colors.transparent,
+  filled: true,
+  labelStyle: TextStyle(fontWeight: FontWeight.w700),
+)
+```
+
+### AppBars
+
+**Style** : Transparent avec éléments noirs
+
+```dart
+AppBar(
+  backgroundColor: Colors.transparent,
+  elevation: 0,
+  iconTheme: IconThemeData(color: Colors.black),
+)
+```
+
+### Cartes d'Items
+
+**Style** : Blocs colorés avec couleurs fluorescentes (palette maintenue pour contraste)
+
+```dart
+// Palette pour les cartes d'items (couleurs vives pour contraste)
+Color(0xFFFF0080), // Rose fluo
+Color(0xFF00FF00), // Vert fluo
+Color(0xFFFF8000), // Orange fluo
+Color(0xFF00FFFF), // Cyan fluo
+Color(0xFF8000FF), // Violet fluo
+Color(0xFFFFFF00), // Jaune fluo
+```
+
+## 📱 Écrans et Couleurs
+
+### Attribution des Couleurs par Écran
+
+| Écran                 | Couleur de Fond  | Code Hex  | Usage               |
+| --------------------- | ---------------- | --------- | ------------------- |
+| 🏠 **Accueil**        | Jaune Principal  | `#FFDD00` | Écran principal     |
+| 🔍 **Recherche**      | Jaune Clair      | `#FFE333` | Fonction recherche  |
+| 📦 **Ranger**         | Jaune Moyen      | `#FFE966` | Gestion des objets  |
+| 📝 **Formulaire**     | Jaune Très Clair | `#FFEF99` | Création/Édition    |
+| 📋 **Résultats**      | Jaune Très Pâle  | `#FFF6CC` | Liste des résultats |
+| 📄 **Détail**         | Jaune Principal  | `#FFDD00` | Vue détaillée       |
+| ❌ **Aucun résultat** | Jaune Principal  | `#FFDD00` | État vide           |
+
+## 🎛️ Règles d'Implémentation
+
+### Structure Scaffold
+
+```dart
+Scaffold(
+  backgroundColor: Color(0xFFCOULEUR_JAUNE), // Voir tableau des couleurs par écran
+  appBar: AppBar(
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    title: Text(
+      'TITRE EN MAJUSCULES',
+      style: TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.w900,
+      ),
+    ),
+    iconTheme: IconThemeData(color: Colors.black),
+  ),
+  body: // Contenu...
+)
+```
+
+### Boutons Standards
+
+#### Bouton Principal (Outlined)
+
+```dart
+OutlinedButton(
+  style: OutlinedButton.styleFrom(
+    side: BorderSide(color: Colors.black, width: 2),
+    backgroundColor: Colors.transparent,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+  ),
+  child: Text(
+    'TEXTE EN MAJUSCULES',
+    style: TextStyle(
+      color: Colors.black,
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+    ),
+  ),
+)
+```
+
+#### Bouton d'Action (Elevated)
+
+```dart
+ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.black,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+  ),
+  child: Text(
+    'TEXTE EN MAJUSCULES',
+    style: TextStyle(
+      color: Color(0xFFCOULEUR_FOND), // Couleur du fond de l'écran
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+    ),
+  ),
+)
+```
+
+## ✅ Checklist de Conformité
+
+Avant de valider un écran, vérifier :
+
+- [ ] Fond d'écran en couleur fluo unie
+- [ ] Titre en majuscules et ultra-gras (w900)
+- [ ] Boutons transparents avec bordure noire 2px
+- [ ] Texte et icônes en noir pour contraste
+- [ ] Labels et placeholders en gras (w700)
+- [ ] AppBar transparent avec éléments noirs
+- [ ] Inputs avec fond transparent et bordure noire
+- [ ] Cohérence avec la palette de couleurs définie
+
+## 🚫 À Éviter
+
+- ❌ Cartes blanches ou fonds blancs
+- ❌ Couleurs ternes ou pastels
+- ❌ Typographie fine ou normale
+- ❌ Boutons colorés (autres que transparent/noir)
+- ❌ Texte en minuscules pour les éléments importants
+- ❌ Bordures colorées ou fines
+- ❌ AppBars avec couleurs de fond
+- ❌ Mélange de styles entre les écrans
+
+## 🔄 Évolutions Futures
+
+Cette direction artistique peut évoluer en gardant les principes de base :
+
+- **Palette jaune** : Maintenir la cohérence avec les nuances de jaune
+- **Contraste fort** : Conserver la lisibilité avec du noir sur jaune
+- **Typographie impactante** : Garder l'aspect gras et majuscules
+- **Simplicité** : Éviter la surcharge visuelle
+- **Boutons duaux** : Continuer avec les boutons outlined transparents et elevated noirs
+
+---
+
+_Dernière mise à jour : Septembre 2025_
+_Version : 2.0 - Migration vers palette jaune_
+# Direction Artistique - Scrountch App
+
+## 🎨 Philosophie Design
+
+L'application Scrountch suit une direction artistique **"Jaune Bold"** caractérisée par :
+
+- Des nuances de jaune comme couleur dominante
+- Une typographie ultra-grasse et impactante
+- Des interfaces minimalistes sans fioritures
+- Une cohérence visuelle forte entre tous les écrans
+- Des contrastes forts entre éléments noirs et fonds jaunes
+
+## 🌈 Palette de Couleurs
+
+### Couleurs Principales (Fonds d'écrans)
+
+```css
+Jaune Principal:     #FFDD00  /* Accueil, Détail, Aucun résultat */
+Jaune Clair:         #FFE333  /* Recherche */
+Jaune Moyen:         #FFE966  /* Ranger/Manage */
+Jaune Très Clair:    #FFEF99  /* Formulaire/Édition */
+Jaune Très Pâle:     #FFF6CC  /* Résultats */
+```
+
+### Couleurs Secondaires
+
+```css
+Noir:        #000000  /* Texte, bordures, icônes */
+Transparent: transparent /* Fonds de boutons et inputs */
+Noir 54%:    Colors.black54 /* Placeholders */
+Blanc:       #FFFFFF  /* Texte sur cartes colorées */
+```
+
+## 🔤 Typographie
+
+### Règles Générales
+
+- **Famille** : `System` (police système)
+- **Style dominant** : Ultra-gras (`FontWeight.w900`)
+- **Casse** : MAJUSCULES pour tous les titres et labels importants
+- **Contraste** : Texte noir sur fonds fluo pour maximum lisibilité
+
+### Hiérarchie Typographique
+
+```dart
+// Titres principaux (écrans)
+fontSize: 32px, fontWeight: w900, color: Colors.black
+
+// Titres d'AppBar
+fontSize: 18px, fontWeight: w900, color: Colors.black
+
+// Boutons
+fontSize: 16px, fontWeight: w700, color: Colors.black
+
+// Labels et placeholders
+fontWeight: w700, color: Colors.black / Colors.black54
+```
+
+## 🎯 Composants UI
+
+### Boutons
+
+**Style unique** : Transparent avec bordure noire
+
+```dart
+OutlinedButton.styleFrom(
+  side: BorderSide(color: Colors.black, width: 2),
+  backgroundColor: Colors.transparent,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(8),
+  ),
+)
+```
+
+### Inputs/Formulaires
+
+**Style** : Fond transparent avec bordure noire
+
+```dart
+InputDecorationTheme(
+  border: OutlineInputBorder(
+    borderSide: BorderSide(color: Colors.black, width: 2),
+  ),
+  fillColor: Colors.transparent,
+  filled: true,
+  labelStyle: TextStyle(fontWeight: FontWeight.w700),
+)
+```
+
+### AppBars
+
+**Style** : Transparent avec éléments noirs
+
+```dart
+AppBar(
+  backgroundColor: Colors.transparent,
+  elevation: 0,
+  iconTheme: IconThemeData(color: Colors.black),
+)
+```
+
+### Cartes d'Items
+
+**Style** : Blocs colorés avec couleurs fluorescentes (palette maintenue pour contraste)
+
+```dart
+// Palette pour les cartes d'items (couleurs vives pour contraste)
+Color(0xFFFF0080), // Rose fluo
+Color(0xFF00FF00), // Vert fluo
+Color(0xFFFF8000), // Orange fluo
+Color(0xFF00FFFF), // Cyan fluo
+Color(0xFF8000FF), // Violet fluo
+Color(0xFFFFFF00), // Jaune fluo
+```
+
+## 📱 Écrans et Couleurs
+
+### Attribution des Couleurs par Écran
+
+| Écran                 | Couleur de Fond  | Code Hex  | Usage               |
+| --------------------- | ---------------- | --------- | ------------------- |
+| 🏠 **Accueil**        | Jaune Principal  | `#FFDD00` | Écran principal     |
+| 🔍 **Recherche**      | Jaune Clair      | `#FFE333` | Fonction recherche  |
+| 📦 **Ranger**         | Jaune Moyen      | `#FFE966` | Gestion des objets  |
+| 📝 **Formulaire**     | Jaune Très Clair | `#FFEF99` | Création/Édition    |
+| 📋 **Résultats**      | Jaune Très Pâle  | `#FFF6CC` | Liste des résultats |
+| 📄 **Détail**         | Jaune Principal  | `#FFDD00` | Vue détaillée       |
+| ❌ **Aucun résultat** | Jaune Principal  | `#FFDD00` | État vide           |
+
+## 🎛️ Règles d'Implémentation
+
+### Structure Scaffold
+
+```dart
+Scaffold(
+  backgroundColor: Color(0xFFCOULEUR_JAUNE), // Voir tableau des couleurs par écran
+  appBar: AppBar(
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    title: Text(
+      'TITRE EN MAJUSCULES',
+      style: TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.w900,
+      ),
+    ),
+    iconTheme: IconThemeData(color: Colors.black),
+  ),
+  body: // Contenu...
+)
+```
+
+### Boutons Standards
+
+#### Bouton Principal (Outlined)
+
+```dart
+OutlinedButton(
+  style: OutlinedButton.styleFrom(
+    side: BorderSide(color: Colors.black, width: 2),
+    backgroundColor: Colors.transparent,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+  ),
+  child: Text(
+    'TEXTE EN MAJUSCULES',
+    style: TextStyle(
+      color: Colors.black,
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+    ),
+  ),
+)
+```
+
+#### Bouton d'Action (Elevated)
+
+```dart
+ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.black,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+  ),
+  child: Text(
+    'TEXTE EN MAJUSCULES',
+    style: TextStyle(
+      color: Color(0xFFCOULEUR_FOND), // Couleur du fond de l'écran
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+    ),
+  ),
+)
+```
+
+## ✅ Checklist de Conformité
+
+Avant de valider un écran, vérifier :
+
+- [ ] Fond d'écran en couleur fluo unie
+- [ ] Titre en majuscules et ultra-gras (w900)
+- [ ] Boutons transparents avec bordure noire 2px
+- [ ] Texte et icônes en noir pour contraste
+- [ ] Labels et placeholders en gras (w700)
+- [ ] AppBar transparent avec éléments noirs
+- [ ] Inputs avec fond transparent et bordure noire
+- [ ] Cohérence avec la palette de couleurs définie
+
+## 🚫 À Éviter
+
+- ❌ Cartes blanches ou fonds blancs
+- ❌ Couleurs ternes ou pastels
+- ❌ Typographie fine ou normale
+- ❌ Boutons colorés (autres que transparent/noir)
+- ❌ Texte en minuscules pour les éléments importants
+- ❌ Bordures colorées ou fines
+- ❌ AppBars avec couleurs de fond
+- ❌ Mélange de styles entre les écrans
+
+## 🔄 Évolutions Futures
+
+Cette direction artistique peut évoluer en gardant les principes de base :
+
+- **Palette jaune** : Maintenir la cohérence avec les nuances de jaune
+- **Contraste fort** : Conserver la lisibilité avec du noir sur jaune
+- **Typographie impactante** : Garder l'aspect gras et majuscules
+- **Simplicité** : Éviter la surcharge visuelle
+- **Boutons duaux** : Continuer avec les boutons outlined transparents et elevated noirs
+
+---
+
+_Dernière mise à jour : Septembre 2025_
+_Version : 2.0 - Migration vers palette jaune_
