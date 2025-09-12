@@ -108,7 +108,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontFamily: 'Chivo',
-                            fontSize: 18,
+                            fontSize: 14,
                             color: Colors.black,
                           ),
                           maxLines: 1,
@@ -128,7 +128,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontFamily: 'Chivo',
-                            fontSize: 28,
+                            fontSize: 24,
                             color: Colors.black,
                           ),
                           maxLines: 6,
@@ -382,6 +382,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           'SUPPRIMER',
                           style: TextStyle(
                             fontFamily: 'DelaGothicOne',
+                            fontSize: 14,
                             color: Colors.black,
                           ),
                         ),
@@ -411,6 +412,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           'ANNULER',
                           style: TextStyle(
                             fontFamily: 'DelaGothicOne',
+                            fontSize: 14,
                             color: Colors.black,
                           ),
                         ),

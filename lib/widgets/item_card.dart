@@ -50,7 +50,7 @@ class ItemCard extends StatelessWidget {
                           color: Colors.black,
                           fontWeight: FontWeight.w500,
                           fontFamily: 'Chivo',
-                          fontSize: 19,
+                          fontSize: 12,
                         ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

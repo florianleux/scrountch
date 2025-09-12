@@ -122,7 +122,7 @@ class ScrountchApp extends StatelessWidget {
         ),
         inputDecorationTheme: InputDecorationTheme(
           contentPadding: const EdgeInsets.symmetric(
-            vertical: 25, // Padding vertical pour TOUS les inputs
+            vertical: 20, // Padding vertical pour TOUS les inputs
             horizontal: 20, // Padding horizontal pour TOUS les inputs
           ),
           labelStyle: const TextStyle(

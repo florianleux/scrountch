@@ -171,7 +171,7 @@ class _ResultsScreenState extends State<ResultsScreen>
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontFamily: 'DelaGothicOne',
-                        fontSize: 38,
+                        fontSize: 34,
                         color: Colors.black,
                         height: 1.1,
                       ),
