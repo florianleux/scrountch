@@ -72,7 +72,8 @@ class _SearchScreenState extends State<SearchScreen> {
           // Contenu principal
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
               child: Column(
                 children: [
                   // Header avec retour et logo

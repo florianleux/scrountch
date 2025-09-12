@@ -7,7 +7,6 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   // Constantes de dimensions spécifiques à l'écran d'accueil
-  static const double _buttonWidth = AppTheme.buttonWidth;
   static const double _buttonHeight = AppTheme.buttonHeight;
   static const double _iconSize = AppTheme.iconSize;
   static const double _logoTop = 30;
@@ -56,59 +55,83 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildButtonsSection(BuildContext context) {
     return SafeArea(
-      child: Column(
-        children: [
-          const Spacer(flex: _topSpacerFlex),
-          Center(
-            child: Column(
-              children: [
-                _buildButton(
-                  label: 'TROUVER',
-                  iconPath: 'assets/images/search_icon.png',
-                  onPressed: () => _navigateToScreen(context, const SearchScreen()),
-                ),
-                const SizedBox(height: _buttonSpacing),
-                _buildButton(
-                  label: 'RANGER',
-                  iconPath: 'assets/images/store_icon.png',
-                  onPressed: () => _navigateToScreen(context, const ManageScreen()),
-                ),
-              ],
-            ),
-          ),
-          const Spacer(flex: _bottomSpacerFlex),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildButton({
-    required String label,
-    required String iconPath,
-    required VoidCallback onPressed,
-  }) {
-    return SizedBox(
-      width: _buttonWidth,
-      height: _buttonHeight,
-      child: OutlinedButton(
-        onPressed: onPressed,
-        style: AppTheme.primaryButtonStyle,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+        child: Column(
           children: [
-            Image.asset(
-              iconPath,
-              width: _iconSize,
-              height: _iconSize,
-            ),
-            const SizedBox(width: 4),
-            Flexible(
-              child: Text(
-                label,
-                style: AppTheme.buttonTextStyle,
-                overflow: TextOverflow.ellipsis,
+            const Spacer(flex: _topSpacerFlex),
+            Center(
+              child: Column(
+                children: [
+                  // Bouton TROUVER
+                  SizedBox(
+                    height: _buttonHeight,
+                    child: ElevatedButton(
+                      onPressed: () =>
+                          _navigateToScreen(context, const SearchScreen()),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/images/search_icon.png',
+                            width: _iconSize,
+                            height: _iconSize,
+                            color: AppTheme.primaryYellow, // Couleur jaune
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'TROUVER',
+                            style: AppTheme.buttonTextStyle.copyWith(
+                              color: AppTheme.primaryYellow, // Couleur jaune
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: _buttonSpacing),
+                  // Bouton RANGER
+                  SizedBox(
+                    height: _buttonHeight,
+                    child: ElevatedButton(
+                      onPressed: () =>
+                          _navigateToScreen(context, const ManageScreen()),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/images/store_icon.png',
+                            width: _iconSize,
+                            height: _iconSize,
+                            color: AppTheme.primaryYellow, // Couleur jaune
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'RANGER',
+                            style: AppTheme.buttonTextStyle.copyWith(
+                              color: AppTheme.primaryYellow, // Couleur jaune
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
+            const Spacer(flex: _bottomSpacerFlex),
           ],
         ),
       ),

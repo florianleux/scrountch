@@ -12,7 +12,7 @@ class ManageScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFFFE966), // Fond jaune moyen
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
           child: Column(
             children: [
               // Header avec retour
@@ -30,15 +30,15 @@ class ManageScreen extends StatelessWidget {
                   Text(
                     'RANGER',
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w900,
-                    ),
+                          color: Colors.black,
+                          fontWeight: FontWeight.w900,
+                        ),
                   ),
                 ],
               ),
-              
+
               const Spacer(),
-              
+
               // Bouton Nouvel Objet
               SizedBox(
                 width: 200,
@@ -71,9 +71,9 @@ class ManageScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Bouton Modifier Objet
               SizedBox(
                 width: 200,
@@ -104,9 +104,9 @@ class ManageScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               const Spacer(),
-              
+
               // Bouton retour à l'accueil
               TextButton(
                 onPressed: () {
