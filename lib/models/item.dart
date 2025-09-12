@@ -1,19 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Item {
-  String id;                    // Document ID Firestore
-  String name;                  // OBLIGATOIRE 1-100 chars
-  String room;                  // OBLIGATOIRE - pièce
-  String? location;             // OPTIONNEL - meuble/zone
-  String? subLocation;          // OPTIONNEL - emplacement précis
-  String? mainCategory;         // OPTIONNEL - catégorie principale
-  String? subCategory;          // OPTIONNEL - sous-catégorie
-  String? owner;                // OPTIONNEL - propriétaire
-  List<String>? tags;           // OPTIONNEL - max 5 tags
-  String? description;          // OPTIONNEL - max 500 chars
-  DateTime createdAt;           // Auto-généré
-  DateTime updatedAt;           // Auto-généré
-  List<String> searchKeywords;  // Auto-généré pour recherche
+  String id; // Document ID Firestore
+  String name; // OBLIGATOIRE 1-100 chars
+  String room; // OBLIGATOIRE - pièce
+  String? location; // OPTIONNEL - meuble/zone
+  String? subLocation; // OPTIONNEL - emplacement précis
+  String? mainCategory; // OPTIONNEL - catégorie principale
+  String? subCategory; // OPTIONNEL - sous-catégorie
+  String? owner; // OPTIONNEL - propriétaire
+  List<String>? tags; // OPTIONNEL - max 5 tags
+  String? description; // OPTIONNEL - max 500 chars
+  DateTime createdAt; // Auto-généré
+  DateTime updatedAt; // Auto-généré
+  List<String> searchKeywords; // Auto-généré pour recherche
 
   Item({
     required this.id,
@@ -34,7 +34,7 @@ class Item {
   // Factory constructor for creating Item from Firestore document
   factory Item.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    
+
     return Item(
       id: doc.id,
       name: data['name'] ?? '',
@@ -48,8 +48,8 @@ class Item {
       description: data['description'],
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
-      searchKeywords: data['searchKeywords'] != null 
-          ? List<String>.from(data['searchKeywords']) 
+      searchKeywords: data['searchKeywords'] != null
+          ? List<String>.from(data['searchKeywords'])
           : [],
     );
   }
@@ -77,7 +77,7 @@ class Item {
       mainCategory: mainCategory,
       subCategory: subCategory,
     );
-    
+
     return Item(
       id: '', // Will be set by Firestore
       name: name,
@@ -133,7 +133,7 @@ class Item {
     final updatedOwner = owner ?? this.owner;
     final updatedMainCategory = mainCategory ?? this.mainCategory;
     final updatedSubCategory = subCategory ?? this.subCategory;
-    
+
     final updatedSearchKeywords = _generateSearchKeywords(
       name: updatedName,
       room: updatedRoom,
@@ -174,7 +174,7 @@ class Item {
     String? subCategory,
   }) {
     final keywords = <String>{};
-    
+
     // Diviser tous les champs en mots
     keywords.addAll(_splitToKeywords(name));
     keywords.addAll(_splitToKeywords(room));
@@ -188,7 +188,7 @@ class Item {
         keywords.addAll(_splitToKeywords(tag));
       }
     }
-    
+
     return keywords.toList();
   }
 
@@ -235,6 +235,18 @@ class Item {
       parts.add(location!);
       if (subLocation != null && subLocation!.isNotEmpty) {
         parts.add(subLocation!);
+      }
+    }
+    return parts.join(' → ');
+  }
+
+  // Get full category string "Catégorie → Sous-catégorie"
+  String get fullCategory {
+    final parts = <String>[];
+    if (mainCategory != null && mainCategory!.isNotEmpty) {
+      parts.add(mainCategory!);
+      if (subCategory != null && subCategory!.isNotEmpty) {
+        parts.add(subCategory!);
       }
     }
     return parts.join(' → ');

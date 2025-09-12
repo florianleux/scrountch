@@ -73,7 +73,7 @@ class _SearchScreenState extends State<SearchScreen> {
           SafeArea(
             child: Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
               child: Column(
                 children: [
                   // Header avec retour et logo
@@ -107,7 +107,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     ],
                   ),
 
-                  SizedBox(height: 170),
+                  SizedBox(height: 140),
                   // Titre centré
                   Center(
                     child: Text(
@@ -175,29 +175,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                 ),
                               ],
                             ),
-                    ),
-                  ),
-
-                  const Spacer(),
-
-                  // Bouton retour à l'accueil
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HomeScreen(),
-                        ),
-                        (route) => false,
-                      );
-                    },
-                    child: const Text(
-                      'Retour à l\'accueil',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                      ),
                     ),
                   ),
                 ],

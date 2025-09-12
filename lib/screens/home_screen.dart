@@ -39,7 +39,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildLogo() {
     return Positioned(
-      top: _logoTop,
+      top: 60,
       left: 0,
       right: 0,
       child: Center(

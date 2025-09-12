@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/item.dart';
 import '../services/firebase_service.dart';
-import '../constants/app_constants.dart';
 import 'no_results_screen.dart';
 import 'item_detail_screen.dart';
+import 'home_screen.dart';
 import '../widgets/item_card.dart';
 
 class ResultsScreen extends StatefulWidget {
@@ -18,16 +18,28 @@ class ResultsScreen extends StatefulWidget {
   State<ResultsScreen> createState() => _ResultsScreenState();
 }
 
-class _ResultsScreenState extends State<ResultsScreen> {
+class _ResultsScreenState extends State<ResultsScreen>
+    with TickerProviderStateMixin {
   final FirebaseService _firebaseService = FirebaseService();
   List<Item>? _searchResults;
   bool _isLoading = true;
   String? _errorMessage;
+  late AnimationController _rotationController;
 
   @override
   void initState() {
     super.initState();
+    _rotationController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat();
     _performSearch();
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
   }
 
   Future<void> _performSearch() async {
@@ -38,7 +50,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
     try {
       final results = await _firebaseService.searchItems(widget.searchQuery);
-      
+
       if (mounted) {
         setState(() {
           _searchResults = results;
@@ -70,7 +82,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => NoResultsScreen(searchQuery: widget.searchQuery),
+            builder: (context) =>
+                NoResultsScreen(searchQuery: widget.searchQuery),
           ),
         );
       });
@@ -94,37 +107,130 @@ class _ResultsScreenState extends State<ResultsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF6CC), // Fond jaune très pâle
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          _isLoading 
-              ? 'RECHERCHE...' 
-              : 'RÉSULTATS (${_searchResults?.length ?? 0} OBJETS)',
-          style: const TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w900,
+      backgroundColor:
+          const Color(0xFFFFE333), // Fond jaune clair comme search_screen
+      body: Stack(
+        children: [
+          // Image de fond par-dessus le fond jaune
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.15,
+              child: Image.asset(
+                'assets/images/results_bg.png',
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+          // Contenu principal
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Column(
+                children: [
+                  // Header avec retour et logo
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Image.asset(
+                            'assets/images/back_icon.png',
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HomeScreen()),
+                              (route) => false,
+                            );
+                          },
+                          child: Image.asset(
+                            'assets/images/home_icon.png',
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 40),
+                  // Titre des résultats
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Text(
+                      _isLoading
+                          ? 'RECHERCHE...'
+                          : '${_searchResults?.length ?? 0} OBJETS',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontFamily: 'DelaGothicOne',
+                        fontSize: 38,
+                        color: Colors.black,
+                        height: 1.1,
+                      ),
+                    ),
+                  ),
+
+                  // Sous-titre avec la requête
+                  Padding(
+                    padding: EdgeInsets.zero,
+                    child: Text(
+                      'pour "${widget.searchQuery}"',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontFamily: 'Chivo',
+                        fontSize: 18,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 60),
+
+                  // Contenu principal (résultats)
+                  Expanded(
+                    child: _buildBody(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
-      body: _buildBody(),
     );
   }
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Chargement...'),
+            const SizedBox(height: 80),
+            RotationTransition(
+              turns: _rotationController,
+              child: Image.asset(
+                'assets/images/loading.png',
+                width: 300,
+                height: 300,
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'CHARGEMENT...',
+              style: TextStyle(
+                fontFamily: 'DelaGothicOne',
+                fontSize: 24,
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
           ],
         ),
       );
@@ -132,43 +238,39 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
     if (_errorMessage != null) {
       return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 64,
-                color: Colors.red[300],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                _errorMessage!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _performSearch,
-                child: const Text('Réessayer'),
-              ),
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red[300],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _errorMessage!,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: _performSearch,
+              child: const Text('Réessayer'),
+            ),
+          ],
         ),
       );
     }
 
     final results = _searchResults!;
-    
+
     // This should only be reached if there are multiple results
     if (results.length > 1) {
       return ListView.builder(
-        padding: const EdgeInsets.all(16.0),
         itemCount: results.length,
         itemBuilder: (context, index) {
           return Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
+            padding: EdgeInsets.zero,
             child: ItemCard(
               item: results[index],
               onTap: () {
