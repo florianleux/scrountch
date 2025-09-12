@@ -233,11 +233,11 @@ class Item {
     final parts = <String>[room];
     if (location != null && location!.isNotEmpty) {
       parts.add(location!);
-      if (subLocation != null && subLocation!.isNotEmpty) {
-        parts.add(subLocation!);
-      }
     }
-    return parts.join(' → ');
+    if (subLocation != null && subLocation!.isNotEmpty) {
+      parts.add(subLocation!);
+    }
+    return parts.join('\n↓\n');
   }
 
   // Get full category string "Catégorie → Sous-catégorie"
