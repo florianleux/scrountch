@@ -162,7 +162,7 @@ class Item {
     );
   }
 
-  // Generate search keywords from all relevant fields
+  // Generate search keywords from name only
   static List<String> _generateSearchKeywords({
     required String name,
     required String room,
@@ -175,19 +175,8 @@ class Item {
   }) {
     final keywords = <String>{};
 
-    // Diviser tous les champs en mots
+    // Diviser seulement le nom en mots
     keywords.addAll(_splitToKeywords(name));
-    keywords.addAll(_splitToKeywords(room));
-    if (location != null) keywords.addAll(_splitToKeywords(location));
-    if (subLocation != null) keywords.addAll(_splitToKeywords(subLocation));
-    if (owner != null) keywords.addAll(_splitToKeywords(owner));
-    if (mainCategory != null) keywords.addAll(_splitToKeywords(mainCategory));
-    if (subCategory != null) keywords.addAll(_splitToKeywords(subCategory));
-    if (tags != null) {
-      for (final tag in tags) {
-        keywords.addAll(_splitToKeywords(tag));
-      }
-    }
 
     return keywords.toList();
   }

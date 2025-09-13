@@ -46,10 +46,11 @@ class FirebaseService {
   Future<Item> createItem(Item item) async {
     try {
       await _ensureAuthenticated();
-      
-      final docRef = await _firestore.collection('items').add(item.toFirestore());
+
+      final docRef =
+          await _firestore.collection('items').add(item.toFirestore());
       print("FirebaseService: Item created with ID - ${docRef.id}");
-      
+
       // Return the item with the new ID
       return Item(
         id: docRef.id,
@@ -76,7 +77,7 @@ class FirebaseService {
   Future<Item?> getItem(String id) async {
     try {
       await _ensureAuthenticated();
-      
+
       final doc = await _firestore.collection('items').doc(id).get();
       if (doc.exists) {
         return Item.fromFirestore(doc);
@@ -92,8 +93,11 @@ class FirebaseService {
   Future<void> updateItem(Item item) async {
     try {
       await _ensureAuthenticated();
-      
-      await _firestore.collection('items').doc(item.id).update(item.toFirestore());
+
+      await _firestore
+          .collection('items')
+          .doc(item.id)
+          .update(item.toFirestore());
       print("FirebaseService: Item updated - ${item.id}");
     } catch (e) {
       print("FirebaseService: Update item error - $e");
@@ -105,7 +109,7 @@ class FirebaseService {
   Future<void> deleteItem(String id) async {
     try {
       await _ensureAuthenticated();
-      
+
       await _firestore.collection('items').doc(id).delete();
       print("FirebaseService: Item deleted - $id");
     } catch (e) {
@@ -118,15 +122,38 @@ class FirebaseService {
   Future<List<Item>> searchItems(String query) async {
     try {
       await _ensureAuthenticated();
-      
+
+      // Diviser la requête en mots individuels
+      final searchWords = query
+          .toLowerCase()
+          .replaceAll(RegExp(r'[^\w\s]'), ' ')
+          .split(' ')
+          .where((word) => word.length > 1)
+          .toList();
+
+      if (searchWords.isEmpty) {
+        return [];
+      }
+
+      // Firestore ne supporte qu'un seul arrayContains par requête
+      // On cherche avec le premier mot et on filtre ensuite
       final querySnapshot = await _firestore
           .collection('items')
-          .where('searchKeywords', arrayContains: query.toLowerCase())
+          .where('searchKeywords', arrayContains: searchWords.first)
           .get();
 
-      final items = querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
-      print("FirebaseService: Search found ${items.length} items for query: $query");
-      return items;
+      final allItems =
+          querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
+
+      // Filtrer localement pour que tous les mots soient présents
+      final filteredItems = allItems.where((item) {
+        return searchWords.every((word) =>
+            item.searchKeywords.any((keyword) => keyword.contains(word)));
+      }).toList();
+
+      print(
+          "FirebaseService: Search found ${filteredItems.length} items for query: $query (${searchWords.length} words)");
+      return filteredItems;
     } catch (e) {
       print("FirebaseService: Search error - $e");
       throw Exception(AppConstants.ERROR_LOAD_FAILED);
@@ -143,7 +170,7 @@ class FirebaseService {
   }) async {
     try {
       await _ensureAuthenticated();
-      
+
       Query query = _firestore.collection('items');
 
       if (room != null) {
@@ -163,7 +190,8 @@ class FirebaseService {
       }
 
       final querySnapshot = await query.get();
-      final items = querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
+      final items =
+          querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
       print("FirebaseService: Filter query returned ${items.length} items");
       return items;
     } catch (e) {
@@ -179,11 +207,13 @@ class FirebaseService {
   }) async {
     try {
       await _ensureAuthenticated();
-      
-      Query query = _firestore.collection('items').orderBy('updatedAt', descending: true);
+
+      Query query =
+          _firestore.collection('items').orderBy('updatedAt', descending: true);
 
       if (startAfter != null) {
-        final lastDoc = await _firestore.collection('items').doc(startAfter).get();
+        final lastDoc =
+            await _firestore.collection('items').doc(startAfter).get();
         if (lastDoc.exists) {
           query = query.startAfterDocument(lastDoc);
         }
@@ -192,7 +222,8 @@ class FirebaseService {
       query = query.limit(limit);
 
       final querySnapshot = await query.get();
-      final items = querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
+      final items =
+          querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
       print("FirebaseService: Loaded ${items.length} items");
       return items;
     } catch (e) {
@@ -221,13 +252,13 @@ class FirebaseService {
     try {
       // Return predefined subcategories from constants
       final subcategories = AppConstants.SUBCATEGORIES[mainCategory] ?? [];
-      
+
       // TODO: Could also fetch dynamic subcategories from Firestore
       // final querySnapshot = await _firestore
       //     .collection('subcategories')
       //     .doc(mainCategory)
       //     .get();
-      
+
       return subcategories;
     } catch (e) {
       print("FirebaseService: Get subcategories error - $e");
@@ -235,10 +266,11 @@ class FirebaseService {
     }
   }
 
-  Future<void> addCustomSubcategory(String mainCategory, String subcategory) async {
+  Future<void> addCustomSubcategory(
+      String mainCategory, String subcategory) async {
     try {
       await _ensureAuthenticated();
-      
+
       // TODO: Save custom subcategory to Firestore
       // await _firestore
       //     .collection('subcategories')
@@ -246,8 +278,9 @@ class FirebaseService {
       //     .update({
       //   'items': FieldValue.arrayUnion([subcategory])
       // });
-      
-      print("FirebaseService: Custom subcategory added - $mainCategory: $subcategory");
+
+      print(
+          "FirebaseService: Custom subcategory added - $mainCategory: $subcategory");
     } catch (e) {
       print("FirebaseService: Add subcategory error - $e");
     }
@@ -262,16 +295,21 @@ class FirebaseService {
   Future<Map<String, int>> getItemStats() async {
     try {
       await _ensureAuthenticated();
-      
+
       final querySnapshot = await _firestore.collection('items').get();
-      final items = querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
-      
+      final items =
+          querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
+
       final stats = {
         'total': items.length,
         'rooms': items.map((item) => item.room).toSet().length,
-        'categories': items.map((item) => item.mainCategory).where((cat) => cat != null).toSet().length,
+        'categories': items
+            .map((item) => item.mainCategory)
+            .where((cat) => cat != null)
+            .toSet()
+            .length,
       };
-      
+
       print("FirebaseService: Stats - $stats");
       return stats;
     } catch (e) {
