@@ -54,10 +54,10 @@ fontSize: 32px, fontWeight: w900, color: Colors.black
 fontSize: 18px, fontWeight: w900, color: Colors.black
 
 // Boutons
-fontSize: 16px, fontWeight: w700, color: Colors.black
+fontSize: 16px, fontWeight: w500,color: Colors.black
 
 // Labels et placeholders
-fontWeight: w700, color: Colors.black / Colors.black54
+fontWeight: w500, color: Colors.black / Colors.black54
 ```
 
 ## 🎯 Composants UI
@@ -172,7 +172,7 @@ OutlinedButton(
     style: TextStyle(
       color: Colors.black,
       fontSize: 16,
-      fontWeight: FontWeight.w700,
+      fontWeight: FontWeight.w500
     ),
   ),
 )
@@ -193,7 +193,7 @@ ElevatedButton(
     style: TextStyle(
       color: Color(0xFFCOULEUR_FOND), // Couleur du fond de l'écran
       fontSize: 16,
-      fontWeight: FontWeight.w700,
+      fontWeight: FontWeight.w500
     ),
   ),
 )
@@ -339,10 +339,10 @@ fontSize: 32px, fontWeight: w900, color: Colors.black
 fontSize: 18px, fontWeight: w900, color: Colors.black
 
 // Boutons
-fontSize: 16px, fontWeight: w700, color: Colors.black
+fontSize: 16px, fontWeight: w500,color: Colors.black
 
 // Labels et placeholders
-fontWeight: w700, color: Colors.black / Colors.black54
+fontWeight: w500,color: Colors.black / Colors.black54
 ```
 
 ## 🎯 Composants UI
@@ -457,7 +457,7 @@ OutlinedButton(
     style: TextStyle(
       color: Colors.black,
       fontSize: 16,
-      fontWeight: FontWeight.w700,
+      fontWeight: FontWeight.w500
     ),
   ),
 )
@@ -478,7 +478,7 @@ ElevatedButton(
     style: TextStyle(
       color: Color(0xFFCOULEUR_FOND), // Couleur du fond de l'écran
       fontSize: 16,
-      fontWeight: FontWeight.w700,
+      fontWeight: FontWeight.w500
     ),
   ),
 )

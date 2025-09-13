@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'search_screen.dart';
-import 'manage_screen.dart';
+import 'item_form_screen.dart';
 import '../theme/app_theme.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -100,10 +100,14 @@ class HomeScreen extends StatelessWidget {
                   SizedBox(
                     height: _buttonHeight,
                     child: ElevatedButton(
-                      onPressed: () =>
-                          _navigateToScreen(context, const ManageScreen()),
+                      onPressed: () => _navigateToScreen(
+                          context,
+                          const ItemFormScreen(
+                            isEditMode: false,
+                          )),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
+                        backgroundColor: AppTheme.primaryYellow,
+                        side: const BorderSide(color: Colors.black, width: 1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -115,13 +119,13 @@ class HomeScreen extends StatelessWidget {
                             'assets/images/store_icon.png',
                             width: _iconSize,
                             height: _iconSize,
-                            color: AppTheme.primaryYellow, // Couleur jaune
+                            color: Colors.black, // Couleur noire
                           ),
                           const SizedBox(width: 8),
                           Text(
                             'RANGER',
                             style: AppTheme.buttonTextStyle.copyWith(
-                              color: AppTheme.primaryYellow, // Couleur jaune
+                              color: Colors.black, // Couleur noire
                             ),
                           ),
                         ],

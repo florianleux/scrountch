@@ -52,7 +52,7 @@ class ScrountchApp extends StatelessWidget {
           ),
           headlineLarge: TextStyle(
             fontSize: 24,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w500,
             color: Color(0xFF1A202C),
             height: 1.2,
           ),
@@ -100,7 +100,7 @@ class ScrountchApp extends StatelessWidget {
           foregroundColor: Color(0xFF1A202C),
           titleTextStyle: TextStyle(
             fontSize: 18,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w500,
             color: Color(0xFF1A202C),
           ),
         ),
@@ -122,18 +122,18 @@ class ScrountchApp extends StatelessWidget {
         ),
         inputDecorationTheme: InputDecorationTheme(
           contentPadding: const EdgeInsets.symmetric(
-            vertical: 20, // Padding vertical pour TOUS les inputs
+            vertical: 10, // Padding vertical pour TOUS les inputs
             horizontal: 20, // Padding horizontal pour TOUS les inputs
           ),
           labelStyle: const TextStyle(
             fontFamily: 'Chivo', // ICI pour la police des labels
-            fontSize: 22, // ICI pour la taille des labels
+            fontSize: 18, // ICI pour la taille des labels
             fontWeight: FontWeight.w300,
             color: Colors.black,
           ),
           hintStyle: const TextStyle(
             fontFamily: 'Chivo', // ICI pour la police des labels
-            fontSize: 22, // ICI pour la taille des labels
+            fontSize: 18, // ICI pour la taille des labels
             fontWeight: FontWeight.w300,
             color: Colors.black,
           ),
@@ -153,18 +153,14 @@ class ScrountchApp extends StatelessWidget {
           fillColor: Colors.transparent,
           filled: true,
           // Style pour le texte saisi
-          floatingLabelStyle: const TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w700,
-          ),
+          floatingLabelStyle:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
           prefixIconColor: Colors.black,
           suffixIconColor: Colors.black,
         ),
         dropdownMenuTheme: const DropdownMenuThemeData(
-          textStyle: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w700,
-          ),
+          textStyle:
+              TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
         ),
         cardTheme: CardTheme(
           elevation: 0,

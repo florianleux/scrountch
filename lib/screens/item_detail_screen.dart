@@ -88,7 +88,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontFamily: 'DelaGothicOne',
-                            fontSize: 40,
+                            fontSize: 30,
                             color: Colors.black,
                             height: 1.1,
                           ),
@@ -108,7 +108,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontFamily: 'Chivo',
-                            fontSize: 14,
+                            fontSize: 12,
                             color: Colors.black,
                           ),
                           maxLines: 1,
@@ -128,7 +128,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontFamily: 'Chivo',
-                            fontSize: 24,
+                            fontSize: 20,
                             color: Colors.black,
                           ),
                           maxLines: 6,

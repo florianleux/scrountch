@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
 import 'search_screen.dart';
 import 'item_form_screen.dart';
 import 'home_screen.dart';
@@ -15,132 +14,202 @@ class NoResultsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFDD00), // Fond jaune (comme accueil)
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          'AUCUN RÉSULTAT',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w900,
+      backgroundColor: const Color(0xFFFFE333), // Fond jaune uniforme
+      body: Stack(
+        children: [
+          // Image de fond par-dessus le fond jaune
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.2,
+              child: Image.asset(
+                'assets/images/search_bg.png',
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // SizedBox(50px)
-            const SizedBox(height: 50),
-            
-            // Icon(Icons.search_off, size: 80, color: grey)
-            const Icon(
-              Icons.search_off,
-              size: 80,
-              color: Colors.grey,
-            ),
-            
-            // SizedBox(30px)
-            const SizedBox(height: 30),
-            
-            // Text "Aucun objet trouvé" (centré, headline6)
-            Text(
-              'AUCUN OBJET TROUVÉ',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.black,
-                fontWeight: FontWeight.w900,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            
-            // SizedBox(50px)
-            const SizedBox(height: 50),
-            
-            // OutlinedButton "Changer la recherche" (pleine largeur)
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SearchScreen(),
+          // Contenu principal
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Column(
+                children: [
+                  // Header avec retour et logo
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Image.asset(
+                            'assets/images/back_icon.png',
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HomeScreen()),
+                              (route) => false,
+                            );
+                          },
+                          child: Image.asset(
+                            'assets/images/home_icon.png',
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                      ],
                     ),
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.black, width: 2),
-                  backgroundColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
                   ),
-                ),
-                child: const Text(
-                  'CHANGER LA RECHERCHE',
-                  style: TextStyle(fontFamily: 'DelaGothicOne', color: Colors.black, fontSize: 16),
-                ),
-              ),
-            ),
-            
-            // SizedBox(20px)
-            const SizedBox(height: 20),
-            
-            // OutlinedButton "Créer un nouvel objet" (pleine largeur)
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ItemFormScreen(
-                        isEditMode: false,
-                        initialName: searchQuery, // Pre-fill with search query
+                  const SizedBox(height: 40),
+
+                  // Titre formaté comme les autres pages
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Text(
+                      'AUCUN RÉSULTAT',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontFamily: 'DelaGothicOne',
+                        fontSize: 38,
+                        color: Colors.black,
+                        height: 1.1,
                       ),
                     ),
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.black, width: 2),
-                  backgroundColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
                   ),
-                ),
-                child: const Text(
-                  'CRÉER UN NOUVEL OBJET',
-                  style: TextStyle(fontFamily: 'DelaGothicOne', color: Colors.black, fontSize: 16),
-                ),
+
+                  const SizedBox(height: 60),
+
+                  // Contenu principal
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Icon de chargement
+                          Image.asset(
+                            'assets/images/loading.png',
+                            width: 300,
+                            height: 300,
+                          ),
+
+                          const SizedBox(height: 30),
+
+                          // Message
+                          Text(
+                            'AUCUN OBJET TROUVÉ',
+                            style: const TextStyle(
+                              fontFamily: 'DelaGothicOne',
+                              fontSize: 24,
+                              color: Colors.black,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+
+                          const SizedBox(height: 60),
+
+                          // Bouton CHANGER LA RECHERCHE
+                          SizedBox(
+                            height: 75,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const SearchScreen(),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/search_icon.png',
+                                    width: 45,
+                                    height: 45,
+                                    color: const Color(0xFFFFE333),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    'CHANGER LA RECHERCHE',
+                                    style: TextStyle(
+                                      fontFamily: 'DelaGothicOne',
+                                      color: Color(0xFFFFE333),
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // Bouton RANGER CET OBJET
+                          SizedBox(
+                            height: 75,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ItemFormScreen(
+                                      isEditMode: false,
+                                      initialName: searchQuery,
+                                    ),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFFE333),
+                                side: const BorderSide(
+                                    color: Colors.black, width: 1),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/plus_icon.png',
+                                    width: 45,
+                                    height: 45,
+                                    color: Colors.black,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    'RANGER CET OBJET',
+                                    style: TextStyle(
+                                      fontFamily: 'DelaGothicOne',
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            
-            // Spacer
-            const Spacer(),
-            
-            // TextButton "Retour à l'accueil"
-            TextButton(
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomeScreen(),
-                  ),
-                  (route) => false,
-                );
-              },
-              child: const Text(
-                'Retour à l\'accueil',
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

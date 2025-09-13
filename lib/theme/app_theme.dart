@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // Couleurs centralisées
-  static const Color primaryYellow = Color(0xFFFFDD00);
+  static const Color primaryYellow = Color(0xFFFFE333);
   static const Color mediumYellow = Color(0xFFFFE966);
   static const Color textBlack = Colors.black;
 
@@ -47,7 +47,7 @@ class AppTheme {
   static const TextStyle textFieldStyle = TextStyle(
     fontFamily: 'Chivo',
     color: textBlack,
-    fontSize: 22,
+    fontSize: 12,
     fontWeight: FontWeight.normal,
   );
 

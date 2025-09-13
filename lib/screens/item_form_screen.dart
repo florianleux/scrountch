@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import '../models/item.dart';
 import '../services/firebase_service.dart';
 import '../constants/app_constants.dart';
-import '../theme/app_theme.dart';
 import '../constants/location_data.dart';
 import 'item_detail_screen.dart';
+import 'home_screen.dart';
 
 class ItemFormScreen extends StatefulWidget {
   final bool isEditMode;
@@ -289,11 +289,19 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Rester', style: TextStyle(fontFamily: 'DelaGothicOne', color: Colors.black, fontSize: 16)),
+                  child: const Text('Rester',
+                      style: TextStyle(
+                          fontFamily: 'DelaGothicOne',
+                          color: Colors.black,
+                          fontSize: 16)),
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Quitter', style: TextStyle(fontFamily: 'DelaGothicOne', color: Colors.black, fontSize: 16)),
+                  child: const Text('Quitter',
+                      style: TextStyle(
+                          fontFamily: 'DelaGothicOne',
+                          color: Colors.black,
+                          fontSize: 16)),
                 ),
               ],
             ),
@@ -317,491 +325,610 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        backgroundColor: const Color(0xFFFFEF99), // Fond jaune très clair
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: Text(
-            widget.isEditMode ? 'MODIFIER OBJET' : 'NOUVEL OBJET',
-            style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w900,
+        backgroundColor:
+            const Color(0xFFFFE333), // Fond jaune clair comme search_screen
+        body: Stack(
+          children: [
+            // Image de fond par-dessus le fond jaune
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.2,
+                child: Image.asset(
+                  'assets/images/search_bg.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
-          ),
-          iconTheme: const IconThemeData(
-            color: Colors.black,
-          ),
-        ),
-        body: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Nom (obligatoire)
-                TextFormField(
-                  controller: _nameController,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  decoration: const InputDecoration(
-                    labelText: 'Nom de l\'objet *',
-                    hintText: 'Ex: Télévision Samsung',
-                  ),
-                  maxLength: AppConstants.MAX_NAME_LENGTH,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return AppConstants.ERROR_NAME_REQUIRED;
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 20),
-
-                // Section Localisation en cascade
-                const Text(
-                  'LOCALISATION *',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.black,
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Pièce (obligatoire)
-                DropdownButtonFormField<String>(
-                  value: _selectedRoom,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  iconEnabledColor: Colors.black,
-                  decoration: const InputDecoration(
-                    labelText: 'Pièce *',
-                    labelStyle: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    prefixIcon: Icon(Icons.room, color: Colors.black),
-                  ),
-                  dropdownColor: const Color(0xFFFFEF99),
-                  items: LocationData.getRooms().map((room) {
-                    return DropdownMenuItem(
-                      value: room,
-                      child: Text(
-                        room,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedRoom = value;
-                      _hasUnsavedChanges = true;
-                    });
-                    if (value != null) {
-                      _updateLocationsForRoom(value);
-                    }
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return AppConstants.ERROR_ROOM_REQUIRED;
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 16),
-
-                // Location (optionnel)
-                DropdownButtonFormField<String>(
-                  value: _selectedLocation,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  iconEnabledColor: Colors.black,
-                  decoration: const InputDecoration(
-                    labelText: 'Meuble/Zone',
-                    labelStyle: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    prefixIcon: Icon(Icons.chair, color: Colors.black),
-                  ),
-                  dropdownColor: const Color(0xFFFFEF99),
-                  items: _availableLocations.map((location) {
-                    return DropdownMenuItem(
-                      value: location,
-                      child: Text(
-                        location,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: _selectedRoom == null
-                      ? null
-                      : (value) {
-                          setState(() {
-                            _selectedLocation = value;
-                            _hasUnsavedChanges = true;
-                          });
-                          if (value != null && _selectedRoom != null) {
-                            _updateSubLocationsForLocation(
-                                _selectedRoom!, value);
-                          }
-                        },
-                ),
-
-                const SizedBox(height: 16),
-
-                // Sous-location (optionnel)
-                DropdownButtonFormField<String>(
-                  value: _selectedSubLocation,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  iconEnabledColor: Colors.black,
-                  decoration: const InputDecoration(
-                    labelText: 'Emplacement précis',
-                    labelStyle: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    prefixIcon: Icon(Icons.place, color: Colors.black),
-                  ),
-                  dropdownColor: const Color(0xFFFFEF99),
-                  items: _availableSubLocations.map((subLocation) {
-                    return DropdownMenuItem(
-                      value: subLocation,
-                      child: Text(
-                        subLocation,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: _selectedLocation == null
-                      ? null
-                      : (value) {
-                          setState(() {
-                            _selectedSubLocation = value;
-                            _hasUnsavedChanges = true;
-                          });
-                        },
-                ),
-
-                const SizedBox(height: 20),
-
-                // Propriétaire
-                DropdownButtonFormField<String>(
-                  value: _selectedOwner,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  iconEnabledColor: Colors.black,
-                  decoration: const InputDecoration(
-                    labelText: 'Propriétaire',
-                    labelStyle: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  dropdownColor: const Color(0xFFFFEF99),
-                  items: [
-                    const DropdownMenuItem<String>(
-                      value: null,
-                      child: Text(
-                        'Aucun',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    ...AppConstants.OWNERS.map((owner) {
-                      return DropdownMenuItem(
-                        value: owner,
-                        child: Text(
-                          owner,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      );
-                    }),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedOwner = value;
-                      _hasUnsavedChanges = true;
-                    });
-                  },
-                ),
-
-                const SizedBox(height: 20),
-
-                // Catégorie principale
-                DropdownButtonFormField<String>(
-                  value: _selectedMainCategory,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  iconEnabledColor: Colors.black,
-                  decoration: const InputDecoration(
-                    labelText: 'Catégorie',
-                    labelStyle: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  dropdownColor: const Color(0xFFFFEF99),
-                  items: [
-                    const DropdownMenuItem<String>(
-                      value: null,
-                      child: Text(
-                        'Aucune',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    ...AppConstants.MAIN_CATEGORIES.map((category) {
-                      return DropdownMenuItem(
-                        value: category,
-                        child: Text(
-                          category,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      );
-                    }),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedMainCategory = value;
-                      _hasUnsavedChanges = true;
-                    });
-                    _updateSubCategoriesForMainCategory(value);
-                  },
-                ),
-
-                const SizedBox(height: 20),
-
-                // Sous-catégorie (conditionnelle)
-                if (_selectedMainCategory != null) ...[
-                  DropdownButtonFormField<String>(
-                    value: _selectedSubCategory,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    iconEnabledColor: Colors.black,
-                    decoration: const InputDecoration(
-                      labelText: 'Sous-catégorie',
-                      labelStyle: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    dropdownColor: const Color(0xFFFFEF99),
-                    items: [
-                      const DropdownMenuItem<String>(
-                        value: null,
-                        child: Text(
-                          'Aucune',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      ..._availableSubCategories.map((subCategory) {
-                        return DropdownMenuItem(
-                          value: subCategory,
-                          child: Text(
-                            subCategory,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        );
-                      }),
-                      const DropdownMenuItem<String>(
-                        value: 'Autre...',
-                        child: Text(
-                          'Autre...',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedSubCategory = value;
-                        _showCustomSubCategory = (value == 'Autre...');
-                        _hasUnsavedChanges = true;
-                      });
-                    },
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Champ personnalisé si "Autre..."
-                  if (_showCustomSubCategory) ...[
-                    TextFormField(
-                      controller: _customSubcategoryController,
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w700,
-                      ),
-                      decoration: const InputDecoration(
-                        labelText: 'Sous-catégorie personnalisée',
-                      ),
-                      maxLength: AppConstants.MAX_SUBCATEGORY_LENGTH,
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ],
-
-                // Tags
-                TextFormField(
-                  controller: _tagsController,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  decoration: const InputDecoration(
-                    labelText: 'Tags',
-                    hintText: 'Séparés par des virgules (max 5)',
-                  ),
-                  maxLength: 150,
-                  validator: _validateTags,
-                ),
-
-                const SizedBox(height: 20),
-
-                // Description
-                TextFormField(
-                  controller: _descriptionController,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                  ),
-                  maxLines: 4,
-                  maxLength: AppConstants.MAX_DESCRIPTION_LENGTH,
-                ),
-
-                const SizedBox(height: 30),
-
-                // Boutons
-                Row(
+            // Contenu principal
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(vertical: 24.0),
+                child: Column(
                   children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 56,
-                        child: OutlinedButton(
-                          onPressed: _isLoading
-                              ? null
-                              : () async {
-                                  if (await _onWillPop()) {
-                                    if (mounted) Navigator.pop(context);
-                                  }
-                                },
-                          style: OutlinedButton.styleFrom(
-                            side:
-                                const BorderSide(color: Colors.black, width: 2),
-                            backgroundColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                    // Header avec retour et logo
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Image.asset(
+                              'assets/images/back_icon.png',
+                              width: 50,
+                              height: 50,
                             ),
                           ),
-                          child: const Text(
-                            'ANNULER',
-                            style: TextStyle(fontFamily: 'DelaGothicOne', color: Colors.black, fontSize: 16),
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const HomeScreen()),
+                                (route) => false,
+                              );
+                            },
+                            child: Image.asset(
+                              'assets/images/home_icon.png',
+                              width: 50,
+                              height: 50,
+                            ),
                           ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+
+                    // Titre formaté comme les autres pages
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Text(
+                        widget.isEditMode
+                            ? 'MODIFIER OBJET'
+                            : 'RANGER UN OBJET',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontFamily: 'DelaGothicOne',
+                          fontSize: 38,
+                          color: Colors.black,
+                          height: 1.1,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: SizedBox(
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _saveItem,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+
+                    const SizedBox(height: 30),
+
+                    // Contenu du formulaire
+                    Form(
+                      key: _formKey,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Nom (obligatoire)
+                            TextFormField(
+                              controller: _nameController,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              decoration: InputDecoration(
+                                labelText: 'Nom de l\'objet *',
+                                hintText: 'Ex: Télévision Samsung',
+                              ),
+                              maxLength: AppConstants.MAX_NAME_LENGTH,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return AppConstants.ERROR_NAME_REQUIRED;
+                                }
+                                return null;
+                              },
                             ),
-                          ),
-                          child: _isLoading
-                              ? const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                Color(0xFFFFEF99)),
+
+                            const SizedBox(height: 20),
+
+                            // Catégorie principale
+                            DropdownButtonFormField<String>(
+                              value: _selectedMainCategory,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              iconEnabledColor: Colors.black,
+                              decoration: InputDecoration(
+                                labelText: 'Catégorie *',
+                                labelStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              dropdownColor: const Color(0xFFFFE333),
+                              items:
+                                  AppConstants.MAIN_CATEGORIES.map((category) {
+                                return DropdownMenuItem(
+                                  value: category,
+                                  child: Text(
+                                    category,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Veuillez sélectionner une catégorie';
+                                }
+                                return null;
+                              },
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedMainCategory = value;
+                                  _hasUnsavedChanges = true;
+                                });
+                                _updateSubCategoriesForMainCategory(value);
+                              },
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // Sous-catégorie (conditionnelle)
+                            if (_selectedMainCategory != null) ...[
+                              DropdownButtonFormField<String>(
+                                value: _selectedSubCategory,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                iconEnabledColor: Colors.black,
+                                decoration: InputDecoration(
+                                  labelText: 'Sous-catégorie',
+                                  labelStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                dropdownColor: const Color(0xFFFFE333),
+                                items: [
+                                  const DropdownMenuItem<String>(
+                                    value: null,
+                                    child: Text(
+                                      'Aucune',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 18,
                                       ),
                                     ),
-                                    SizedBox(width: 8),
+                                  ),
+                                  ..._availableSubCategories.map((subCategory) {
+                                    return DropdownMenuItem(
+                                      value: subCategory,
+                                      child: Text(
+                                        subCategory,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                  const DropdownMenuItem<String>(
+                                    value: 'Autre...',
+                                    child: Text(
+                                      'Autre...',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedSubCategory = value;
+                                    _showCustomSubCategory =
+                                        (value == 'Autre...');
+                                    _hasUnsavedChanges = true;
+                                  });
+                                },
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              // Champ personnalisé si "Autre..."
+                              if (_showCustomSubCategory) ...[
+                                TextFormField(
+                                  controller: _customSubcategoryController,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  decoration: InputDecoration(
+                                    labelText: 'Sous-catégorie personnalisée',
+                                  ),
+                                  maxLength:
+                                      AppConstants.MAX_SUBCATEGORY_LENGTH,
+                                ),
+                                const SizedBox(height: 20),
+                              ],
+                            ],
+
+                            const SizedBox(height: 20),
+
+                            // Section Localisation en cascade
+                            const Text(
+                              'LOCALISATION *',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontFamily: 'DelaGothicOne',
+                                color: Colors.black,
+                              ),
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Pièce (obligatoire)
+                            DropdownButtonFormField<String>(
+                              value: _selectedRoom,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              iconEnabledColor: Colors.black,
+                              decoration: InputDecoration(
+                                labelText: 'Pièce *',
+                                labelStyle: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                prefixIcon: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Image.asset(
+                                    'assets/images/room_icon.png',
+                                    width: 30,
+                                    height: 30,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              dropdownColor: const Color(0xFFFFE333),
+                              items: LocationData.getRooms().map((room) {
+                                return DropdownMenuItem(
+                                  value: room,
+                                  child: Text(
+                                    room,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedRoom = value;
+                                  _hasUnsavedChanges = true;
+                                });
+                                if (value != null) {
+                                  _updateLocationsForRoom(value);
+                                }
+                              },
+                              validator: (value) {
+                                if (value == null) {
+                                  return AppConstants.ERROR_ROOM_REQUIRED;
+                                }
+                                return null;
+                              },
+                            ),
+
+                            // Location (conditionnelle)
+                            if (_selectedRoom != null) ...[
+                              const SizedBox(height: 16),
+
+                              DropdownButtonFormField<String>(
+                                value: _selectedLocation,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                iconEnabledColor: Colors.black,
+                                decoration: InputDecoration(
+                                  labelText: 'Meuble/Zone',
+                                  labelStyle: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  prefixIcon: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Image.asset(
+                                      'assets/images/shelf_icon.png',
+                                      width: 30,
+                                      height: 30,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                dropdownColor: const Color(0xFFFFE333),
+                                items: _availableLocations.map((location) {
+                                  return DropdownMenuItem(
+                                    value: location,
+                                    child: Text(
+                                      location,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedLocation = value;
+                                    _hasUnsavedChanges = true;
+                                  });
+                                  if (value != null && _selectedRoom != null) {
+                                    _updateSubLocationsForLocation(
+                                        _selectedRoom!, value);
+                                  }
+                                },
+                              ),
+
+                              // Sous-location (conditionnelle)
+                              if (_selectedLocation != null) ...[
+                                const SizedBox(height: 16),
+                                DropdownButtonFormField<String>(
+                                  value: _selectedSubLocation,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  iconEnabledColor: Colors.black,
+                                  decoration: InputDecoration(
+                                    labelText: 'Emplacement précis',
+                                    labelStyle: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    prefixIcon: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Image.asset(
+                                        'assets/images/spot_icon.png',
+                                        width: 30,
+                                        height: 30,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  dropdownColor: const Color(0xFFFFE333),
+                                  items:
+                                      _availableSubLocations.map((subLocation) {
+                                    return DropdownMenuItem(
+                                      value: subLocation,
+                                      child: Text(
+                                        subLocation,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedSubLocation = value;
+                                      _hasUnsavedChanges = true;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ],
+
+                            const SizedBox(height: 40),
+
+                            // Propriétaire
+                            DropdownButtonFormField<String>(
+                              value: _selectedOwner,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              iconEnabledColor: Colors.black,
+                              decoration: InputDecoration(
+                                labelText: 'Propriétaire',
+                                labelStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              dropdownColor: const Color(0xFFFFE333),
+                              items: [
+                                const DropdownMenuItem<String>(
+                                  value: null,
+                                  child: Text(
+                                    'Aucun',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                ...AppConstants.OWNERS.map((owner) {
+                                  return DropdownMenuItem(
+                                    value: owner,
+                                    child: Text(
+                                      owner,
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedOwner = value;
+                                  _hasUnsavedChanges = true;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                            // Tags
+                            TextFormField(
+                              controller: _tagsController,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              decoration: InputDecoration(
+                                labelText: 'Tags',
+                                hintText: 'Séparés par des virgules (max 5)',
+                              ),
+                              maxLength: 150,
+                              validator: _validateTags,
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // Description
+                            TextFormField(
+                              controller: _descriptionController,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              decoration: InputDecoration(
+                                labelText: 'Description',
+                              ),
+                              maxLines: 4,
+                              maxLength: AppConstants.MAX_DESCRIPTION_LENGTH,
+                            ),
+
+                            const SizedBox(height: 30),
+
+                            // Boutons
+                            SizedBox(
+                              height: 75,
+                              child: ElevatedButton(
+                                onPressed: _isLoading ? null : _saveItem,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: _isLoading
+                                    ? const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      Color(0xFFFFE333)),
+                                            ),
+                                          ),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            'ENREGISTREMENT...',
+                                            style: TextStyle(
+                                              fontFamily: 'DelaGothicOne',
+                                              color: Color(0xFFFFE333),
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/check_icon.png',
+                                            width: 45,
+                                            height: 45,
+                                            color: const Color(0xFFFFE333),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          const Text(
+                                            'ENREGISTRER',
+                                            style: TextStyle(
+                                              fontFamily: 'DelaGothicOne',
+                                              color: Color(0xFFFFE333),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 10),
+
+                            SizedBox(
+                              height: 75,
+                              child: ElevatedButton(
+                                onPressed: _isLoading
+                                    ? null
+                                    : () async {
+                                        if (await _onWillPop()) {
+                                          if (mounted) Navigator.pop(context);
+                                        }
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFFFE333),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/cross_icon.png',
+                                      width: 45,
+                                      height: 45,
+                                      color: Colors.black,
+                                    ),
+                                    const SizedBox(width: 8),
                                     const Text(
-                                      'CHARGEMENT...',
+                                      'ANNULER',
                                       style: TextStyle(
                                         fontFamily: 'DelaGothicOne',
-                                        color: Color(0xFFFFEF99),
-                                        fontSize: 16,
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ],
-                                )
-                              : const Text(
-                                  'ENREGISTRER',
-                                  style: TextStyle(
-                                    fontFamily: 'DelaGothicOne',
-                                    color: Color(0xFFFFEF99),
-                                    fontSize: 16,
-                                  ),
                                 ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

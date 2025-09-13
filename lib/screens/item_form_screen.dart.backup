@@ -607,7 +607,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                           'ANNULER',
                           style: TextStyle(
                             color: Colors.black,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w500
                           ),
                         ),
                       ),
@@ -640,7 +640,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                                     'CHARGEMENT...',
                                     style: TextStyle(
                                       color: Colors.black,
-                                      fontWeight: FontWeight.w700,
+                                      fontWeight: FontWeight.w500
                                     ),
                                   ),
                                 ],
@@ -649,7 +649,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                                 'ENREGISTRER',
                                 style: TextStyle(
                                   color: Colors.black,
-                                  fontWeight: FontWeight.w700,
+                                  fontWeight: FontWeight.w500
                                 ),
                               ),
                       ),
