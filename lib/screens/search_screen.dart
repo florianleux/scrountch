@@ -127,8 +127,6 @@ class _SearchScreenState extends State<SearchScreen> {
                     controller: _searchController,
                     hintText: 'Nom de l\'objet',
                     labelText: 'Nom de l\'objet',
-                    fillColor: const Color(0xFFFFE333),
-                    filled: true,
                     textInputAction: TextInputAction.search,
                     onFieldSubmitted: (_) => _performSearch(),
                   ),

@@ -24,7 +24,7 @@ class CustomTextField extends StatelessWidget {
     this.textInputAction,
     this.onFieldSubmitted,
     this.onChanged,
-    this.filled = false,
+    this.filled = true, // Par défaut true pour utiliser le fond jaune du thème
     this.fillColor,
   });
 

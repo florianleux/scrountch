@@ -143,32 +143,46 @@ class ScrountchApp extends StatelessWidget {
             fontFamily: 'Chivo',
             fontSize: 18,
             fontWeight: FontWeight.w300,
-            color: Colors.grey,
+            color: Colors.black,
           ),
-          // Style pour le texte saisi
+          // Style pour le label flottant (en focus) - DelaGothicOne
           floatingLabelStyle: const TextStyle(
-            fontFamily: 'Chivo',
+            fontFamily: 'DelaGothicOne',
             fontSize: 16,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.normal,
             color: Colors.black,
           ),
 
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.black, width: 3),
+            borderSide: const BorderSide(color: Colors.black, width: 1),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.black, width: 2),
+            borderSide: const BorderSide(color: Colors.black, width: 1),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: const BorderSide(color: Colors.black, width: 2),
           ),
-          fillColor: Colors.transparent,
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Colors.red, width: 1),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Colors.red, width: 2),
+          ),
+          fillColor: const Color(0xFFFFE333), // Fond jaune uniforme
           filled: true,
           prefixIconColor: Colors.black,
           suffixIconColor: Colors.black,
+          // Style du compteur de caractères
+          counterStyle: const TextStyle(
+            fontSize: 12,
+            color: Colors.black54,
+            fontWeight: FontWeight.w700, // En gras comme les autres compteurs
+          ),
         ),
         dropdownMenuTheme: const DropdownMenuThemeData(
           textStyle:

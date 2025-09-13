@@ -62,7 +62,7 @@ class AppTheme {
   // Style pour les hints
   static const TextStyle hintStyle = TextStyle(
     fontFamily: 'Chivo',
-    color: Color(0xFF666666),
+    color: Colors.black,
     fontSize: 16,
     fontWeight: FontWeight.normal,
   );
