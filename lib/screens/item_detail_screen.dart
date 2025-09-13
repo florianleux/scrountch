@@ -4,6 +4,7 @@ import '../services/firebase_service.dart';
 import 'home_screen.dart';
 import 'item_form_screen.dart';
 import '../widgets/custom_buttons.dart';
+import '../widgets/confirmation_dialog.dart';
 
 class ItemDetailScreen extends StatefulWidget {
   final Item item;
@@ -280,52 +281,10 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   }
 
   void _showDeleteConfirmation(BuildContext context) {
-    showDialog(
+    ConfirmationDialog.showDeleteConfirmation(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFFFFE333),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4),
-          ),
-          title: const Text(
-            'Confirmer la suppression',
-            style: TextStyle(
-              fontFamily: 'DelaGothicOne',
-              fontSize: 18,
-              color: Colors.black,
-            ),
-          ),
-          content: Text(
-            'Êtes-vous sûr de vouloir supprimer "${widget.item.name}" ?',
-            style: const TextStyle(
-              fontFamily: 'Chivo',
-              fontSize: 16,
-              color: Colors.black,
-            ),
-          ),
-          actions: [
-            Column(
-              children: [
-                TertiaryButton(
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                    await _deleteItem();
-                  },
-                  text: 'SUPPRIMER',
-                  iconPath: 'assets/images/trash_icon.png',
-                ),
-                const SizedBox(height: 10),
-                TertiaryButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  text: 'ANNULER',
-                  iconPath: 'assets/images/cross_icon.png',
-                ),
-              ],
-            ),
-          ],
-        );
-      },
+      itemName: widget.item.name,
+      onConfirm: _deleteItem,
     );
   }
 

@@ -41,7 +41,7 @@ class AppButtonStyles {
   /// Style pour les textes des boutons
   static const TextStyle buttonTextStyle = TextStyle(
     fontFamily: 'DelaGothicOne',
-    fontSize: 24, // Uniformisé avec AppTheme (30 * 0.8 = 24)
+    fontSize: 21.6, // Réduit de 10% (24 * 0.9 = 21.6)
     fontWeight: FontWeight.normal,
   );
 

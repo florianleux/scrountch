@@ -7,6 +7,7 @@ import 'item_detail_screen.dart';
 import 'home_screen.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_buttons.dart';
+import '../widgets/confirmation_dialog.dart';
 
 class ItemFormScreen extends StatefulWidget {
   final bool isEditMode;
@@ -283,32 +284,15 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
 
   Future<bool> _onWillPop() async {
     if (_hasUnsavedChanges) {
-      return await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Modifications non sauvées'),
-              content: const Text(AppConstants.CONFIRM_UNSAVED_CHANGES),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Rester',
-                      style: TextStyle(
-                          fontFamily: 'DelaGothicOne',
-                          color: Colors.black,
-                          fontSize: 16)),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Quitter',
-                      style: TextStyle(
-                          fontFamily: 'DelaGothicOne',
-                          color: Colors.black,
-                          fontSize: 16)),
-                ),
-              ],
-            ),
-          ) ??
-          false;
+      return await ConfirmationDialog.show(
+        context: context,
+        title: 'Modifications non sauvées',
+        content: AppConstants.CONFIRM_UNSAVED_CHANGES,
+        confirmText: 'QUITTER',
+        cancelText: 'RESTER',
+        confirmIconPath: 'assets/images/cross_icon.png',
+        cancelIconPath: 'assets/images/check_icon.png',
+      );
     }
     return true;
   }
