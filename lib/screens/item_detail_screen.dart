@@ -3,6 +3,7 @@ import '../models/item.dart';
 import '../services/firebase_service.dart';
 import 'home_screen.dart';
 import 'item_form_screen.dart';
+import '../widgets/custom_buttons.dart';
 
 class ItemDetailScreen extends StatefulWidget {
   final Item item;
@@ -239,81 +240,29 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       child: Column(
                         children: [
                           // Bouton MODIFIER
-                          SizedBox(
-                            height: 75,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ItemFormScreen(
-                                      isEditMode: true,
-                                      existingItem: widget.item,
-                                    ),
+                          PrimaryButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ItemFormScreen(
+                                    isEditMode: true,
+                                    existingItem: widget.item,
                                   ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    'assets/images/pen_icon.png',
-                                    width: 45,
-                                    height: 45,
-                                    color: const Color(0xFFFFE333),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Text(
-                                    'MODIFIER',
-                                    style: TextStyle(
-                                      color: Color(0xFFFFE333),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                              );
+                            },
+                            text: 'MODIFIER',
+                            iconPath: 'assets/images/pen_icon.png',
                           ),
 
                           const SizedBox(height: 16),
 
                           // Bouton SUPPRIMER
-                          SizedBox(
-                            height: 75,
-                            child: ElevatedButton(
-                              onPressed: () => _showDeleteConfirmation(context),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFFE333),
-                                side: const BorderSide(
-                                    color: Colors.black, width: 1),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    'assets/images/trash_icon.png',
-                                    width: 45,
-                                    height: 45,
-                                    color: Colors.black,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Text(
-                                    'SUPPRIMER',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          SecondaryButton(
+                            onPressed: () => _showDeleteConfirmation(context),
+                            text: 'SUPPRIMER',
+                            iconPath: 'assets/images/trash_icon.png',
                           ),
                         ],
                       ),
@@ -358,67 +307,19 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           actions: [
             Column(
               children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      Navigator.of(context).pop();
-                      await _deleteItem();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFE333),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/images/trash_icon.png',
-                          width: 40,
-                          height: 40,
-                          color: Colors.black,
-                        ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'SUPPRIMER',
-                          style: TextStyle(
-                            fontFamily: 'DelaGothicOne',
-                            fontSize: 14,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                TertiaryButton(
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    await _deleteItem();
+                  },
+                  text: 'SUPPRIMER',
+                  iconPath: 'assets/images/trash_icon.png',
                 ),
                 const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFE333),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/images/cross_icon.png',
-                          width: 40,
-                          height: 40,
-                          color: Colors.black,
-                        ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'ANNULER',
-                          style: TextStyle(
-                            fontFamily: 'DelaGothicOne',
-                            fontSize: 14,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                TertiaryButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  text: 'ANNULER',
+                  iconPath: 'assets/images/cross_icon.png',
                 ),
               ],
             ),

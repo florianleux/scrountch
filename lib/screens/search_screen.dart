@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'results_screen.dart';
 import 'home_screen.dart';
+import '../widgets/custom_text_field.dart';
+import '../widgets/custom_buttons.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -121,15 +123,12 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   SizedBox(height: 80),
                   // Champ de recherche
-                  TextFormField(
+                  CustomTextField(
                     controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Nom de l\'objet',
-                      labelText: 'Nom de l\'objet',
-                      fillColor: const Color(0xFFFFE333),
-                      filled: true,
-                    ),
-                    style: AppTheme.textFieldStyle,
+                    hintText: 'Nom de l\'objet',
+                    labelText: 'Nom de l\'objet',
+                    fillColor: const Color(0xFFFFE333),
+                    filled: true,
                     textInputAction: TextInputAction.search,
                     onFieldSubmitted: (_) => _performSearch(),
                   ),
@@ -137,45 +136,11 @@ class _SearchScreenState extends State<SearchScreen> {
                   const SizedBox(height: 20),
 
                   // Bouton de recherche
-                  SizedBox(
-                    height: 75,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _performSearch,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 30,
-                              height: 30,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    Color(0xFFFFE333)),
-                              ),
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  'assets/images/search_icon.png', // ICI votre icône PNG
-                                  width: 45, // Taille de l'icône
-                                  height: 45,
-                                  color: Color(
-                                      0xFFFFE333), // Colorier l'icône (optionnel)
-                                ),
-                                const SizedBox(
-                                    width: 8), // Espace entre icône et texte
-                                const Text(
-                                  'RECHERCHER',
-                                  style: TextStyle(color: Color(0xFFFFE333)),
-                                ),
-                              ],
-                            ),
-                    ),
+                  PrimaryButton(
+                    onPressed: _isLoading ? null : _performSearch,
+                    text: _isLoading ? 'RECHERCHE...' : 'RECHERCHER',
+                    iconPath:
+                        _isLoading ? null : 'assets/images/search_icon.png',
                   ),
                 ],
               ),

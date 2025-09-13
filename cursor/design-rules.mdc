@@ -16,15 +16,13 @@ L'application Scrountch suit une direction artistique **"Jaune Bold"** caractér
 
 ## 🌈 Palette de Couleurs
 
-### Couleurs Principales (Fonds d'écrans)
+### Couleur Principale Unifiée (Fonds d'écrans)
 
 ```css
-Jaune Principal:     #FFDD00  /* Accueil, Détail, Aucun résultat */
-Jaune Clair:         #FFE333  /* Recherche */
-Jaune Moyen:         #FFE966  /* Ranger/Manage */
-Jaune Très Clair:    #FFEF99  /* Formulaire/Édition */
-Jaune Très Pâle:     #FFF6CC  /* Résultats */
+Jaune Uniforme:     #FFE333  /* TOUTES les pages utilisent cette couleur */
 ```
+
+**⚠️ IMPORTANT** : Toutes les pages utilisent maintenant la même couleur de fond `#FFE333` pour une cohérence parfaite.
 
 ### Couleurs Secondaires
 
@@ -33,213 +31,12 @@ Noir:        #000000  /* Texte, bordures, icônes */
 Transparent: transparent /* Fonds de boutons et inputs */
 Noir 54%:    Colors.black54 /* Placeholders */
 Blanc:       #FFFFFF  /* Texte sur cartes colorées */
+Rouge:       #FF0000  /* Cartes d'items (couleur actuelle) */
 ```
 
-## 🔤 Typographie
-
-### Règles Générales
-
-- **Famille** : `System` (police système)
-- **Style dominant** : Ultra-gras (`FontWeight.w900`)
-- **Casse** : MAJUSCULES pour tous les titres et labels importants
-- **Contraste** : Texte noir sur fonds fluo pour maximum lisibilité
-
-### Hiérarchie Typographique
-
-```dart
-// Titres principaux (écrans)
-fontSize: 32px, fontWeight: w900, color: Colors.black
-
-// Titres d'AppBar
-fontSize: 18px, fontWeight: w900, color: Colors.black
-
-// Boutons
-fontSize: 16px, fontWeight: w500,color: Colors.black
-
-// Labels et placeholders
-fontWeight: w500, color: Colors.black / Colors.black54
-```
-
-## 🎯 Composants UI
-
-### Boutons
-
-**Style unique** : Transparent avec bordure noire
-
-```dart
-OutlinedButton.styleFrom(
-  side: BorderSide(color: Colors.black, width: 2),
-  backgroundColor: Colors.transparent,
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(8),
-  ),
-)
-```
-
-### Inputs/Formulaires
-
-**Style** : Fond transparent avec bordure noire
-
-```dart
-InputDecorationTheme(
-  border: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.black, width: 2),
-  ),
-  fillColor: Colors.transparent,
-  filled: true,
-  labelStyle: TextStyle(fontWeight: FontWeight.w700),
-)
-```
-
-### AppBars
-
-**Style** : Transparent avec éléments noirs
-
-```dart
-AppBar(
-  backgroundColor: Colors.transparent,
-  elevation: 0,
-  iconTheme: IconThemeData(color: Colors.black),
-)
-```
-
-### Cartes d'Items
-
-**Style** : Blocs colorés avec couleurs fluorescentes (palette maintenue pour contraste)
-
-```dart
-// Palette pour les cartes d'items (couleurs vives pour contraste)
-Color(0xFFFF0080), // Rose fluo
-Color(0xFF00FF00), // Vert fluo
-Color(0xFFFF8000), // Orange fluo
-Color(0xFF00FFFF), // Cyan fluo
-Color(0xFF8000FF), // Violet fluo
-Color(0xFFFFFF00), // Jaune fluo
-```
-
-## 📱 Écrans et Couleurs
-
-### Attribution des Couleurs par Écran
-
-| Écran                 | Couleur de Fond  | Code Hex  | Usage               |
-| --------------------- | ---------------- | --------- | ------------------- |
-| 🏠 **Accueil**        | Jaune Principal  | `#FFDD00` | Écran principal     |
-| 🔍 **Recherche**      | Jaune Clair      | `#FFE333` | Fonction recherche  |
-| 📦 **Ranger**         | Jaune Moyen      | `#FFE966` | Gestion des objets  |
-| 📝 **Formulaire**     | Jaune Très Clair | `#FFEF99` | Création/Édition    |
-| 📋 **Résultats**      | Jaune Très Pâle  | `#FFF6CC` | Liste des résultats |
-| 📄 **Détail**         | Jaune Principal  | `#FFDD00` | Vue détaillée       |
-| ❌ **Aucun résultat** | Jaune Principal  | `#FFDD00` | État vide           |
-
-## 🎛️ Règles d'Implémentation
-
-### Structure Scaffold
-
-```dart
-Scaffold(
-  backgroundColor: Color(0xFFCOULEUR_JAUNE), // Voir tableau des couleurs par écran
-  appBar: AppBar(
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-    title: Text(
-      'TITRE EN MAJUSCULES',
-      style: TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.w900,
-      ),
-    ),
-    iconTheme: IconThemeData(color: Colors.black),
-  ),
-  body: // Contenu...
-)
-```
-
-### Boutons Standards
-
-#### Bouton Principal (Outlined)
-
-```dart
-OutlinedButton(
-  style: OutlinedButton.styleFrom(
-    side: BorderSide(color: Colors.black, width: 2),
-    backgroundColor: Colors.transparent,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
-  ),
-  child: Text(
-    'TEXTE EN MAJUSCULES',
-    style: TextStyle(
-      color: Colors.black,
-      fontSize: 16,
-      fontWeight: FontWeight.w500
-    ),
-  ),
-)
-```
-
-#### Bouton d'Action (Elevated)
-
-```dart
-ElevatedButton(
-  style: ElevatedButton.styleFrom(
-    backgroundColor: Colors.black,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
-  ),
-  child: Text(
-    'TEXTE EN MAJUSCULES',
-    style: TextStyle(
-      color: Color(0xFFCOULEUR_FOND), // Couleur du fond de l'écran
-      fontSize: 16,
-      fontWeight: FontWeight.w500
-    ),
-  ),
-)
-```
-
-## ✅ Checklist de Conformité
-
-Avant de valider un écran, vérifier :
-
-- [ ] Fond d'écran en couleur fluo unie
-- [ ] Titre en majuscules et ultra-gras (w900)
-- [ ] Boutons transparents avec bordure noire 2px
-- [ ] Texte et icônes en noir pour contraste
-- [ ] Labels et placeholders en gras (w700)
-- [ ] AppBar transparent avec éléments noirs
-- [ ] Inputs avec fond transparent et bordure noire
-- [ ] Cohérence avec la palette de couleurs définie
-
-## 🚫 À Éviter
-
-- ❌ Cartes blanches ou fonds blancs
-- ❌ Couleurs ternes ou pastels
-- ❌ Typographie fine ou normale
-- ❌ Boutons colorés (autres que transparent/noir)
-- ❌ Texte en minuscules pour les éléments importants
-- ❌ Bordures colorées ou fines
-- ❌ AppBars avec couleurs de fond
-- ❌ Mélange de styles entre les écrans
-
-## 🔄 Évolutions Futures
-
-Cette direction artistique peut évoluer en gardant les principes de base :
-
-- **Palette jaune** : Maintenir la cohérence avec les nuances de jaune
-- **Contraste fort** : Conserver la lisibilité avec du noir sur jaune
-- **Typographie impactante** : Garder l'aspect gras et majuscules
-- **Simplicité** : Éviter la surcharge visuelle
-- **Boutons duaux** : Continuer avec les boutons outlined transparents et elevated noirs
-
----
-
-## 🔤 RÈGLES DES POLICES - MISE À JOUR CRITIQUE
+## 🔤 RÈGLES DES POLICES
 
 ### ⚠️ SEULES 2 POLICES AUTORISÉES
-
-Cette règle remplace toutes les précédentes règles typographiques.
 
 #### 1. **Dela Gothic One**
 
@@ -262,312 +59,295 @@ Cette règle remplace toutes les précédentes règles typographiques.
 - Pas d'autres Google Fonts
 - Pas de mélange avec d'autres familles
 
-### 📝 Implémentation
+## 🎯 SYSTÈME DE BOUTONS GLOBALISÉ
+
+### 📋 3 Variants de Boutons Standardisés
+
+#### 1. **Primary Button** - Actions Principales
 
 ```dart
-// Configuration pubspec.yaml
-fonts:
-  - family: DelaGothicOne
-    fonts:
-      - asset: assets/fonts/DelaGothicOne-Regular.ttf
-  - family: Chivo
-    fonts:
-      - asset: assets/fonts/Chivo-Regular.ttf
-
-// Usage dans le code
-// Titres et boutons
-TextStyle(fontFamily: 'DelaGothicOne', fontSize: 24, color: Colors.black)
-
-// Tout le reste
-TextStyle(fontFamily: 'Chivo', fontSize: 16, color: Colors.black)
-```
-
----
-
-_Dernière mise à jour : Septembre 2025_
-_Version : 2.1 - Polices locales Dela Gothic One + Chivo_
-
-# Direction Artistique - Scrountch App
-
-## 🎨 Philosophie Design
-
-L'application Scrountch suit une direction artistique **"Jaune Bold"** caractérisée par :
-
-- Des nuances de jaune comme couleur dominante
-- Une typographie ultra-grasse et impactante
-- Des interfaces minimalistes sans fioritures
-- Une cohérence visuelle forte entre tous les écrans
-- Des contrastes forts entre éléments noirs et fonds jaunes
-
-## 🌈 Palette de Couleurs
-
-### Couleurs Principales (Fonds d'écrans)
-
-```css
-Jaune Principal:     #FFDD00  /* Accueil, Détail, Aucun résultat */
-Jaune Clair:         #FFE333  /* Recherche */
-Jaune Moyen:         #FFE966  /* Ranger/Manage */
-Jaune Très Clair:    #FFEF99  /* Formulaire/Édition */
-Jaune Très Pâle:     #FFF6CC  /* Résultats */
-```
-
-### Couleurs Secondaires
-
-```css
-Noir:        #000000  /* Texte, bordures, icônes */
-Transparent: transparent /* Fonds de boutons et inputs */
-Noir 54%:    Colors.black54 /* Placeholders */
-Blanc:       #FFFFFF  /* Texte sur cartes colorées */
-```
-
-## 🔤 Typographie
-
-### Règles Générales
-
-- **Famille** : `System` (police système)
-- **Style dominant** : Ultra-gras (`FontWeight.w900`)
-- **Casse** : MAJUSCULES pour tous les titres et labels importants
-- **Contraste** : Texte noir sur fonds fluo pour maximum lisibilité
-
-### Hiérarchie Typographique
-
-```dart
-// Titres principaux (écrans)
-fontSize: 32px, fontWeight: w900, color: Colors.black
-
-// Titres d'AppBar
-fontSize: 18px, fontWeight: w900, color: Colors.black
-
-// Boutons
-fontSize: 16px, fontWeight: w500,color: Colors.black
-
-// Labels et placeholders
-fontWeight: w500,color: Colors.black / Colors.black54
-```
-
-## 🎯 Composants UI
-
-### Boutons
-
-**Style unique** : Transparent avec bordure noire
-
-```dart
-OutlinedButton.styleFrom(
-  side: BorderSide(color: Colors.black, width: 2),
-  backgroundColor: Colors.transparent,
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(8),
-  ),
+// Usage: RECHERCHER, ENREGISTRER, MODIFIER, CHANGER LA RECHERCHE
+PrimaryButton(
+  onPressed: () => action(),
+  text: 'TEXTE EN MAJUSCULES',
+  iconPath: 'assets/images/icon.png', // Optionnel
 )
+
+// Style automatique:
+// - Fond: Colors.black
+// - Texte/Icône: Color(0xFFFFE333) (jaune)
+// - Police: DelaGothicOne, 24px
+// - Bordure: Aucune
+// - Hauteur: 75px
 ```
 
-### Inputs/Formulaires
-
-**Style** : Fond transparent avec bordure noire
+#### 2. **Secondary Button** - Actions Secondaires
 
 ```dart
-InputDecorationTheme(
-  border: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.black, width: 2),
-  ),
-  fillColor: Colors.transparent,
-  filled: true,
-  labelStyle: TextStyle(fontWeight: FontWeight.w700),
+// Usage: RANGER, SUPPRIMER, ANNULER, RANGER CET OBJET
+SecondaryButton(
+  onPressed: () => action(),
+  text: 'TEXTE EN MAJUSCULES',
+  iconPath: 'assets/images/icon.png', // Optionnel
 )
+
+// Style automatique:
+// - Fond: Color(0xFFFFE333) (jaune)
+// - Texte/Icône: Colors.black
+// - Police: DelaGothicOne, 24px
+// - Bordure: Noire 1px
+// - Hauteur: 75px
 ```
 
-### AppBars
-
-**Style** : Transparent avec éléments noirs
+#### 3. **Tertiary Button** - Dialogues de Confirmation
 
 ```dart
-AppBar(
-  backgroundColor: Colors.transparent,
-  elevation: 0,
-  iconTheme: IconThemeData(color: Colors.black),
+// Usage: Boutons dans AlertDialog uniquement
+TertiaryButton(
+  onPressed: () => action(),
+  text: 'TEXTE EN MAJUSCULES',
+  iconPath: 'assets/images/icon.png', // Optionnel
 )
+
+// Style automatique:
+// - Fond: Color(0xFFFFE333) (jaune)
+// - Texte/Icône: Colors.black
+// - Police: DelaGothicOne, 19.2px (24px × 0.8)
+// - Bordure: Aucune
+// - Hauteur: 50px
 ```
 
-### Cartes d'Items
+### 📁 Fichiers de Styles Centralisés
 
-**Style** : Blocs colorés avec couleurs fluorescentes (palette maintenue pour contraste)
+#### `/lib/theme/button_styles.dart`
 
 ```dart
-// Palette pour les cartes d'items (couleurs vives pour contraste)
-Color(0xFFFF0080), // Rose fluo
-Color(0xFF00FF00), // Vert fluo
-Color(0xFFFF8000), // Orange fluo
-Color(0xFF00FFFF), // Cyan fluo
-Color(0xFF8000FF), // Violet fluo
-Color(0xFFFFFF00), // Jaune fluo
+class AppButtonStyles {
+  static ButtonStyle get primary    // Fond noir, texte jaune
+  static ButtonStyle get secondary  // Fond jaune, texte noir, bordure
+  static ButtonStyle get tertiary   // Fond jaune, texte noir, sans bordure
+  static const TextStyle buttonTextStyle // DelaGothicOne, 24px
+  static Widget buildButtonContent(...) // Helper pour icône + texte
+}
 ```
 
-## 📱 Écrans et Couleurs
+#### `/lib/widgets/custom_buttons.dart`
 
-### Attribution des Couleurs par Écran
+```dart
+class PrimaryButton extends StatelessWidget   // Bouton primary
+class SecondaryButton extends StatelessWidget // Bouton secondary
+class TertiaryButton extends StatelessWidget  // Bouton tertiary (taille réduite)
+```
 
-| Écran                 | Couleur de Fond  | Code Hex  | Usage               |
-| --------------------- | ---------------- | --------- | ------------------- |
-| 🏠 **Accueil**        | Jaune Principal  | `#FFDD00` | Écran principal     |
-| 🔍 **Recherche**      | Jaune Clair      | `#FFE333` | Fonction recherche  |
-| 📦 **Ranger**         | Jaune Moyen      | `#FFE966` | Gestion des objets  |
-| 📝 **Formulaire**     | Jaune Très Clair | `#FFEF99` | Création/Édition    |
-| 📋 **Résultats**      | Jaune Très Pâle  | `#FFF6CC` | Liste des résultats |
-| 📄 **Détail**         | Jaune Principal  | `#FFDD00` | Vue détaillée       |
-| ❌ **Aucun résultat** | Jaune Principal  | `#FFDD00` | État vide           |
+### 🎨 Mapping des Boutons par Écran
 
-## 🎛️ Règles d'Implémentation
+| Écran             | Bouton               | Type      | Icône           |
+| ----------------- | -------------------- | --------- | --------------- |
+| **Home**          | TROUVER              | Primary   | search_icon.png |
+| **Home**          | RANGER               | Secondary | store_icon.png  |
+| **Search**        | RECHERCHER           | Primary   | search_icon.png |
+| **Form**          | ENREGISTRER          | Primary   | check_icon.png  |
+| **Form**          | ANNULER              | Secondary | cross_icon.png  |
+| **Detail**        | MODIFIER             | Primary   | pen_icon.png    |
+| **Detail**        | SUPPRIMER            | Secondary | trash_icon.png  |
+| **Detail Dialog** | SUPPRIMER            | Tertiary  | trash_icon.png  |
+| **Detail Dialog** | ANNULER              | Tertiary  | cross_icon.png  |
+| **No Results**    | CHANGER LA RECHERCHE | Primary   | search_icon.png |
+| **No Results**    | RANGER CET OBJET     | Secondary | plus_icon.png   |
 
-### Structure Scaffold
+## 📱 STRUCTURE D'ÉCRAN STANDARDISÉE
+
+### 🏗️ Layout Uniforme
+
+Tous les écrans suivent cette structure :
 
 ```dart
 Scaffold(
-  backgroundColor: Color(0xFFCOULEUR_JAUNE), // Voir tableau des couleurs par écran
-  appBar: AppBar(
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-    title: Text(
-      'TITRE EN MAJUSCULES',
-      style: TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.w900,
+  backgroundColor: const Color(0xFFFFE333), // Jaune uniforme
+  body: Stack(
+    children: [
+      // Image de fond avec opacité
+      Positioned.fill(
+        child: Opacity(
+          opacity: 0.2, // 20% d'opacité
+          child: Image.asset('assets/images/search_bg.png'),
+        ),
       ),
-    ),
-    iconTheme: IconThemeData(color: Colors.black),
+
+      // Contenu principal
+      SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24.0), // 24px vertical
+          child: Column(
+            children: [
+              // Header standardisé
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Row(
+                  children: [
+                    // Bouton retour (50x50px)
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Image.asset(
+                        'assets/images/back_icon.png',
+                        width: 50,
+                        height: 50,
+                      ),
+                    ),
+                    const Spacer(),
+                    // Bouton home (50x50px)
+                    GestureDetector(
+                      onTap: () => Navigator.pushAndRemoveUntil(...),
+                      child: Image.asset(
+                        'assets/images/home_icon.png',
+                        width: 50,
+                        height: 50,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Titre de la page
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Text(
+                  'TITRE EN MAJUSCULES',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: 'DelaGothicOne',
+                    fontSize: 38,
+                    color: Colors.black,
+                    height: 1.1,
+                  ),
+                ),
+              ),
+
+              // Contenu spécifique à l'écran...
+            ],
+          ),
+        ),
+      ),
+    ],
   ),
-  body: // Contenu...
 )
 ```
 
-### Boutons Standards
-
-#### Bouton Principal (Outlined)
+### 📏 Espacements Standardisés
 
 ```dart
-OutlinedButton(
-  style: OutlinedButton.styleFrom(
-    side: BorderSide(color: Colors.black, width: 2),
-    backgroundColor: Colors.transparent,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
-  ),
-  child: Text(
-    'TEXTE EN MAJUSCULES',
-    style: TextStyle(
-      color: Colors.black,
-      fontSize: 16,
-      fontWeight: FontWeight.w500
-    ),
-  ),
-)
+// Padding global des écrans
+vertical: 24px    // Haut et bas de chaque écran
+horizontal: 24px  // Gauche et droite pour header et titres
+
+// Tailles des icônes header
+back_icon.png: 50x50px
+home_icon.png: 50x50px
+
+// Tailles des icônes boutons
+Boutons principaux: 45x45px
+Boutons dialogues: 40x40px
+
+// Hauteurs des boutons
+Primary/Secondary: 75px
+Tertiary: 50px
 ```
 
-#### Bouton d'Action (Elevated)
+## 🔧 INPUTS ET FORMULAIRES GLOBALISÉS
+
+### 📝 CustomTextField Widget
 
 ```dart
-ElevatedButton(
-  style: ElevatedButton.styleFrom(
-    backgroundColor: Colors.black,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
-  ),
-  child: Text(
-    'TEXTE EN MAJUSCULES',
-    style: TextStyle(
-      color: Color(0xFFCOULEUR_FOND), // Couleur du fond de l'écran
-      fontSize: 16,
-      fontWeight: FontWeight.w500
-    ),
-  ),
+// Usage standardisé
+CustomTextField(
+  controller: controller,
+  labelText: 'Label',
+  hintText: 'Placeholder',
+  fillColor: const Color(0xFFFFE333), // Fond jaune si nécessaire
+  filled: true,
 )
+
+// Style automatique depuis main.dart:
+// - Police: Chivo, 18px
+// - Bordure: Noire, arrondie 8px
+// - Padding: 12px vertical, 16px horizontal
 ```
 
-## ✅ Checklist de Conformité
+### 🎛️ Configuration Globale (main.dart)
+
+```dart
+inputDecorationTheme: InputDecorationTheme(
+  contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+  labelStyle: TextStyle(fontFamily: 'Chivo', fontSize: 18, color: Colors.black),
+  hintStyle: TextStyle(fontFamily: 'Chivo', fontSize: 18, color: Colors.grey),
+  border: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8),
+    borderSide: BorderSide(color: Colors.black, width: 1),
+  ),
+),
+
+textTheme: TextTheme(
+  bodySmall: TextStyle( // Style pour le texte des inputs
+    fontFamily: 'Chivo',
+    fontSize: 18,
+    fontWeight: FontWeight.w500,
+    color: Colors.black,
+  ),
+),
+```
+
+## 📋 CHECKLIST DE CONFORMITÉ
 
 Avant de valider un écran, vérifier :
 
-- [ ] Fond d'écran en couleur fluo unie
-- [ ] Titre en majuscules et ultra-gras (w900)
-- [ ] Boutons transparents avec bordure noire 2px
-- [ ] Texte et icônes en noir pour contraste
-- [ ] Labels et placeholders en gras (w700)
-- [ ] AppBar transparent avec éléments noirs
-- [ ] Inputs avec fond transparent et bordure noire
-- [ ] Cohérence avec la palette de couleurs définie
+### 🎨 Design
 
-## 🚫 À Éviter
+- [ ] Fond d'écran jaune uniforme `#FFE333`
+- [ ] Image de fond `search_bg.png` avec 20% d'opacité
+- [ ] Header standardisé (back_icon + home_icon 50x50px)
+- [ ] Padding vertical 24px et horizontal 24px
 
-- ❌ Cartes blanches ou fonds blancs
-- ❌ Couleurs ternes ou pastels
-- ❌ Typographie fine ou normale
-- ❌ Boutons colorés (autres que transparent/noir)
-- ❌ Texte en minuscules pour les éléments importants
-- ❌ Bordures colorées ou fines
-- ❌ AppBars avec couleurs de fond
-- ❌ Mélange de styles entre les écrans
+### 🔤 Typographie
+
+- [ ] Titres en DelaGothicOne 38px
+- [ ] Boutons en DelaGothicOne (24px primary/secondary, 19.2px tertiary)
+- [ ] Inputs/labels en Chivo 18px
+- [ ] Texte en MAJUSCULES pour titres et boutons
+
+### 🎯 Boutons
+
+- [ ] Utilisation des widgets `PrimaryButton`, `SecondaryButton`, `TertiaryButton`
+- [ ] Icônes PNG appropriées (45x45px pour principaux, 40x40px pour dialogues)
+- [ ] Hauteurs correctes (75px principaux, 50px dialogues)
+
+### 📱 Interactions
+
+- [ ] Navigation home fonctionnelle sur tous les écrans
+- [ ] Bouton retour fonctionnel
+- [ ] Loading states gérés pour les boutons async
+
+## 🚫 À ÉVITER ABSOLUMENT
+
+- ❌ Utiliser `ElevatedButton` ou `OutlinedButton` directement
+- ❌ Définir des styles de boutons inline
+- ❌ Mélanger les tailles de police des boutons
+- ❌ Utiliser d'autres couleurs de fond que `#FFE333`
+- ❌ Créer des headers différents entre écrans
+- ❌ Utiliser des polices autres que DelaGothicOne et Chivo
+- ❌ Oublier les icônes PNG dans les boutons
+- ❌ Créer des `TextFormField` sans `CustomTextField`
 
 ## 🔄 Évolutions Futures
 
-Cette direction artistique peut évoluer en gardant les principes de base :
+Cette architecture permet :
 
-- **Palette jaune** : Maintenir la cohérence avec les nuances de jaune
-- **Contraste fort** : Conserver la lisibilité avec du noir sur jaune
-- **Typographie impactante** : Garder l'aspect gras et majuscules
-- **Simplicité** : Éviter la surcharge visuelle
-- **Boutons duaux** : Continuer avec les boutons outlined transparents et elevated noirs
-
----
-
-## 🔤 RÈGLES DES POLICES - MISE À JOUR CRITIQUE
-
-### ⚠️ SEULES 2 POLICES AUTORISÉES
-
-Cette règle remplace toutes les précédentes règles typographiques.
-
-#### 1. **Dela Gothic One**
-
-- **Usage** : TITRES DE PAGES + TOUS LES BOUTONS (en CAPITALES)
-- **Fichier** : `assets/fonts/DelaGothicOne-Regular.ttf`
-- **Style** : Bold naturellement, moderne et distinctif
-- **Exemples** : "TROUVER", "RANGER", "RECHERCHER", "NOUVEL OBJET", "ANNULER", "ENREGISTRER"
-
-#### 2. **Chivo Regular**
-
-- **Usage** : TOUT LE RESTE (texte courant, champs, labels, hints)
-- **Fichier** : `assets/fonts/Chivo-Regular.ttf`
-- **Style** : Regular uniquement, lisible et élégant
-- **Exemples** : Champs de texte, descriptions, labels de formulaires, texte courant
-
-### 🚫 INTERDICTIONS ABSOLUES
-
-- **AUCUNE AUTRE POLICE** n'est acceptée
-- Pas de polices système (System, San Francisco, Roboto, etc.)
-- Pas d'autres Google Fonts
-- Pas de mélange avec d'autres familles
-
-### 📝 Implémentation
-
-```dart
-// Configuration pubspec.yaml
-fonts:
-  - family: DelaGothicOne
-    fonts:
-      - asset: assets/fonts/DelaGothicOne-Regular.ttf
-  - family: Chivo
-    fonts:
-      - asset: assets/fonts/Chivo-Regular.ttf
-
-// Usage dans le code
-// Titres et boutons
-TextStyle(fontFamily: 'DelaGothicOne', fontSize: 24, color: Colors.black)
-
-// Tout le reste
-TextStyle(fontFamily: 'Chivo', fontSize: 16, color: Colors.black)
-```
+- **Maintenance centralisée** : Tous les styles dans 2 fichiers
+- **Cohérence garantie** : Impossible de dévier des standards
+- **Évolutivité** : Modification globale en un seul endroit
+- **Performance** : Widgets réutilisables et optimisés
+- **Lisibilité** : Code simplifié et expressif
 
 ---
 
-_Dernière mise à jour : Septembre 2025_
-_Version : 2.1 - Polices locales Dela Gothic One + Chivo_
+_Dernière mise à jour : Janvier 2025_
+_Version : 3.0 - Système de boutons globalisé + Couleur unifiée_

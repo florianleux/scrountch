@@ -92,6 +92,14 @@ class ScrountchApp extends StatelessWidget {
             color: Color(0xFFFFFFFF),
             height: 1.2,
           ),
+          // Style pour le texte des inputs
+          bodySmall: TextStyle(
+            fontFamily: 'Chivo',
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+            height: 1.4,
+          ),
         ),
         appBarTheme: const AppBarTheme(
           centerTitle: true,
@@ -122,19 +130,26 @@ class ScrountchApp extends StatelessWidget {
         ),
         inputDecorationTheme: InputDecorationTheme(
           contentPadding: const EdgeInsets.symmetric(
-            vertical: 10, // Padding vertical pour TOUS les inputs
-            horizontal: 20, // Padding horizontal pour TOUS les inputs
+            vertical: 12, // Padding vertical pour TOUS les inputs
+            horizontal: 16, // Padding horizontal pour TOUS les inputs
           ),
           labelStyle: const TextStyle(
-            fontFamily: 'Chivo', // ICI pour la police des labels
-            fontSize: 18, // ICI pour la taille des labels
-            fontWeight: FontWeight.w300,
+            fontFamily: 'Chivo',
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
             color: Colors.black,
           ),
           hintStyle: const TextStyle(
-            fontFamily: 'Chivo', // ICI pour la police des labels
-            fontSize: 18, // ICI pour la taille des labels
+            fontFamily: 'Chivo',
+            fontSize: 18,
             fontWeight: FontWeight.w300,
+            color: Colors.grey,
+          ),
+          // Style pour le texte saisi
+          floatingLabelStyle: const TextStyle(
+            fontFamily: 'Chivo',
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
             color: Colors.black,
           ),
 
@@ -152,9 +167,6 @@ class ScrountchApp extends StatelessWidget {
           ),
           fillColor: Colors.transparent,
           filled: true,
-          // Style pour le texte saisi
-          floatingLabelStyle:
-              const TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
           prefixIconColor: Colors.black,
           suffixIconColor: Colors.black,
         ),

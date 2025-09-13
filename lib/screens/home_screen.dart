@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'search_screen.dart';
 import 'item_form_screen.dart';
 import '../theme/app_theme.dart';
+import '../widgets/custom_buttons.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -64,73 +65,26 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 children: [
                   // Bouton TROUVER
-                  SizedBox(
+                  PrimaryButton(
+                    onPressed: () =>
+                        _navigateToScreen(context, const SearchScreen()),
+                    text: 'TROUVER',
+                    iconPath: 'assets/images/search_icon.png',
                     height: _buttonHeight,
-                    child: ElevatedButton(
-                      onPressed: () =>
-                          _navigateToScreen(context, const SearchScreen()),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/search_icon.png',
-                            width: _iconSize,
-                            height: _iconSize,
-                            color: AppTheme.primaryYellow, // Couleur jaune
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'TROUVER',
-                            style: AppTheme.buttonTextStyle.copyWith(
-                              color: AppTheme.primaryYellow, // Couleur jaune
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    iconSize: _iconSize,
                   ),
                   const SizedBox(height: _buttonSpacing),
                   // Bouton RANGER
-                  SizedBox(
+                  SecondaryButton(
+                    onPressed: () => _navigateToScreen(
+                        context,
+                        const ItemFormScreen(
+                          isEditMode: false,
+                        )),
+                    text: 'RANGER',
+                    iconPath: 'assets/images/store_icon.png',
                     height: _buttonHeight,
-                    child: ElevatedButton(
-                      onPressed: () => _navigateToScreen(
-                          context,
-                          const ItemFormScreen(
-                            isEditMode: false,
-                          )),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryYellow,
-                        side: const BorderSide(color: Colors.black, width: 1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/store_icon.png',
-                            width: _iconSize,
-                            height: _iconSize,
-                            color: Colors.black, // Couleur noire
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'RANGER',
-                            style: AppTheme.buttonTextStyle.copyWith(
-                              color: Colors.black, // Couleur noire
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    iconSize: _iconSize,
                   ),
                 ],
               ),

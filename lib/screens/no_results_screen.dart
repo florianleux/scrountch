@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'search_screen.dart';
 import 'item_form_screen.dart';
 import 'home_screen.dart';
+import '../widgets/custom_buttons.dart';
 
 class NoResultsScreen extends StatelessWidget {
   final String searchQuery;
@@ -114,92 +115,36 @@ class NoResultsScreen extends StatelessWidget {
                           const SizedBox(height: 60),
 
                           // Bouton CHANGER LA RECHERCHE
-                          SizedBox(
-                            height: 75,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const SearchScreen(),
-                                  ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                          PrimaryButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SearchScreen(),
                                 ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    'assets/images/search_icon.png',
-                                    width: 45,
-                                    height: 45,
-                                    color: const Color(0xFFFFE333),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Text(
-                                    'CHANGER LA RECHERCHE',
-                                    style: TextStyle(
-                                      fontFamily: 'DelaGothicOne',
-                                      color: Color(0xFFFFE333),
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                              );
+                            },
+                            text: 'CHANGER LA RECHERCHE',
+                            iconPath: 'assets/images/search_icon.png',
                           ),
 
                           const SizedBox(height: 10),
 
                           // Bouton RANGER CET OBJET
-                          SizedBox(
-                            height: 75,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ItemFormScreen(
-                                      isEditMode: false,
-                                      initialName: searchQuery,
-                                    ),
+                          SecondaryButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ItemFormScreen(
+                                    isEditMode: false,
+                                    initialName: searchQuery,
                                   ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFFE333),
-                                side: const BorderSide(
-                                    color: Colors.black, width: 1),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    'assets/images/plus_icon.png',
-                                    width: 45,
-                                    height: 45,
-                                    color: Colors.black,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Text(
-                                    'RANGER CET OBJET',
-                                    style: TextStyle(
-                                      fontFamily: 'DelaGothicOne',
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                              );
+                            },
+                            text: 'RANGER CET OBJET',
+                            iconPath: 'assets/images/plus_icon.png',
                           ),
                         ],
                       ),

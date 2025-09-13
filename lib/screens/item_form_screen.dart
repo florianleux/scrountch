@@ -5,6 +5,8 @@ import '../constants/app_constants.dart';
 import '../constants/location_data.dart';
 import 'item_detail_screen.dart';
 import 'home_screen.dart';
+import '../widgets/custom_text_field.dart';
+import '../widgets/custom_buttons.dart';
 
 class ItemFormScreen extends StatefulWidget {
   final bool isEditMode;
@@ -407,16 +409,10 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Nom (obligatoire)
-                            TextFormField(
+                            CustomTextField(
                               controller: _nameController,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              decoration: InputDecoration(
-                                labelText: 'Nom de l\'objet *',
-                                hintText: 'Ex: Télévision Samsung',
-                              ),
+                              labelText: 'Nom de l\'objet *',
+                              hintText: 'Ex: Télévision Samsung',
                               maxLength: AppConstants.MAX_NAME_LENGTH,
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
@@ -544,15 +540,9 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
 
                               // Champ personnalisé si "Autre..."
                               if (_showCustomSubCategory) ...[
-                                TextFormField(
+                                CustomTextField(
                                   controller: _customSubcategoryController,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  decoration: InputDecoration(
-                                    labelText: 'Sous-catégorie personnalisée',
-                                  ),
+                                  labelText: 'Sous-catégorie personnalisée',
                                   maxLength:
                                       AppConstants.MAX_SUBCATEGORY_LENGTH,
                                 ),
@@ -789,16 +779,10 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                             ),
                             const SizedBox(height: 20),
                             // Tags
-                            TextFormField(
+                            CustomTextField(
                               controller: _tagsController,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              decoration: InputDecoration(
-                                labelText: 'Tags',
-                                hintText: 'Séparés par des virgules (max 5)',
-                              ),
+                              labelText: 'Tags',
+                              hintText: 'Séparés par des virgules (max 5)',
                               maxLength: 150,
                               validator: _validateTags,
                             ),
@@ -806,15 +790,9 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                             const SizedBox(height: 20),
 
                             // Description
-                            TextFormField(
+                            CustomTextField(
                               controller: _descriptionController,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              decoration: InputDecoration(
-                                labelText: 'Description',
-                              ),
+                              labelText: 'Description',
                               maxLines: 4,
                               maxLength: AppConstants.MAX_DESCRIPTION_LENGTH,
                             ),
@@ -822,103 +800,28 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                             const SizedBox(height: 30),
 
                             // Boutons
-                            SizedBox(
-                              height: 75,
-                              child: ElevatedButton(
-                                onPressed: _isLoading ? null : _saveItem,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: _isLoading
-                                    ? const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                            width: 20,
-                                            height: 20,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              valueColor:
-                                                  AlwaysStoppedAnimation<Color>(
-                                                      Color(0xFFFFE333)),
-                                            ),
-                                          ),
-                                          SizedBox(width: 8),
-                                          Text(
-                                            'ENREGISTREMENT...',
-                                            style: TextStyle(
-                                              fontFamily: 'DelaGothicOne',
-                                              color: Color(0xFFFFE333),
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Image.asset(
-                                            'assets/images/check_icon.png',
-                                            width: 45,
-                                            height: 45,
-                                            color: const Color(0xFFFFE333),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          const Text(
-                                            'ENREGISTRER',
-                                            style: TextStyle(
-                                              fontFamily: 'DelaGothicOne',
-                                              color: Color(0xFFFFE333),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                              ),
+                            PrimaryButton(
+                              onPressed: _isLoading ? null : _saveItem,
+                              text: _isLoading
+                                  ? 'ENREGISTREMENT...'
+                                  : 'ENREGISTRER',
+                              iconPath: _isLoading
+                                  ? null
+                                  : 'assets/images/check_icon.png',
                             ),
 
                             const SizedBox(height: 10),
 
-                            SizedBox(
-                              height: 75,
-                              child: ElevatedButton(
-                                onPressed: _isLoading
-                                    ? null
-                                    : () async {
-                                        if (await _onWillPop()) {
-                                          if (mounted) Navigator.pop(context);
-                                        }
-                                      },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFFFE333),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      'assets/images/cross_icon.png',
-                                      width: 45,
-                                      height: 45,
-                                      color: Colors.black,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    const Text(
-                                      'ANNULER',
-                                      style: TextStyle(
-                                        fontFamily: 'DelaGothicOne',
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                            SecondaryButton(
+                              onPressed: _isLoading
+                                  ? null
+                                  : () async {
+                                      if (await _onWillPop()) {
+                                        if (mounted) Navigator.pop(context);
+                                      }
+                                    },
+                              text: 'ANNULER',
+                              iconPath: 'assets/images/cross_icon.png',
                             ),
                           ],
                         ),
