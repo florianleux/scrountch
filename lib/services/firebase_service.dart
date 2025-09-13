@@ -118,6 +118,43 @@ class FirebaseService {
     }
   }
 
+  // Migration function to update searchKeywords for existing items
+  Future<void> migrateSearchKeywords() async {
+    try {
+      await _ensureAuthenticated();
+
+      final querySnapshot = await _firestore.collection('items').get();
+
+      for (final doc in querySnapshot.docs) {
+        final item = Item.fromFirestore(doc);
+
+        // Régénérer les searchKeywords avec seulement le nom
+        final newKeywords = Item.generateSearchKeywordsFromName(item.name);
+
+        // Mettre à jour seulement si les keywords ont changé
+        if (!_listsEqual(item.searchKeywords, newKeywords)) {
+          await doc.reference.update({
+            'searchKeywords': newKeywords,
+          });
+          print('Updated searchKeywords for item: ${item.name}');
+        }
+      }
+
+      print('Migration completed successfully');
+    } catch (e) {
+      print('Migration error: $e');
+      throw Exception('Migration failed');
+    }
+  }
+
+  bool _listsEqual(List<String> list1, List<String> list2) {
+    if (list1.length != list2.length) return false;
+    for (int i = 0; i < list1.length; i++) {
+      if (list1[i] != list2[i]) return false;
+    }
+    return true;
+  }
+
   // Search items by name
   Future<List<Item>> searchItems(String query) async {
     try {

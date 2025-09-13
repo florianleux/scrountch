@@ -1,4 +1,170 @@
+---
+alwaysApply: true
+---
+
 # Règles de Build - Scrountch Family Inventory
+
+## Scripts de Build Obligatoires
+
+### RÈGLE CRITIQUE : Utiliser UNIQUEMENT les scripts fournis
+- ✅ `./build_apk_simple.sh` - Script recommandé pour builds de routine
+- ✅ `./build_apk.sh` - Script avancé avec options supplémentaires
+- ❌ JAMAIS `flutter build apk --release` directement
+
+### Pourquoi ces scripts ?
+- Configuration Android NDK automatique (version 26.1.10909125 requise pour Firebase)
+- Nettoyage préalable avec `flutter clean`
+- Vérification des prérequis
+- Optimisations (tree-shaking, compression)
+- Gestion d'erreurs explicite
+
+## Processus de Build Standard
+
+### 1. Préparation
+```bash
+git status                    # Vérifier l'état
+git add .                     # Ajouter changements
+git commit -m "type: desc"    # Commit descriptif
+```
+
+### 2. Build
+```bash
+./build_apk_simple.sh         # TOUJOURS utiliser ce script
+```
+
+### 3. Vérification
+```bash
+ls -la build/app/outputs/flutter-apk/app-release.apk
+```
+
+## Types de Commits Standardisés
+
+- `feat:` - Nouvelle fonctionnalité
+- `fix:` - Correction de bug  
+- `style:` - Changements UI/UX
+- `refactor:` - Refactoring code
+- `docs:` - Documentation
+- `build:` - Changements build/scripts
+
+## Règles de Développement
+
+### Avant chaque Build
+1. Tests en mode debug OK
+2. Correction de tous les lints
+3. Commit avec message descriptif
+4. Documentation mise à jour si nécessaire
+
+### Structure Projet Flutter
+- `lib/` - Code source Dart
+- `assets/` - Images, fonts, ressources
+- `android/` - Configuration Android native
+- `cursor/` - Règles et assets Cursor
+- Scripts `.sh` - Build automatisé
+
+## Résolution Problèmes Courants
+
+### "No Android SDK found"
+→ Utiliser `./build_apk_simple.sh` (configure automatiquement)
+
+### "NDK version mismatch" 
+→ Scripts gèrent automatiquement la bonne version NDK
+
+### Build échoue
+```bash
+flutter clean
+rm -rf build/
+./build_apk_simple.sh
+```
+
+### Dépendances corrompues
+```bash
+flutter pub get
+flutter pub upgrade --major-versions
+```
+
+## Métriques Build Attendues
+
+- **Taille APK** : ~50MB
+- **Temps build propre** : 45-60s
+- **Temps build incrémental** : 20-30s
+- **Tree-shaking** : Activé (réduction 99%+ des icônes)
+
+## Installation APK
+
+1. Transférer APK sur Android
+2. Paramètres → Sécurité → "Sources inconnues" 
+3. Ouvrir APK avec gestionnaire fichiers
+4. Installer
+
+## Maintenance
+
+### Nettoyage périodique
+```bash
+flutter clean                 # Cache Flutter
+cd android && ./gradlew clean # Cache Gradle
+```
+
+### Mise à jour dépendances
+```bash
+flutter pub outdated          # Vérifier mises à jour
+flutter pub upgrade --major-versions  # Mettre à jour (prudence)
+```
+
+## Architecture Technique
+
+### Widgets Personnalisés
+- `SearchableDropdown` - Dropdowns avec recherche/autocomplétion
+- `TagInputField` - Gestion tags visuels avec chips
+- `CustomTextField` - Champs texte thématisés
+- `CustomButtons` - Boutons avec style uniforme
+
+### Thème Global
+- Couleur principale : `#FFE333` (jaune)
+- Police titres : `DelaGothicOne`
+- Police corps : `Chivo`
+- Bordures noires 1-2px
+- Compteurs caractères en gras
+
+### Firebase Integration
+- `firebase_core` - Configuration base
+- `firebase_auth` - Authentification (future)
+- `cloud_firestore` - Base de données NoSQL
+- Configuration : `google-services.json`
+
+## Validation Code
+
+### Linting Obligatoire
+```bash
+flutter analyze                # Analyse statique
+```
+
+### Tests Recommandés
+```bash
+flutter test                   # Tests unitaires
+```
+
+### Performance
+- Tree-shaking activé
+- Images optimisées
+- Lazy loading des listes
+- Validation côté client
+
+## Sécurité
+
+### Fichiers Sensibles
+- `google-services.json` - OK (projet familial)
+- Pas de clés API externes
+- Pas de données sensibles hardcodées
+
+### Distribution
+- APK debug uniquement (pas de signature release)
+- Installation manuelle sur appareils famille
+- Pas de publication Play Store
+
+---
+
+**IMPORTANT** : Ces règles garantissent la cohérence et qualité des builds. 
+Toujours consulter ce fichier avant modifications importantes du projet.# Règles de Build - Scrountch Family Inventory
 
 ## Scripts de Build Obligatoires
 

@@ -181,6 +181,11 @@ class Item {
     return keywords.toList();
   }
 
+  // Generate search keywords from name only (for migration)
+  static List<String> generateSearchKeywordsFromName(String name) {
+    return _splitToKeywords(name);
+  }
+
   static List<String> _splitToKeywords(String text) {
     return text
         .toLowerCase()
