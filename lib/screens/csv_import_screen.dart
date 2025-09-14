@@ -373,7 +373,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
         await Future.delayed(const Duration(milliseconds: 100));
       }
 
-      _showSuccess('${imported} objets importés avec succès !');
+      _showSuccess('$imported objets importés avec succès !');
       Navigator.pop(
           context, true); // Retourner true pour indiquer un import réussi
     } catch (e) {

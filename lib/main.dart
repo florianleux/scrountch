@@ -33,7 +33,6 @@ class ScrountchApp extends StatelessWidget {
           primary: Color(0xFF2D3748),
           secondary: Color(0xFF38B2AC),
           surface: Color(0xFFF7FAFC),
-          background: Color(0xFFF7FAFC),
         ),
         useMaterial3: true,
         fontFamily: 'Chivo',
