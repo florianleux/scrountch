@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/item.dart';
 import '../services/firebase_service.dart';
+import '../services/navigation_service.dart';
 import 'no_results_screen.dart';
 import 'item_detail_screen.dart';
 import 'home_screen.dart';
@@ -79,24 +80,19 @@ class _ResultsScreenState extends State<ResultsScreen>
     if (results.isEmpty) {
       // Navigate to NoResultsScreen
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
+        NavigationService.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) =>
-                NoResultsScreen(searchQuery: widget.searchQuery),
-          ),
+          NoResultsScreen(searchQuery: widget.searchQuery),
         );
       });
     } else if (results.length == 1) {
       // Navigate directly to ItemDetailScreen
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
+        NavigationService.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => ItemDetailScreen(
-              item: results.first,
-              isFromCreation: false,
-            ),
+          ItemDetailScreen(
+            item: results.first,
+            isFromCreation: false,
           ),
         );
       });
