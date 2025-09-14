@@ -2,6 +2,8 @@
 
 Une application Flutter simple pour gérer l'inventaire familial avec Firebase.
 
+> ⚠️ **Configuration Required**: Ce repo nécessite une configuration Firebase. Voir [FIREBASE_SETUP.md](FIREBASE_SETUP.md) pour les instructions complètes.
+
 ## Aperçu
 
 Scrountch aide les familles à suivre et localiser les objets de la maison dans différentes pièces et emplacements. Conçu avec une simplicité extrême, utilise Firebase pour le stockage de données et l'authentification anonyme.
