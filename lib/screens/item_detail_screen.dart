@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/item.dart';
 import '../services/firebase_service.dart';
+import '../services/navigation_service.dart';
+import '../theme/unified_theme.dart';
 import 'home_screen.dart';
 import 'item_form_screen.dart';
 import '../widgets/custom_buttons.dart';
@@ -26,7 +28,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFE333), // Fond jaune clair
+      backgroundColor: UnifiedTheme.primaryYellow,
       body: Stack(
         children: [
           // Image de fond par-dessus le fond jaune
@@ -62,11 +64,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           const Spacer(),
                           GestureDetector(
                             onTap: () {
-                              Navigator.pushAndRemoveUntil(
+                              NavigationService.pushAndRemoveUntil(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => const HomeScreen()),
-                                (route) => false,
+                                const HomeScreen(),
                               );
                             },
                             child: Image.asset(
@@ -243,13 +243,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           // Bouton MODIFIER
                           PrimaryButton(
                             onPressed: () {
-                              Navigator.push(
+                              NavigationService.push(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) => ItemFormScreen(
-                                    isEditMode: true,
-                                    existingItem: widget.item,
-                                  ),
+                                ItemFormScreen(
+                                  isEditMode: true,
+                                  existingItem: widget.item,
                                 ),
                               );
                             },
@@ -292,10 +290,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     try {
       await _firebaseService.deleteItem(widget.item.id);
       if (mounted) {
-        Navigator.pushAndRemoveUntil(
+        NavigationService.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-          (route) => false,
+          const HomeScreen(),
         );
       }
     } catch (e) {

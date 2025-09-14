@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../theme/unified_theme.dart';
+import '../services/navigation_service.dart';
 import 'search_screen.dart';
 import 'item_form_screen.dart';
 import 'home_screen.dart';
@@ -15,7 +17,7 @@ class NoResultsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFE333), // Fond jaune uniforme
+      backgroundColor: UnifiedTheme.primaryYellow,
       body: Stack(
         children: [
           // Image de fond par-dessus le fond jaune
@@ -50,11 +52,9 @@ class NoResultsScreen extends StatelessWidget {
                         const Spacer(),
                         GestureDetector(
                           onTap: () {
-                            Navigator.pushAndRemoveUntil(
+                            NavigationService.pushAndRemoveUntil(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => const HomeScreen()),
-                              (route) => false,
+                              const HomeScreen(),
                             );
                           },
                           child: Image.asset(
@@ -117,11 +117,9 @@ class NoResultsScreen extends StatelessWidget {
                           // Bouton CHANGER LA RECHERCHE
                           PrimaryButton(
                             onPressed: () {
-                              Navigator.pushReplacement(
+                              NavigationService.pushReplacement(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SearchScreen(),
-                                ),
+                                const SearchScreen(),
                               );
                             },
                             text: 'CHANGER LA RECHERCHE',
@@ -133,13 +131,11 @@ class NoResultsScreen extends StatelessWidget {
                           // Bouton RANGER CET OBJET
                           SecondaryButton(
                             onPressed: () {
-                              Navigator.push(
+                              NavigationService.push(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) => ItemFormScreen(
-                                    isEditMode: false,
-                                    initialName: searchQuery,
-                                  ),
+                                ItemFormScreen(
+                                  isEditMode: false,
+                                  initialName: searchQuery,
                                 ),
                               );
                             },
