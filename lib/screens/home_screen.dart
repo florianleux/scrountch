@@ -4,15 +4,14 @@ import '../theme/unified_theme.dart';
 import 'search_screen.dart';
 import 'item_form_screen.dart';
 import 'csv_import_screen.dart';
-import '../theme/app_theme.dart';
 import '../widgets/custom_buttons.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   // Constantes de dimensions spécifiques à l'écran d'accueil
-  static const double _buttonHeight = AppTheme.buttonHeight;
-  static const double _iconSize = AppTheme.iconSize;
+  static const double _buttonHeight = UnifiedTheme.buttonHeight;
+  static const double _iconSize = UnifiedTheme.iconSize;
   static const double _buttonSpacing = 24;
   static const int _topSpacerFlex = 55;
   static const int _bottomSpacerFlex = 45;

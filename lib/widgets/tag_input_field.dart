@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
+import '../theme/unified_theme.dart';
 
 /// Widget pour la gestion des tags avec des chips visuels
 /// Permet d'ajouter et supprimer des tags individuellement
@@ -87,7 +87,7 @@ class _TagInputFieldState extends State<TagInputField> {
             hintText: _tags.length < widget.maxTags
                 ? 'Tapez un tag et appuyez sur Entrée'
                 : 'Maximum ${widget.maxTags} tags atteint',
-            hintStyle: AppTheme.hintStyle.copyWith(
+            hintStyle: UnifiedTheme.hintStyle.copyWith(
               fontWeight: FontWeight.w500, // Encore plus en gras
             ),
             suffixIcon: _controller.text.isNotEmpty

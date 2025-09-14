@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/navigation_service.dart';
 import '../theme/unified_theme.dart';
-import '../theme/app_theme.dart';
 import 'results_screen.dart';
 import 'home_screen.dart';
 import '../widgets/custom_text_field.dart';
@@ -115,7 +114,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: Text(
                       'TROUVER\nUN OBJET',
                       textAlign: TextAlign.center,
-                      style: AppTheme.headingStyle.copyWith(
+                      style: UnifiedTheme.headingStyle.copyWith(
                         fontSize: 38,
                         height: 1.1,
                       ),
