@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import '../models/item.dart';
 import '../constants/app_constants.dart';
 
@@ -17,9 +18,9 @@ class FirebaseService {
     try {
       await Firebase.initializeApp();
       await _signInAnonymously();
-      print("FirebaseService: Initialized successfully");
+      debugPrint("FirebaseService: Initialized successfully");
     } catch (e) {
-      print("FirebaseService: Initialization error - $e");
+      debugPrint("FirebaseService: Initialization error - $e");
       throw Exception(AppConstants.ERROR_NO_CONNECTION);
     }
   }
@@ -29,10 +30,10 @@ class FirebaseService {
     try {
       if (_auth.currentUser == null) {
         await _auth.signInAnonymously();
-        print("FirebaseService: Anonymous authentication successful");
+        debugPrint("FirebaseService: Anonymous authentication successful");
       }
     } catch (e) {
-      print("FirebaseService: Authentication error - $e");
+      debugPrint("FirebaseService: Authentication error - $e");
       throw Exception(AppConstants.ERROR_NO_CONNECTION);
     }
   }
@@ -49,7 +50,7 @@ class FirebaseService {
 
       final docRef =
           await _firestore.collection('items').add(item.toFirestore());
-      print("FirebaseService: Item created with ID - ${docRef.id}");
+      debugPrint("FirebaseService: Item created with ID - ${docRef.id}");
 
       // Return the item with the new ID
       return Item(
@@ -68,7 +69,7 @@ class FirebaseService {
         searchKeywords: item.searchKeywords,
       );
     } catch (e) {
-      print("FirebaseService: Create item error - $e");
+      debugPrint("FirebaseService: Create item error - $e");
       throw Exception(AppConstants.ERROR_SAVE_FAILED);
     }
   }
@@ -84,7 +85,7 @@ class FirebaseService {
       }
       return null;
     } catch (e) {
-      print("FirebaseService: Get item error - $e");
+      debugPrint("FirebaseService: Get item error - $e");
       throw Exception(AppConstants.ERROR_LOAD_FAILED);
     }
   }
@@ -98,9 +99,9 @@ class FirebaseService {
           .collection('items')
           .doc(item.id)
           .update(item.toFirestore());
-      print("FirebaseService: Item updated - ${item.id}");
+      debugPrint("FirebaseService: Item updated - ${item.id}");
     } catch (e) {
-      print("FirebaseService: Update item error - $e");
+      debugPrint("FirebaseService: Update item error - $e");
       throw Exception(AppConstants.ERROR_SAVE_FAILED);
     }
   }
@@ -111,9 +112,9 @@ class FirebaseService {
       await _ensureAuthenticated();
 
       await _firestore.collection('items').doc(id).delete();
-      print("FirebaseService: Item deleted - $id");
+      debugPrint("FirebaseService: Item deleted - $id");
     } catch (e) {
-      print("FirebaseService: Delete item error - $e");
+      debugPrint("FirebaseService: Delete item error - $e");
       throw Exception(AppConstants.ERROR_DELETE_FAILED);
     }
   }
@@ -136,13 +137,13 @@ class FirebaseService {
           await doc.reference.update({
             'searchKeywords': newKeywords,
           });
-          print('Updated searchKeywords for item: ${item.name}');
+          debugPrint('Updated searchKeywords for item: ${item.name}');
         }
       }
 
-      print('Migration completed successfully');
+      debugPrint('Migration completed successfully');
     } catch (e) {
-      print('Migration error: $e');
+      debugPrint('Migration error: $e');
       throw Exception('Migration failed');
     }
   }
@@ -188,11 +189,11 @@ class FirebaseService {
             item.searchKeywords.any((keyword) => keyword.contains(word)));
       }).toList();
 
-      print(
+      debugPrint(
           "FirebaseService: Search found ${filteredItems.length} items for query: $query (${searchWords.length} words)");
       return filteredItems;
     } catch (e) {
-      print("FirebaseService: Search error - $e");
+      debugPrint("FirebaseService: Search error - $e");
       throw Exception(AppConstants.ERROR_LOAD_FAILED);
     }
   }
@@ -229,10 +230,10 @@ class FirebaseService {
       final querySnapshot = await query.get();
       final items =
           querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
-      print("FirebaseService: Filter query returned ${items.length} items");
+      debugPrint("FirebaseService: Filter query returned ${items.length} items");
       return items;
     } catch (e) {
-      print("FirebaseService: Filter query error - $e");
+      debugPrint("FirebaseService: Filter query error - $e");
       throw Exception(AppConstants.ERROR_LOAD_FAILED);
     }
   }
@@ -261,10 +262,10 @@ class FirebaseService {
       final querySnapshot = await query.get();
       final items =
           querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
-      print("FirebaseService: Loaded ${items.length} items");
+      debugPrint("FirebaseService: Loaded ${items.length} items");
       return items;
     } catch (e) {
-      print("FirebaseService: Get all items error - $e");
+      debugPrint("FirebaseService: Get all items error - $e");
       throw Exception(AppConstants.ERROR_LOAD_FAILED);
     }
   }
@@ -298,7 +299,7 @@ class FirebaseService {
 
       return subcategories;
     } catch (e) {
-      print("FirebaseService: Get subcategories error - $e");
+      debugPrint("FirebaseService: Get subcategories error - $e");
       return AppConstants.SUBCATEGORIES[mainCategory] ?? [];
     }
   }
@@ -316,10 +317,10 @@ class FirebaseService {
       //   'items': FieldValue.arrayUnion([subcategory])
       // });
 
-      print(
+      debugPrint(
           "FirebaseService: Custom subcategory added - $mainCategory: $subcategory");
     } catch (e) {
-      print("FirebaseService: Add subcategory error - $e");
+      debugPrint("FirebaseService: Add subcategory error - $e");
     }
   }
 
@@ -347,10 +348,10 @@ class FirebaseService {
             .length,
       };
 
-      print("FirebaseService: Stats - $stats");
+      debugPrint("FirebaseService: Stats - $stats");
       return stats;
     } catch (e) {
-      print("FirebaseService: Get stats error - $e");
+      debugPrint("FirebaseService: Get stats error - $e");
       return {'total': 0, 'rooms': 0, 'categories': 0};
     }
   }
