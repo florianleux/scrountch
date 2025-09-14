@@ -119,7 +119,7 @@ class HomeScreen extends StatelessWidget {
     );
 
     // Si l'import a réussi, on pourrait rafraîchir l'écran ou afficher un message
-    if (result == true) {
+    if (result == true && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Import CSV terminé avec succès !'),

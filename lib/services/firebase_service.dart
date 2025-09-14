@@ -230,7 +230,8 @@ class FirebaseService {
       final querySnapshot = await query.get();
       final items =
           querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
-      debugPrint("FirebaseService: Filter query returned ${items.length} items");
+      debugPrint(
+          "FirebaseService: Filter query returned ${items.length} items");
       return items;
     } catch (e) {
       debugPrint("FirebaseService: Filter query error - $e");
