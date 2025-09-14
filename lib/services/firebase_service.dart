@@ -21,7 +21,7 @@ class FirebaseService {
       debugPrint("FirebaseService: Initialized successfully");
     } catch (e) {
       debugPrint("FirebaseService: Initialization error - $e");
-      throw Exception(AppConstants.ERROR_NO_CONNECTION);
+      throw Exception(AppConstants.errorNoConnection);
     }
   }
 
@@ -34,7 +34,7 @@ class FirebaseService {
       }
     } catch (e) {
       debugPrint("FirebaseService: Authentication error - $e");
-      throw Exception(AppConstants.ERROR_NO_CONNECTION);
+      throw Exception(AppConstants.errorNoConnection);
     }
   }
 
@@ -70,7 +70,7 @@ class FirebaseService {
       );
     } catch (e) {
       debugPrint("FirebaseService: Create item error - $e");
-      throw Exception(AppConstants.ERROR_SAVE_FAILED);
+      throw Exception(AppConstants.errorSaveFailed);
     }
   }
 
@@ -86,7 +86,7 @@ class FirebaseService {
       return null;
     } catch (e) {
       debugPrint("FirebaseService: Get item error - $e");
-      throw Exception(AppConstants.ERROR_LOAD_FAILED);
+      throw Exception(AppConstants.errorLoadFailed);
     }
   }
 
@@ -102,7 +102,7 @@ class FirebaseService {
       debugPrint("FirebaseService: Item updated - ${item.id}");
     } catch (e) {
       debugPrint("FirebaseService: Update item error - $e");
-      throw Exception(AppConstants.ERROR_SAVE_FAILED);
+      throw Exception(AppConstants.errorSaveFailed);
     }
   }
 
@@ -115,7 +115,7 @@ class FirebaseService {
       debugPrint("FirebaseService: Item deleted - $id");
     } catch (e) {
       debugPrint("FirebaseService: Delete item error - $e");
-      throw Exception(AppConstants.ERROR_DELETE_FAILED);
+      throw Exception(AppConstants.errorDeleteFailed);
     }
   }
 
@@ -194,7 +194,7 @@ class FirebaseService {
       return filteredItems;
     } catch (e) {
       debugPrint("FirebaseService: Search error - $e");
-      throw Exception(AppConstants.ERROR_LOAD_FAILED);
+      throw Exception(AppConstants.errorLoadFailed);
     }
   }
 
@@ -235,7 +235,7 @@ class FirebaseService {
       return items;
     } catch (e) {
       debugPrint("FirebaseService: Filter query error - $e");
-      throw Exception(AppConstants.ERROR_LOAD_FAILED);
+      throw Exception(AppConstants.errorLoadFailed);
     }
   }
 
@@ -267,7 +267,7 @@ class FirebaseService {
       return items;
     } catch (e) {
       debugPrint("FirebaseService: Get all items error - $e");
-      throw Exception(AppConstants.ERROR_LOAD_FAILED);
+      throw Exception(AppConstants.errorLoadFailed);
     }
   }
 
@@ -290,7 +290,7 @@ class FirebaseService {
   Future<List<String>> getSubcategories(String mainCategory) async {
     try {
       // Return predefined subcategories from constants
-      final subcategories = AppConstants.SUBCATEGORIES[mainCategory] ?? [];
+      final subcategories = AppConstants.subcategories[mainCategory] ?? [];
 
       // TODO: Could also fetch dynamic subcategories from Firestore
       // final querySnapshot = await _firestore
@@ -301,7 +301,7 @@ class FirebaseService {
       return subcategories;
     } catch (e) {
       debugPrint("FirebaseService: Get subcategories error - $e");
-      return AppConstants.SUBCATEGORIES[mainCategory] ?? [];
+      return AppConstants.subcategories[mainCategory] ?? [];
     }
   }
 

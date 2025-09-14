@@ -138,7 +138,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
     }
 
     setState(() {
-      _availableSubCategories = AppConstants.SUBCATEGORIES[mainCategory] ?? [];
+      _availableSubCategories = AppConstants.subcategories[mainCategory] ?? [];
       _selectedSubCategory = null;
       _showCustomSubCategory = false;
     });
@@ -205,7 +205,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
         await _firebaseService.updateItem(updatedItem);
 
         if (mounted) {
-          _showSnackBar(AppConstants.SUCCESS_UPDATED, isError: false);
+          _showSnackBar(AppConstants.successUpdated, isError: false);
           Navigator.pop(context, updatedItem);
         }
       } else {
@@ -227,7 +227,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
         final createdItem = await _firebaseService.createItem(newItem);
 
         if (mounted) {
-          _showSnackBar(AppConstants.SUCCESS_SAVED, isError: false);
+          _showSnackBar(AppConstants.successSaved, isError: false);
           NavigationService.pushReplacement(
             context,
             ItemDetailScreen(
@@ -239,7 +239,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        _showSnackBar(AppConstants.ERROR_SAVE_FAILED, isError: true);
+        _showSnackBar(AppConstants.errorSaveFailed, isError: true);
       }
     } finally {
       if (mounted) {
@@ -265,7 +265,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
       return await ConfirmationDialog.show(
         context: context,
         title: 'Modifications non sauvées',
-        content: AppConstants.CONFIRM_UNSAVED_CHANGES,
+        content: AppConstants.confirmUnsavedChanges,
         confirmText: 'QUITTER',
         cancelText: 'RESTER',
         confirmIconPath: 'assets/images/cross_icon.png',
@@ -289,9 +289,10 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
       canPop: false,
       onPopInvokedWithResult: (bool didPop, dynamic result) async {
         if (didPop) return;
+        final navigator = Navigator.of(context);
         final shouldPop = await _onWillPop();
         if (shouldPop && mounted) {
-          Navigator.of(context).pop();
+          navigator.pop();
         }
       },
       child: Scaffold(
@@ -381,7 +382,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                               maxLength: AppConstants.maxNameLength,
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
-                                  return AppConstants.ERROR_NAME_REQUIRED;
+                                  return AppConstants.errorNameRequired;
                                 }
                                 return null;
                               },
@@ -395,7 +396,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                               labelText: 'Catégorie',
                               isRequired: true,
                               items:
-                                  AppConstants.MAIN_CATEGORIES.map((category) {
+                                  AppConstants.mainCategories.map((category) {
                                 return DropdownMenuItem(
                                   value: category,
                                   child: Text(
@@ -490,8 +491,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                                 CustomTextField(
                                   controller: _customSubcategoryController,
                                   labelText: 'Sous-catégorie personnalisée',
-                                  maxLength:
-                                      AppConstants.maxSubcategoryLength,
+                                  maxLength: AppConstants.maxSubcategoryLength,
                                 ),
                                 const SizedBox(height: 20),
                               ],
@@ -541,7 +541,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                               },
                               validator: (value) {
                                 if (value == null) {
-                                  return AppConstants.ERROR_ROOM_REQUIRED;
+                                  return AppConstants.errorRoomRequired;
                                 }
                                 return null;
                               },
@@ -749,9 +749,10 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                               onPressed: _isLoading
                                   ? null
                                   : () async {
+                                      final navigator = Navigator.of(context);
                                       final shouldPop = await _onWillPop();
                                       if (shouldPop && mounted) {
-                                        Navigator.pop(context);
+                                        navigator.pop();
                                       }
                                     },
                               text: 'ANNULER',

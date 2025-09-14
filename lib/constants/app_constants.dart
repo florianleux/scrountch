@@ -17,7 +17,7 @@ class AppConstants {
 
   static const List<String> owners = ['Marie', 'Florian', 'Alice', 'Oscar'];
 
-  static const List<String> MAIN_CATEGORIES = [
+  static const List<String> mainCategories = [
     'Vêtements',
     'Cuisine',
     'Électronique',
@@ -35,7 +35,7 @@ class AppConstants {
   ];
 
   // Subcategories maps
-  static const Map<String, List<String>> SUBCATEGORIES = {
+  static const Map<String, List<String>> subcategories = {
     'Vêtements': [
       'Hauts manches longues',
       'Hauts manches courtes',
@@ -233,29 +233,29 @@ class AppConstants {
   static const int maxSubcategoryLength = 50;
 
   // MESSAGES D'INTERFACE
-  static const String ERROR_NAME_REQUIRED = "Le nom est obligatoire";
-  static const String ERROR_ROOM_REQUIRED = "La pièce est obligatoire";
-  static const String ERROR_MAX_TAGS = "Maximum 5 tags autorisés";
-  static const String ERROR_TAG_LENGTH =
+  static const String errorNameRequired = "Le nom est obligatoire";
+  static const String errorRoomRequired = "La pièce est obligatoire";
+  static const String errorMaxTags = "Maximum 5 tags autorisés";
+  static const String errorTagLength =
       "Chaque tag ne peut pas dépasser 25 caractères";
-  static const String ERROR_CHOOSE_ROOM_FIRST = "Choisissez d'abord une pièce";
-  static const String ERROR_CHOOSE_LOCATION_FIRST =
+  static const String errorChooseRoomFirst = "Choisissez d'abord une pièce";
+  static const String errorChooseLocationFirst =
       "Choisissez d'abord un meuble";
-  static const String ERROR_NO_SUBLOCATION = "Aucun emplacement disponible";
+  static const String errorNoSublocation = "Aucun emplacement disponible";
 
   // CONFIRMATIONS
-  static const String CONFIRM_UNSAVED_CHANGES =
+  static const String confirmUnsavedChanges =
       "Vous avez des modifications non sauvées. Quitter quand même ?";
-  static const String CONFIRM_MODIFY =
+  static const String confirmModify =
       "Êtes-vous sûr de vouloir modifier cet objet ?";
 
   // SUCCÈS/ERREUR
-  static const String SUCCESS_SAVED = "Objet enregistré avec succès";
-  static const String SUCCESS_UPDATED = "Objet modifié avec succès";
-  static const String ERROR_SAVE_FAILED = "Erreur lors de la sauvegarde";
-  static const String ERROR_LOAD_FAILED =
+  static const String successSaved = "Objet enregistré avec succès";
+  static const String successUpdated = "Objet modifié avec succès";
+  static const String errorSaveFailed = "Erreur lors de la sauvegarde";
+  static const String errorLoadFailed =
       "Erreur lors du chargement des données";
-  static const String ERROR_DELETE_FAILED = "Erreur lors de la suppression";
-  static const String ERROR_NO_CONNECTION =
+  static const String errorDeleteFailed = "Erreur lors de la suppression";
+  static const String errorNoConnection =
       "Pas de connexion internet. Vérifiez votre réseau.";
 }

@@ -284,14 +284,14 @@ class CsvService {
 
     // Validation de la catégorie principale
     if (categoriePrincipale != null &&
-        !AppConstants.MAIN_CATEGORIES.contains(categoriePrincipale)) {
+        !AppConstants.mainCategories.contains(categoriePrincipale)) {
       return 'Catégorie principale invalide: "$categoriePrincipale"';
     }
 
     // Validation de la sous-catégorie
     if (sousCategorie != null && categoriePrincipale != null) {
       final availableSubCategories =
-          AppConstants.SUBCATEGORIES[categoriePrincipale] ?? [];
+          AppConstants.subcategories[categoriePrincipale] ?? [];
       if (!availableSubCategories.contains(sousCategorie)) {
         return 'Sous-catégorie invalide pour "$categoriePrincipale": "$sousCategorie"';
       }
