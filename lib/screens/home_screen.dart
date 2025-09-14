@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/navigation_service.dart';
+import '../theme/unified_theme.dart';
 import 'search_screen.dart';
 import 'item_form_screen.dart';
 import 'csv_import_screen.dart';
@@ -19,7 +20,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.primaryYellow,
+      backgroundColor: UnifiedTheme.primaryYellow,
       body: Stack(
         children: [
           _buildBackground(),
@@ -119,10 +120,7 @@ class HomeScreen extends StatelessWidget {
     // Si l'import a réussi, on pourrait rafraîchir l'écran ou afficher un message
     if (result == true) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Import CSV terminé avec succès !'),
-          backgroundColor: Colors.green,
-        ),
+        UnifiedTheme.successSnackBar('Import CSV terminé avec succès !'),
       );
     }
   }
