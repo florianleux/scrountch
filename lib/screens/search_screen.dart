@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/navigation_service.dart';
+import '../theme/unified_theme.dart';
 import '../theme/app_theme.dart';
 import 'results_screen.dart';
 import 'home_screen.dart';
@@ -57,7 +58,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFE333), // Fond jaune clair
+      backgroundColor: UnifiedTheme.primaryYellow,
       body: Stack(
         children: [
           // Image de fond par-dessus le fond jaune
