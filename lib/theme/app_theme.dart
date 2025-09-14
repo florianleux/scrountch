@@ -78,7 +78,7 @@ class AppTheme {
   // Thème global pour tous les inputs
   static const InputDecorationTheme inputDecorationTheme = InputDecorationTheme(
     contentPadding: EdgeInsets.symmetric(
-      vertical: 16, // Padding vertical pour TOUS les inputs
+      vertical: 20, // Padding vertical uniforme pour tous les inputs
       horizontal: 12, // Padding horizontal pour TOUS les inputs
     ),
   );

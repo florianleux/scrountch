@@ -7,6 +7,7 @@ import 'item_detail_screen.dart';
 import 'home_screen.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_buttons.dart';
+import '../widgets/custom_dropdown.dart';
 import '../widgets/confirmation_dialog.dart';
 import '../widgets/tag_input_field.dart';
 
@@ -385,34 +386,10 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                             const SizedBox(height: 10),
 
                             // Catégorie principale
-                            DropdownButtonFormField<String>(
+                            CustomDropdown<String>(
                               value: _selectedMainCategory,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              iconEnabledColor: Colors.black,
-                              decoration: const InputDecoration(
-                                labelText: 'Catégorie *',
-                                labelStyle: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 20,
-                                    horizontal:
-                                        12), // Augmenté pour égaler les champs avec icônes
-                                filled: true,
-                                fillColor: Color(0xFFFFE333),
-                              ),
-                              dropdownColor: const Color(0xFFFFE333),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Veuillez sélectionner une catégorie';
-                                }
-                                return null;
-                              },
+                              labelText: 'Catégorie',
+                              isRequired: true,
                               items:
                                   AppConstants.MAIN_CATEGORIES.map((category) {
                                 return DropdownMenuItem(
@@ -434,51 +411,38 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                                 });
                                 _updateSubCategoriesForMainCategory(value);
                               },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Veuillez sélectionner une catégorie';
+                                }
+                                return null;
+                              },
                             ),
 
                             const SizedBox(height: 20),
 
                             // Sous-catégorie (conditionnelle)
                             if (_selectedMainCategory != null) ...[
-                              DropdownButtonFormField<String>(
+                              CustomDropdown<String>(
                                 value: _selectedSubCategory,
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                iconEnabledColor: Colors.black,
-                                decoration: InputDecoration(
-                                  labelText: 'Sous-catégorie',
-                                  labelStyle: const TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 20,
-                                      horizontal:
-                                          12), // Uniformisé avec les autres champs
-                                  filled: true,
-                                  fillColor: const Color(0xFFFFE333),
-                                  suffixIcon: _selectedSubCategory != null
-                                      ? IconButton(
-                                          icon: Image.asset(
-                                            'assets/images/cross_icon.png',
-                                            width: 20,
-                                            height: 20,
-                                            color: Colors.black,
-                                          ),
-                                          onPressed: () {
-                                            setState(() {
-                                              _selectedSubCategory = null;
-                                              _showCustomSubCategory = false;
-                                              _hasUnsavedChanges = true;
-                                            });
-                                          },
-                                        )
-                                      : null,
-                                ),
-                                dropdownColor: const Color(0xFFFFE333),
+                                labelText: 'Sous-catégorie',
+                                suffixIcon: _selectedSubCategory != null
+                                    ? IconButton(
+                                        icon: Image.asset(
+                                          'assets/images/cross_icon.png',
+                                          width: 20,
+                                          height: 20,
+                                          color: Colors.black,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedSubCategory = null;
+                                            _showCustomSubCategory = false;
+                                            _hasUnsavedChanges = true;
+                                          });
+                                        },
+                                      )
+                                    : null,
                                 items: [
                                   ..._availableSubCategories.map((subCategory) {
                                     return DropdownMenuItem(
@@ -544,44 +508,11 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                             const SizedBox(height: 16),
 
                             // Pièce (obligatoire)
-                            DropdownButtonFormField<String>(
+                            CustomIconDropdown<String>(
                               value: _selectedRoom,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              iconEnabledColor: Colors.black,
-                              decoration: InputDecoration(
-                                labelText: 'Pièce *',
-                                labelStyle: const TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 8,
-                                    horizontal:
-                                        12), // Réduit pour compenser l'icône
-                                prefixIcon: Padding(
-                                  padding: const EdgeInsets.all(
-                                      4.0), // Réduit pour compenser l'icône plus grande
-                                  child: Image.asset(
-                                    'assets/images/room_icon.png',
-                                    width: 32, // Augmenté de 24 à 32
-                                    height: 32, // Augmenté de 24 à 32
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                filled: true,
-                                fillColor: const Color(0xFFFFE333),
-                              ),
-                              dropdownColor: const Color(0xFFFFE333),
-                              validator: (value) {
-                                if (value == null) {
-                                  return AppConstants.ERROR_ROOM_REQUIRED;
-                                }
-                                return null;
-                              },
+                              labelText: 'Pièce',
+                              isRequired: true,
+                              iconAsset: 'assets/images/room_icon.png',
                               items: LocationData.getRooms().map((room) {
                                 return DropdownMenuItem(
                                   value: room,
@@ -604,65 +535,43 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                                   _updateLocationsForRoom(value);
                                 }
                               },
+                              validator: (value) {
+                                if (value == null) {
+                                  return AppConstants.ERROR_ROOM_REQUIRED;
+                                }
+                                return null;
+                              },
                             ),
 
                             // Location (conditionnelle)
                             if (_selectedRoom != null) ...[
                               const SizedBox(height: 16),
 
-                              DropdownButtonFormField<String>(
+                              CustomIconDropdown<String>(
                                 value: _selectedLocation,
+                                labelText: 'Meuble/Zone',
+                                iconAsset: 'assets/images/shelf_icon.png',
                                 isExpanded:
                                     true, // Utilise toute la largeur disponible
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize:
-                                      16, // Légèrement réduit pour éviter l'overflow
-                                ),
-                                iconEnabledColor: Colors.black,
-                                decoration: InputDecoration(
-                                  labelText: 'Meuble/Zone',
-                                  labelStyle: const TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 8,
-                                      horizontal:
-                                          12), // Réduit pour compenser l'icône
-                                  prefixIcon: Padding(
-                                    padding: const EdgeInsets.all(
-                                        4.0), // Réduit pour compenser l'icône plus grande
-                                    child: Image.asset(
-                                      'assets/images/shelf_icon.png',
-                                      width: 32, // Augmenté de 24 à 32
-                                      height: 32, // Augmenté de 24 à 32
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  suffixIcon: _selectedLocation != null
-                                      ? IconButton(
-                                          icon: Image.asset(
-                                            'assets/images/cross_icon.png',
-                                            width: 20,
-                                            height: 20,
-                                            color: Colors.black,
-                                          ),
-                                          onPressed: () {
-                                            setState(() {
-                                              _selectedLocation = null;
-                                              _selectedSubLocation = null;
-                                              _hasUnsavedChanges = true;
-                                            });
-                                          },
-                                        )
-                                      : null,
-                                  filled: true,
-                                  fillColor: const Color(0xFFFFE333),
-                                ),
-                                dropdownColor: const Color(0xFFFFE333),
+                                fontSize:
+                                    16, // Légèrement réduit pour éviter l'overflow
+                                suffixIcon: _selectedLocation != null
+                                    ? IconButton(
+                                        icon: Image.asset(
+                                          'assets/images/cross_icon.png',
+                                          width: 20,
+                                          height: 20,
+                                          color: Colors.black,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedLocation = null;
+                                            _selectedSubLocation = null;
+                                            _hasUnsavedChanges = true;
+                                          });
+                                        },
+                                      )
+                                    : null,
                                 items: _availableLocations.map((location) {
                                   return DropdownMenuItem(
                                     value: location,
@@ -702,54 +611,26 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                                   LocationData.hasSubLocations(
                                       _selectedRoom!, _selectedLocation!)) ...[
                                 const SizedBox(height: 16),
-                                DropdownButtonFormField<String>(
+                                CustomIconDropdown<String>(
                                   value: _selectedSubLocation,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  iconEnabledColor: Colors.black,
-                                  decoration: InputDecoration(
-                                    labelText: 'Emplacement précis',
-                                    labelStyle: const TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 8,
-                                        horizontal:
-                                            12), // Réduit pour compenser l'icône
-                                    prefixIcon: Padding(
-                                      padding: const EdgeInsets.all(
-                                          4.0), // Réduit pour compenser l'icône plus grande
-                                      child: Image.asset(
-                                        'assets/images/spot_icon.png',
-                                        width: 32, // Augmenté de 24 à 32
-                                        height: 32, // Augmenté de 24 à 32
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    suffixIcon: _selectedSubLocation != null
-                                        ? IconButton(
-                                            icon: Image.asset(
-                                              'assets/images/cross_icon.png',
-                                              width: 20,
-                                              height: 20,
-                                              color: Colors.black,
-                                            ),
-                                            onPressed: () {
-                                              setState(() {
-                                                _selectedSubLocation = null;
-                                                _hasUnsavedChanges = true;
-                                              });
-                                            },
-                                          )
-                                        : null,
-                                    filled: true,
-                                    fillColor: const Color(0xFFFFE333),
-                                  ),
-                                  dropdownColor: const Color(0xFFFFE333),
+                                  labelText: 'Emplacement précis',
+                                  iconAsset: 'assets/images/spot_icon.png',
+                                  suffixIcon: _selectedSubLocation != null
+                                      ? IconButton(
+                                          icon: Image.asset(
+                                            'assets/images/cross_icon.png',
+                                            width: 20,
+                                            height: 20,
+                                            color: Colors.black,
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              _selectedSubLocation = null;
+                                              _hasUnsavedChanges = true;
+                                            });
+                                          },
+                                        )
+                                      : null,
                                   items:
                                       _availableSubLocations.map((subLocation) {
                                     return DropdownMenuItem(
@@ -786,44 +667,25 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
 
                             const SizedBox(height: 16),
                             // Propriétaire
-                            DropdownButtonFormField<String>(
+                            CustomDropdown<String>(
                               value: _selectedOwner,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              iconEnabledColor: Colors.black,
-                              decoration: InputDecoration(
-                                labelText: 'Propriétaire',
-                                labelStyle: const TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 20,
-                                    horizontal:
-                                        12), // Uniformisé avec les champs sans icônes
-                                suffixIcon: _selectedOwner != null
-                                    ? IconButton(
-                                        icon: Image.asset(
-                                          'assets/images/cross_icon.png',
-                                          width: 20,
-                                          height: 20,
-                                          color: Colors.black,
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            _selectedOwner = null;
-                                            _hasUnsavedChanges = true;
-                                          });
-                                        },
-                                      )
-                                    : null,
-                                filled: true,
-                                fillColor: const Color(0xFFFFE333),
-                              ),
-                              dropdownColor: const Color(0xFFFFE333),
+                              labelText: 'Propriétaire',
+                              suffixIcon: _selectedOwner != null
+                                  ? IconButton(
+                                      icon: Image.asset(
+                                        'assets/images/cross_icon.png',
+                                        width: 20,
+                                        height: 20,
+                                        color: Colors.black,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _selectedOwner = null;
+                                          _hasUnsavedChanges = true;
+                                        });
+                                      },
+                                    )
+                                  : null,
                               items: AppConstants.OWNERS.map((owner) {
                                 return DropdownMenuItem(
                                   value: owner,
