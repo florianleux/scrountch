@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/item.dart';
 import '../services/firebase_service.dart';
+import '../services/navigation_service.dart';
+import '../theme/unified_theme.dart';
 import '../constants/app_constants.dart';
 import '../constants/location_data.dart';
 import 'item_detail_screen.dart';
@@ -226,13 +228,11 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
 
         if (mounted) {
           _showSnackBar(AppConstants.SUCCESS_SAVED, isError: false);
-          Navigator.pushReplacement(
+          NavigationService.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => ItemDetailScreen(
-                item: createdItem,
-                isFromCreation: true,
-              ),
+            ItemDetailScreen(
+              item: createdItem,
+              isFromCreation: true,
             ),
           );
         }
@@ -295,8 +295,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor:
-            const Color(0xFFFFE333), // Fond jaune clair comme search_screen
+        backgroundColor: UnifiedTheme.primaryYellow,
         body: Stack(
           children: [
             // Image de fond par-dessus le fond jaune
@@ -331,11 +330,9 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                           const Spacer(),
                           GestureDetector(
                             onTap: () {
-                              Navigator.pushAndRemoveUntil(
+                              NavigationService.pushAndRemoveUntil(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => const HomeScreen()),
-                                (route) => false,
+                                const HomeScreen(),
                               );
                             },
                             child: Image.asset(
