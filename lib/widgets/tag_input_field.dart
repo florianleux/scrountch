@@ -90,24 +90,29 @@ class _TagInputFieldState extends State<TagInputField> {
             hintStyle: UnifiedTheme.hintStyle.copyWith(
               fontWeight: FontWeight.w500, // Encore plus en gras
             ),
-            suffixIcon: _controller.text.isNotEmpty
-                ? IconButton(
-                    icon: Image.asset(
-                      'assets/images/plus_icon.png',
-                      width: 20,
-                      height: 20,
-                      color: Colors.black,
-                    ),
-                    onPressed: () => _addTag(_controller.text),
-                  )
-                : null,
+            suffixIcon: ValueListenableBuilder<TextEditingValue>(
+              valueListenable: _controller,
+              builder: (context, value, child) {
+                return value.text.isNotEmpty
+                    ? IconButton(
+                        icon: Image.asset(
+                          'assets/images/plus_icon.png',
+                          width: 20,
+                          height: 20,
+                          color: Colors.black,
+                        ),
+                        onPressed: () => _addTag(_controller.text),
+                      )
+                    : const SizedBox.shrink();
+              },
+            ),
             filled: true,
             fillColor: const Color(0xFFFFE333),
           ),
           enabled: _tags.length < widget.maxTags,
           onFieldSubmitted: _onSubmitted,
           onChanged: (value) {
-            setState(() {}); // Pour mettre à jour l'icône plus
+            // L'icône plus se met à jour automatiquement via _controller.text.isNotEmpty
           },
         ),
 

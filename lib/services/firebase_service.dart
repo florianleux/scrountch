@@ -161,79 +161,6 @@ class FirebaseService {
     }
   }
 
-  // Get items by filters
-  Future<List<Item>> getItemsByFilters({
-    String? room,
-    String? mainCategory,
-    String? subCategory,
-    String? owner,
-    int? limit,
-  }) async {
-    try {
-      await _ensureAuthenticated();
-
-      Query query = _firestore.collection('items');
-
-      if (room != null) {
-        query = query.where('room', isEqualTo: room);
-      }
-      if (mainCategory != null) {
-        query = query.where('mainCategory', isEqualTo: mainCategory);
-      }
-      if (subCategory != null) {
-        query = query.where('subCategory', isEqualTo: subCategory);
-      }
-      if (owner != null) {
-        query = query.where('owner', isEqualTo: owner);
-      }
-      if (limit != null) {
-        query = query.limit(limit);
-      }
-
-      final querySnapshot = await query.get();
-      final items =
-          querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
-      debugPrint(
-          "FirebaseService: Filter query returned ${items.length} items");
-      return items;
-    } catch (e) {
-      debugPrint("FirebaseService: Filter query error - $e");
-      throw Exception(AppConstants.errorLoadFailed);
-    }
-  }
-
-  // Get all items (paginated)
-  Future<List<Item>> getAllItems({
-    int limit = 20,
-    String? startAfter,
-  }) async {
-    try {
-      await _ensureAuthenticated();
-
-      Query query =
-          _firestore.collection('items').orderBy('updatedAt', descending: true);
-
-      if (startAfter != null) {
-        final lastDoc =
-            await _firestore.collection('items').doc(startAfter).get();
-        if (lastDoc.exists) {
-          query = query.startAfterDocument(lastDoc);
-        }
-      }
-
-      query = query.limit(limit);
-
-      final querySnapshot = await query.get();
-      final items =
-          querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
-      debugPrint("FirebaseService: Loaded ${items.length} items");
-      return items;
-    } catch (e) {
-      debugPrint("FirebaseService: Get all items error - $e");
-      throw Exception(AppConstants.errorLoadFailed);
-    }
-  }
-
   // Subcategory management
   Future<List<String>> getSubcategories(String mainCategory) async {
     try {
@@ -247,21 +174,10 @@ class FirebaseService {
     }
   }
 
-  Future<void> addCustomSubcategory(
-      String mainCategory, String subcategory) async {
-    try {
-      await _ensureAuthenticated();
-
-      debugPrint(
-          "FirebaseService: Custom subcategory added - $mainCategory: $subcategory");
-    } catch (e) {
-      debugPrint("FirebaseService: Add subcategory error - $e");
-    }
-  }
-
-  // Alias pour addCustomSubcategory (utilisé dans item_form_screen.dart)
+  // Add subcategory (currently just logs - no actual storage)
   Future<void> addSubcategory(String mainCategory, String subcategory) async {
-    await addCustomSubcategory(mainCategory, subcategory);
+    debugPrint(
+        "FirebaseService: Custom subcategory added - $mainCategory: $subcategory");
   }
 
   // Private helper methods
