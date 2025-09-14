@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import '../services/navigation_service.dart';
 import '../theme/unified_theme.dart';
 import 'results_screen.dart';
-import 'home_screen.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_buttons.dart';
+import '../widgets/app_header.dart';
+import '../widgets/background_image.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -61,14 +62,9 @@ class _SearchScreenState extends State<SearchScreen> {
       body: Stack(
         children: [
           // Image de fond par-dessus le fond jaune
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.2,
-              child: Image.asset(
-                'assets/images/search_bg.png',
-                fit: BoxFit.cover,
-              ),
-            ),
+          const BackgroundImage(
+            imagePath: 'assets/images/search_bg.png',
+            opacity: 0.2,
           ),
           // Contenu principal
           SafeArea(
@@ -78,35 +74,7 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Column(
                 children: [
                   // Header avec retour et logo
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Image.asset(
-                          'assets/images/back_icon.png',
-                          width: 50,
-                          height: 50,
-                        ),
-                      ),
-                      const Spacer(),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const HomeScreen()),
-                            (route) =>
-                                false, // Supprime toutes les routes précédentes
-                          );
-                        },
-                        child: Image.asset(
-                          'assets/images/home_icon.png',
-                          width: 50,
-                          height: 50,
-                        ),
-                      ),
-                    ],
-                  ),
+                  const AppHeader(),
 
                   SizedBox(height: 140),
                   // Titre centré

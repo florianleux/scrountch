@@ -119,43 +119,6 @@ class FirebaseService {
     }
   }
 
-  // Migration function to update searchKeywords for existing items
-  Future<void> migrateSearchKeywords() async {
-    try {
-      await _ensureAuthenticated();
-
-      final querySnapshot = await _firestore.collection('items').get();
-
-      for (final doc in querySnapshot.docs) {
-        final item = Item.fromFirestore(doc);
-
-        // Régénérer les searchKeywords avec seulement le nom
-        final newKeywords = Item.generateSearchKeywordsFromName(item.name);
-
-        // Mettre à jour seulement si les keywords ont changé
-        if (!_listsEqual(item.searchKeywords, newKeywords)) {
-          await doc.reference.update({
-            'searchKeywords': newKeywords,
-          });
-          debugPrint('Updated searchKeywords for item: ${item.name}');
-        }
-      }
-
-      debugPrint('Migration completed successfully');
-    } catch (e) {
-      debugPrint('Migration error: $e');
-      throw Exception('Migration failed');
-    }
-  }
-
-  bool _listsEqual(List<String> list1, List<String> list2) {
-    if (list1.length != list2.length) return false;
-    for (int i = 0; i < list1.length; i++) {
-      if (list1[i] != list2[i]) return false;
-    }
-    return true;
-  }
-
   // Search items by name
   Future<List<Item>> searchItems(String query) async {
     try {
@@ -271,32 +234,11 @@ class FirebaseService {
     }
   }
 
-  // Get items by room
-  Future<List<Item>> getItemsByRoom(String room) async {
-    return getItemsByFilters(room: room);
-  }
-
-  // Get items by category
-  Future<List<Item>> getItemsByCategory(String category) async {
-    return getItemsByFilters(mainCategory: category);
-  }
-
-  // Get items by owner
-  Future<List<Item>> getItemsByOwner(String owner) async {
-    return getItemsByFilters(owner: owner);
-  }
-
   // Subcategory management
   Future<List<String>> getSubcategories(String mainCategory) async {
     try {
       // Return predefined subcategories from constants
       final subcategories = AppConstants.subcategories[mainCategory] ?? [];
-
-      // TODO: Could also fetch dynamic subcategories from Firestore
-      // final querySnapshot = await _firestore
-      //     .collection('subcategories')
-      //     .doc(mainCategory)
-      //     .get();
 
       return subcategories;
     } catch (e) {
@@ -310,14 +252,6 @@ class FirebaseService {
     try {
       await _ensureAuthenticated();
 
-      // TODO: Save custom subcategory to Firestore
-      // await _firestore
-      //     .collection('subcategories')
-      //     .doc(mainCategory)
-      //     .update({
-      //   'items': FieldValue.arrayUnion([subcategory])
-      // });
-
       debugPrint(
           "FirebaseService: Custom subcategory added - $mainCategory: $subcategory");
     } catch (e) {
@@ -328,33 +262,6 @@ class FirebaseService {
   // Alias pour addCustomSubcategory (utilisé dans item_form_screen.dart)
   Future<void> addSubcategory(String mainCategory, String subcategory) async {
     await addCustomSubcategory(mainCategory, subcategory);
-  }
-
-  // Get item statistics
-  Future<Map<String, int>> getItemStats() async {
-    try {
-      await _ensureAuthenticated();
-
-      final querySnapshot = await _firestore.collection('items').get();
-      final items =
-          querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
-
-      final stats = {
-        'total': items.length,
-        'rooms': items.map((item) => item.room).toSet().length,
-        'categories': items
-            .map((item) => item.mainCategory)
-            .where((cat) => cat != null)
-            .toSet()
-            .length,
-      };
-
-      debugPrint("FirebaseService: Stats - $stats");
-      return stats;
-    } catch (e) {
-      debugPrint("FirebaseService: Get stats error - $e");
-      return {'total': 0, 'rooms': 0, 'categories': 0};
-    }
   }
 
   // Private helper methods

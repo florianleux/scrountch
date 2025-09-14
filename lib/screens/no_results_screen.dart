@@ -3,8 +3,8 @@ import '../theme/unified_theme.dart';
 import '../services/navigation_service.dart';
 import 'search_screen.dart';
 import 'item_form_screen.dart';
-import 'home_screen.dart';
 import '../widgets/custom_buttons.dart';
+import '../widgets/app_header.dart';
 
 class NoResultsScreen extends StatelessWidget {
   final String searchQuery;
@@ -37,35 +37,7 @@ class NoResultsScreen extends StatelessWidget {
               child: Column(
                 children: [
                   // Header avec retour et logo
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Image.asset(
-                            'assets/images/back_icon.png',
-                            width: 50,
-                            height: 50,
-                          ),
-                        ),
-                        const Spacer(),
-                        GestureDetector(
-                          onTap: () {
-                            NavigationService.pushAndRemoveUntil(
-                              context,
-                              const HomeScreen(),
-                            );
-                          },
-                          child: Image.asset(
-                            'assets/images/home_icon.png',
-                            width: 50,
-                            height: 50,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  const AppHeader(),
                   const SizedBox(height: 40),
 
                   // Titre formaté comme les autres pages

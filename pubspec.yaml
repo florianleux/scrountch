@@ -12,7 +12,6 @@ dependencies:
   firebase_core: 4.1.0
   firebase_auth: ^6.0.2
   cloud_firestore: ^6.0.1
-  # firebase_firestore: problème de version - à ajouter plus tard
   file_picker: ^6.1.1
   csv: ^5.0.2
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/button_styles.dart';
+import '../theme/unified_theme.dart';
 
 /// Bouton Primary: Fond noir, texte/icône jaunes
 class PrimaryButton extends StatelessWidget {
@@ -24,15 +24,17 @@ class PrimaryButton extends StatelessWidget {
       height: height,
       child: ElevatedButton(
         onPressed: onPressed,
-        style: AppButtonStyles.primary,
+        style: UnifiedTheme.primaryButtonStyle.copyWith(
+          minimumSize: WidgetStateProperty.all(Size(double.infinity, height)),
+        ),
         child: iconPath != null
-            ? AppButtonStyles.buildButtonContent(
+            ? UnifiedTheme.buildButtonContent(
                 iconPath: iconPath!,
                 text: text,
-                iconColor: const Color(0xFFFFE333),
+                iconColor: UnifiedTheme.primaryYellow,
                 iconSize: iconSize,
               )
-            : Text(text, style: AppButtonStyles.buttonTextStyle),
+            : Text(text, style: UnifiedTheme.buttonTextStyle),
       ),
     );
   }
@@ -61,15 +63,17 @@ class SecondaryButton extends StatelessWidget {
       height: height,
       child: ElevatedButton(
         onPressed: onPressed,
-        style: AppButtonStyles.secondary,
+        style: UnifiedTheme.secondaryButtonStyle.copyWith(
+          minimumSize: WidgetStateProperty.all(Size(double.infinity, height)),
+        ),
         child: iconPath != null
-            ? AppButtonStyles.buildButtonContent(
+            ? UnifiedTheme.buildButtonContent(
                 iconPath: iconPath!,
                 text: text,
-                iconColor: Colors.black,
+                iconColor: UnifiedTheme.textBlack,
                 iconSize: iconSize,
               )
-            : Text(text, style: AppButtonStyles.buttonTextStyle),
+            : Text(text, style: UnifiedTheme.buttonTextStyle),
       ),
     );
   }
@@ -95,9 +99,9 @@ class TertiaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Style spécifique pour les boutons tertiary avec taille réduite de 20%
-    final tertiaryTextStyle = AppButtonStyles.buttonTextStyle.copyWith(
+    final tertiaryTextStyle = UnifiedTheme.buttonTextStyle.copyWith(
       fontSize:
-          AppButtonStyles.buttonTextStyle.fontSize! * 0.8, // 24 * 0.8 = 19.2px
+          UnifiedTheme.buttonTextStyle.fontSize! * 0.8, // 24 * 0.8 = 19.2px
     );
 
     return SizedBox(
@@ -105,7 +109,9 @@ class TertiaryButton extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
-        style: AppButtonStyles.tertiary,
+        style: UnifiedTheme.tertiaryButtonStyle.copyWith(
+          minimumSize: WidgetStateProperty.all(Size(double.infinity, height)),
+        ),
         child: iconPath != null
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -114,7 +120,7 @@ class TertiaryButton extends StatelessWidget {
                     iconPath!,
                     width: iconSize,
                     height: iconSize,
-                    color: Colors.black,
+                    color: UnifiedTheme.textBlack,
                   ),
                   const SizedBox(width: 8),
                   Text(

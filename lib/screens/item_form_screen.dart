@@ -6,12 +6,12 @@ import '../theme/unified_theme.dart';
 import '../constants/app_constants.dart';
 import '../constants/location_data.dart';
 import 'item_detail_screen.dart';
-import 'home_screen.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_buttons.dart';
 import '../widgets/custom_dropdown.dart';
 import '../widgets/confirmation_dialog.dart';
 import '../widgets/tag_input_field.dart';
+import '../widgets/app_header.dart';
 
 class ItemFormScreen extends StatefulWidget {
   final bool isEditMode;
@@ -316,35 +316,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                 child: Column(
                   children: [
                     // Header avec retour et logo
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: Image.asset(
-                              'assets/images/back_icon.png',
-                              width: 50,
-                              height: 50,
-                            ),
-                          ),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: () {
-                              NavigationService.pushAndRemoveUntil(
-                                context,
-                                const HomeScreen(),
-                              );
-                            },
-                            child: Image.asset(
-                              'assets/images/home_icon.png',
-                              width: 50,
-                              height: 50,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    const AppHeader(),
                     const SizedBox(height: 40),
 
                     // Titre formaté comme les autres pages

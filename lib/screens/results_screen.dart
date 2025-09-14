@@ -5,8 +5,8 @@ import '../services/navigation_service.dart';
 import '../theme/unified_theme.dart';
 import 'no_results_screen.dart';
 import 'item_detail_screen.dart';
-import 'home_screen.dart';
 import '../widgets/item_card.dart';
+import '../widgets/app_header.dart';
 
 class ResultsScreen extends StatefulWidget {
   final String searchQuery;
@@ -124,37 +124,7 @@ class _ResultsScreenState extends State<ResultsScreen>
               child: Column(
                 children: [
                   // Header avec retour et logo
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Image.asset(
-                            'assets/images/back_icon.png',
-                            width: 50,
-                            height: 50,
-                          ),
-                        ),
-                        const Spacer(),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const HomeScreen()),
-                              (route) => false,
-                            );
-                          },
-                          child: Image.asset(
-                            'assets/images/home_icon.png',
-                            width: 50,
-                            height: 50,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  const AppHeader(),
 
                   const SizedBox(height: 40),
                   // Titre des résultats
