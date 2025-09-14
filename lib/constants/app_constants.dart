@@ -1,5 +1,5 @@
 class AppConstants {
-  static const List<String> ROOMS = [
+  static const List<String> rooms = [
     'Salon',
     'Cuisine',
     'Salle de bain',
@@ -15,12 +15,7 @@ class AppConstants {
     'Extérieur'
   ];
 
-  static const List<String> OWNERS = [
-    'Marie',
-    'Florian',
-    'Alice',
-    'Oscar'
-  ];
+  static const List<String> owners = ['Marie', 'Florian', 'Alice', 'Oscar'];
 
   static const List<String> MAIN_CATEGORIES = [
     'Vêtements',
@@ -231,30 +226,36 @@ class AppConstants {
   };
 
   // LIMITES DE VALIDATION
-  static const int MAX_NAME_LENGTH = 100;
-  static const int MAX_DESCRIPTION_LENGTH = 500;
-  static const int MAX_TAGS = 5;
-  static const int MAX_TAG_LENGTH = 25;
-  static const int MAX_SUBCATEGORY_LENGTH = 50;
+  static const int maxNameLength = 100;
+  static const int maxDescriptionLength = 500;
+  static const int maxTags = 5;
+  static const int maxTagLength = 25;
+  static const int maxSubcategoryLength = 50;
 
   // MESSAGES D'INTERFACE
   static const String ERROR_NAME_REQUIRED = "Le nom est obligatoire";
   static const String ERROR_ROOM_REQUIRED = "La pièce est obligatoire";
   static const String ERROR_MAX_TAGS = "Maximum 5 tags autorisés";
-  static const String ERROR_TAG_LENGTH = "Chaque tag ne peut pas dépasser 25 caractères";
+  static const String ERROR_TAG_LENGTH =
+      "Chaque tag ne peut pas dépasser 25 caractères";
   static const String ERROR_CHOOSE_ROOM_FIRST = "Choisissez d'abord une pièce";
-  static const String ERROR_CHOOSE_LOCATION_FIRST = "Choisissez d'abord un meuble";
+  static const String ERROR_CHOOSE_LOCATION_FIRST =
+      "Choisissez d'abord un meuble";
   static const String ERROR_NO_SUBLOCATION = "Aucun emplacement disponible";
-  
+
   // CONFIRMATIONS
-  static const String CONFIRM_UNSAVED_CHANGES = "Vous avez des modifications non sauvées. Quitter quand même ?";
-  static const String CONFIRM_MODIFY = "Êtes-vous sûr de vouloir modifier cet objet ?";
-  
+  static const String CONFIRM_UNSAVED_CHANGES =
+      "Vous avez des modifications non sauvées. Quitter quand même ?";
+  static const String CONFIRM_MODIFY =
+      "Êtes-vous sûr de vouloir modifier cet objet ?";
+
   // SUCCÈS/ERREUR
   static const String SUCCESS_SAVED = "Objet enregistré avec succès";
   static const String SUCCESS_UPDATED = "Objet modifié avec succès";
   static const String ERROR_SAVE_FAILED = "Erreur lors de la sauvegarde";
-  static const String ERROR_LOAD_FAILED = "Erreur lors du chargement des données";
+  static const String ERROR_LOAD_FAILED =
+      "Erreur lors du chargement des données";
   static const String ERROR_DELETE_FAILED = "Erreur lors de la suppression";
-  static const String ERROR_NO_CONNECTION = "Pas de connexion internet. Vérifiez votre réseau.";
+  static const String ERROR_NO_CONNECTION =
+      "Pas de connexion internet. Vérifiez votre réseau.";
 }

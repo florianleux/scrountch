@@ -164,9 +164,9 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
         return;
       }
       if (_customSubcategoryController.text.length >
-          AppConstants.MAX_SUBCATEGORY_LENGTH) {
+          AppConstants.maxSubcategoryLength) {
         _showSnackBar(
-            "La sous-catégorie ne peut pas dépasser ${AppConstants.MAX_SUBCATEGORY_LENGTH} caractères",
+            "La sous-catégorie ne peut pas dépasser ${AppConstants.maxSubcategoryLength} caractères",
             isError: true);
         return;
       }
@@ -378,7 +378,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                               controller: _nameController,
                               labelText: 'Nom de l\'objet *',
                               hintText: 'Ex: Bottes de ville',
-                              maxLength: AppConstants.MAX_NAME_LENGTH,
+                              maxLength: AppConstants.maxNameLength,
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
                                   return AppConstants.ERROR_NAME_REQUIRED;
@@ -491,7 +491,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                                   controller: _customSubcategoryController,
                                   labelText: 'Sous-catégorie personnalisée',
                                   maxLength:
-                                      AppConstants.MAX_SUBCATEGORY_LENGTH,
+                                      AppConstants.maxSubcategoryLength,
                                 ),
                                 const SizedBox(height: 20),
                               ],
@@ -690,7 +690,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                                       },
                                     )
                                   : null,
-                              items: AppConstants.OWNERS.map((owner) {
+                              items: AppConstants.owners.map((owner) {
                                 return DropdownMenuItem(
                                   value: owner,
                                   child: Text(
@@ -715,8 +715,8 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                             TagInputField(
                               initialTags: _tags,
                               labelText: 'Tags',
-                              maxTags: AppConstants.MAX_TAGS,
-                              maxTagLength: AppConstants.MAX_TAG_LENGTH,
+                              maxTags: AppConstants.maxTags,
+                              maxTagLength: AppConstants.maxTagLength,
                               onTagsChanged: _onTagsChanged,
                             ),
 
@@ -727,7 +727,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                               controller: _descriptionController,
                               labelText: 'Description',
                               maxLines: 4,
-                              maxLength: AppConstants.MAX_DESCRIPTION_LENGTH,
+                              maxLength: AppConstants.maxDescriptionLength,
                             ),
 
                             const SizedBox(height: 30),

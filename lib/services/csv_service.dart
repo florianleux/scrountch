@@ -37,7 +37,7 @@ class CsvImportResult {
 
 /// Service simple pour l'import CSV
 class CsvService {
-  static const List<String> EXPECTED_HEADERS = [
+  static const List<String> expectedHeaders = [
     'nom',
     'piece',
     'meuble_zone',
@@ -180,7 +180,9 @@ class CsvService {
 
       // Parser les tags et ajouter automatiquement "import-csv"
       // Tous les objets importés via CSV auront le tag "import-csv" pour faciliter leur identification
-      List<String> tags = ['import-csv']; // Tag automatique pour tous les imports CSV
+      List<String> tags = [
+        'import-csv'
+      ]; // Tag automatique pour tous les imports CSV
       final tagsString = data['tags'];
       if (tagsString != null && tagsString.isNotEmpty) {
         final userTags = tagsString
@@ -251,13 +253,13 @@ class CsvService {
     String? description,
   }) {
     // Validation du nom
-    if (nom.length > AppConstants.MAX_NAME_LENGTH) {
-      return 'Le nom ne peut pas dépasser ${AppConstants.MAX_NAME_LENGTH} caractères';
+    if (nom.length > AppConstants.maxNameLength) {
+      return 'Le nom ne peut pas dépasser ${AppConstants.maxNameLength} caractères';
     }
 
     // Validation de la pièce
-    if (!AppConstants.ROOMS.contains(piece)) {
-      return 'Pièce invalide: "$piece". Valeurs autorisées: ${AppConstants.ROOMS.join(", ")}';
+    if (!AppConstants.rooms.contains(piece)) {
+      return 'Pièce invalide: "$piece". Valeurs autorisées: ${AppConstants.rooms.join(", ")}';
     }
 
     // Validation du meuble/zone
@@ -296,26 +298,26 @@ class CsvService {
     }
 
     // Validation du propriétaire
-    if (proprietaire != null && !AppConstants.OWNERS.contains(proprietaire)) {
-      return 'Propriétaire invalide: "$proprietaire". Valeurs autorisées: ${AppConstants.OWNERS.join(", ")}';
+    if (proprietaire != null && !AppConstants.owners.contains(proprietaire)) {
+      return 'Propriétaire invalide: "$proprietaire". Valeurs autorisées: ${AppConstants.owners.join(", ")}';
     }
 
     // Validation des tags (en tenant compte du tag automatique "import-csv")
     if (tags != null) {
-      if (tags.length > AppConstants.MAX_TAGS) {
-        return 'Maximum ${AppConstants.MAX_TAGS} tags autorisés (y compris le tag automatique "import-csv")';
+      if (tags.length > AppConstants.maxTags) {
+        return 'Maximum ${AppConstants.maxTags} tags autorisés (y compris le tag automatique "import-csv")';
       }
       for (final tag in tags) {
-        if (tag.length > AppConstants.MAX_TAG_LENGTH) {
-          return 'Tag trop long: "$tag" (max ${AppConstants.MAX_TAG_LENGTH} caractères)';
+        if (tag.length > AppConstants.maxTagLength) {
+          return 'Tag trop long: "$tag" (max ${AppConstants.maxTagLength} caractères)';
         }
       }
     }
 
     // Validation de la description
     if (description != null &&
-        description.length > AppConstants.MAX_DESCRIPTION_LENGTH) {
-      return 'Description trop longue (max ${AppConstants.MAX_DESCRIPTION_LENGTH} caractères)';
+        description.length > AppConstants.maxDescriptionLength) {
+      return 'Description trop longue (max ${AppConstants.maxDescriptionLength} caractères)';
     }
 
     return null;
@@ -324,7 +326,7 @@ class CsvService {
   /// Générer un fichier CSV d'exemple
   static String generateExampleCsv() {
     final List<List<String>> rows = [
-      EXPECTED_HEADERS,
+      expectedHeaders,
       [
         'Fer à repasser',
         'Buanderie',
