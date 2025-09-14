@@ -749,8 +749,9 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                               onPressed: _isLoading
                                   ? null
                                   : () async {
-                                      if (await _onWillPop()) {
-                                        if (mounted) Navigator.pop(context);
+                                      final shouldPop = await _onWillPop();
+                                      if (shouldPop && mounted) {
+                                        Navigator.pop(context);
                                       }
                                     },
                               text: 'ANNULER',

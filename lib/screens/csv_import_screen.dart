@@ -374,8 +374,10 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
       }
 
       _showSuccess('$imported objets importés avec succès !');
-      Navigator.pop(
-          context, true); // Retourner true pour indiquer un import réussi
+      if (mounted) {
+        Navigator.pop(
+            context, true); // Retourner true pour indiquer un import réussi
+      }
     } catch (e) {
       _showError('Erreur lors de l\'import: $e');
     } finally {
