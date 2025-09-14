@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/navigation_service.dart';
 import 'search_screen.dart';
 import 'item_form_screen.dart';
 import 'csv_import_screen.dart';
@@ -106,10 +107,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _navigateToScreen(BuildContext context, Widget screen) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => screen),
-    );
+    NavigationService.push(context, screen);
   }
 
   void _navigateToImportCsv(BuildContext context) async {
@@ -119,7 +117,7 @@ class HomeScreen extends StatelessWidget {
     );
 
     // Si l'import a réussi, on pourrait rafraîchir l'écran ou afficher un message
-    if (result == true && mounted) {
+    if (result == true) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Import CSV terminé avec succès !'),
