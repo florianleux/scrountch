@@ -1,248 +1,296 @@
 # Scrountch - Family Home Inventory App
 
-Une application Flutter simple pour gérer l'inventaire familial avec Firebase.
+A simple Flutter application for managing family home inventory with Firebase backend.
 
-> ⚠️ **Configuration Required**: Ce repo nécessite une configuration Firebase. Voir [FIREBASE_SETUP.md](FIREBASE_SETUP.md) pour les instructions complètes.
+> ⚠️ **Firebase Configuration Required**: This repository requires Firebase setup. See [FIREBASE_SETUP.md](FIREBASE_SETUP.md) for complete instructions.
 
-## Aperçu
+## Overview
 
-Scrountch aide les familles à suivre et localiser les objets de la maison dans différentes pièces et emplacements. Conçu avec une simplicité extrême, utilise Firebase pour le stockage de données et l'authentification anonyme.
+Scrountch helps families track and locate household items across different rooms and locations. Designed with extreme simplicity in mind, it uses Firebase for data storage and anonymous authentication.
 
-## Fonctionnalités
+## Features
 
-- **Gestion des Objets**: Créer, modifier et rechercher des objets
-- **Organisation par Pièces**: Hiérarchie complète Pièce → Location → Sous-location
-- **Catégorisation**: Catégories principales et sous-catégories avec ajouts dynamiques
-- **Recherche**: Recherche par nom avec résultats instantanés
-- **Support Hors Ligne**: Fonctionne hors ligne avec cache Firebase
-- **Synchronisation Multi-appareils**: Données synchronisées entre appareils familiaux
-- **100% Gratuit**: Aucun coût, pas de photos pour éviter les frais Firebase
+- **Item Management**: Create, edit, and search for household items
+- **Room Organization**: Complete hierarchy Room → Location → Sub-location
+- **Categorization**: Main categories and subcategories with dynamic additions
+- **Search**: Name-based search with instant results
+- **CSV Import/Export**: Bulk import and export functionality
+- **Offline Support**: Works offline with Firebase caching
+- **Multi-device Sync**: Data synchronized across family devices
+- **100% Free**: No costs, no photos to avoid Firebase charges
 
-## Stack Technique
+## Tech Stack
 
 - **Framework**: Flutter (Dart)
-- **Base de Données**: Firebase Firestore
-- **Authentification**: Firebase Anonymous Authentication
-- **Cible**: Android API niveau 21+
+- **Database**: Firebase Firestore
+- **Authentication**: Firebase Anonymous Authentication
+- **Target**: Android API level 23+
+- **Dependencies**: Firebase Core 4.1.0, Firestore 6.0.1, Auth 6.0.2
 
-## Structure du Projet
+## Project Structure
 
 ```
 lib/
-├── main.dart                    # Point d'entrée de l'app
+├── main.dart                    # App entry point
 ├── constants/
-│   ├── app_constants.dart       # Données de référence et constantes
-│   └── location_data.dart       # Hiérarchie complète des locations
+│   ├── app_constants.dart       # Reference data and constants
+│   └── location_data.dart       # Complete location hierarchy
 ├── models/
-│   └── item.dart               # Modèle de données Item
+│   └── item.dart               # Item data model
 ├── services/
-│   └── firebase_service.dart   # Opérations CRUD Firebase
+│   ├── firebase_service.dart   # Firebase CRUD operations
+│   ├── navigation_service.dart # Centralized navigation
+│   └── csv_service.dart        # CSV import/export functionality
 ├── screens/
-│   ├── home_screen.dart        # Écran de navigation principal
-│   ├── search_screen.dart      # Écran de saisie recherche
-│   ├── results_screen.dart     # Affichage résultats recherche
-│   ├── no_results_screen.dart  # Écran aucun résultat trouvé
-│   ├── item_detail_screen.dart # Affichage détails objet
-│   ├── manage_screen.dart      # Options de gestion
-│   └── item_form_screen.dart   # Formulaire créer/modifier objet
-└── widgets/
-    └── item_card.dart          # Carte d'affichage objet réutilisable
+│   ├── home_screen.dart        # Main navigation screen
+│   ├── search_screen.dart      # Search input screen
+│   ├── results_screen.dart     # Search results display
+│   ├── no_results_screen.dart  # No results found screen
+│   ├── item_detail_screen.dart # Item details display
+│   ├── csv_import_screen.dart  # CSV import interface
+│   └── item_form_screen.dart   # Create/edit item form
+├── widgets/
+│   ├── item_card.dart          # Reusable item display card
+│   ├── app_header.dart         # Consistent navigation header
+│   ├── background_image.dart   # Reusable background component
+│   ├── custom_buttons.dart     # Themed button components
+│   ├── custom_dropdown.dart    # Searchable dropdown widget
+│   ├── custom_text_field.dart  # Themed text input fields
+│   ├── tag_input_field.dart    # Tag management with chips
+│   └── confirmation_dialog.dart # Reusable confirmation dialog
+└── theme/
+    └── unified_theme.dart      # Centralized theme definitions
 ```
 
-## Instructions de Configuration
+## Quick Start
 
-### 1. Configuration Firebase
+### 1. Prerequisites
 
-1. Créer projet Firebase : `scrountch-family-inventory`
-2. Activer l'authentification anonyme
-3. Créer base de données Firestore avec règles de sécurité
-4. Télécharger `google-services.json` dans `android/app/`
+- Flutter SDK 3.1.0+
+- Android development environment
+- Java 17 (OpenJDK Temurin recommended)
+- Firebase account
 
-### 2. Prérequis pour le Build Android
+### 2. Firebase Setup
 
-#### Installation des outils requis
+1. Create a new Firebase project
+2. Enable Anonymous Authentication
+3. Create Firestore database with security rules
+4. Copy configuration files using the provided templates
 
-1. **Java 17** (recommandé pour la compatibilité) :
+**Detailed setup instructions**: [FIREBASE_SETUP.md](FIREBASE_SETUP.md)
 
-   ```bash
-   brew install --cask temurin@17
-   ```
-
-2. **Android Command Line Tools** :
-
-   ```bash
-   brew install --cask android-commandlinetools
-   ```
-
-3. **Configuration des variables d'environnement** :
-
-   ```bash
-   export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
-   export ANDROID_HOME=/opt/homebrew/share/android-commandlinetools
-   export PATH="$PATH:$ANDROID_HOME/platform-tools"
-   ```
-
-4. **Installation des composants Android SDK** :
-   ```bash
-   sdkmanager --install "platform-tools" "platforms;android-33" "build-tools;33.0.0"
-   ```
-
-#### Configuration du projet
-
-1. **Vérifier les versions dans `android/settings.gradle`** :
-
-   ```gradle
-   id "com.android.application" version "8.5.0" apply false
-   id "org.jetbrains.kotlin.android" version "2.1.0" apply false
-   ```
-
-2. **Vérifier Gradle dans `android/gradle/wrapper/gradle-wrapper.properties`** :
-
-   ```properties
-   distributionUrl=https\://services.gradle.org/distributions/gradle-8.7-all.zip
-   ```
-
-3. **Vérifier le SDK minimum dans `android/app/build.gradle`** :
-   ```gradle
-   minSdkVersion 23  // Requis pour Firebase
-   ```
-
-### 3. Instructions de Build
-
-#### Option A : Script automatisé (recommandé)
+### 3. Installation
 
 ```bash
-# Build release (production)
+# Clone the repository
+git clone https://github.com/florianleux/scrountch.git
+cd scrountch
+
+# Install dependencies
+flutter pub get
+
+# Configure Firebase (see FIREBASE_SETUP.md)
+# Copy your firebase_options.dart and google-services.json
+
+# Run the app
+flutter run
+```
+
+### 4. Build APK
+
+#### Option A: Automated Script (Recommended)
+
+```bash
+# Production build
 ./build_apk_simple.sh release
 
-# Build debug (tests)
+# Debug build
 ./build_apk_simple.sh debug
 ```
 
-#### Option B : Commandes manuelles
+#### Option B: Manual Commands
 
 ```bash
-# Configuration des variables d'environnement
+# Set environment variables
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
 export ANDROID_HOME=/opt/homebrew/share/android-commandlinetools
-export PATH="/Users/[username]/code/flutter/bin:$PATH"
 
-# Nettoyer et builder
+# Clean and build
 flutter clean
 flutter build apk --release
 ```
 
-**L'APK sera généré dans** : `build/app/outputs/flutter-apk/app-release.apk`
+**APK Output**: `build/app/outputs/flutter-apk/app-release.apk`
 
-### 4. Dépannage Build Android
+## Usage
 
-#### Problèmes courants et solutions
+### Creating Items
 
-1. **Erreur "Command not found: flutter"** :
+1. Tap "STORE" on the home screen
+2. Tap "NEW ITEM"
+3. Fill required fields (Name, Room)
+4. Optionally add location, category, owner, tags, etc.
+5. Tap "Save"
 
+### Finding Items
+
+1. Tap "FIND" on the home screen
+2. Enter the item name
+3. Tap "SEARCH"
+4. View results or item details
+
+### CSV Import/Export
+
+1. Tap "IMPORT" on the home screen
+2. Select CSV file with proper format
+3. Review and import items
+4. Export functionality available in settings
+
+### Managing Items
+
+- Edit items by tapping the edit icon in item details
+- Delete items with confirmation dialog
+- Add custom subcategories when "Other..." is selected
+- Use tags for better organization (max 5 per item)
+
+## Data Model
+
+Items contain:
+
+- **Name** (required) - Item identifier
+- **Room** (required) - One of 13 predefined rooms
+- **Location** (optional) - Specific furniture/area within room
+- **Sub-location** (optional) - Precise placement (drawer, shelf, etc.)
+- **Owner** (optional) - Family member
+- **Main Category** (optional) - Broad item classification
+- **Subcategory** (optional) - Specific item type
+- **Tags** (optional) - Up to 5 searchable keywords
+- **Description** (optional) - Additional details
+
+## Location Hierarchy
+
+- **13 Rooms**: Living room, Kitchen, Bathroom, Office, Bedrooms, etc.
+- **~92 Locations**: Specific furniture and areas per room
+- **~400 Sub-locations**: Precise placements (drawers, shelves, compartments)
+
+## Theme & Design
+
+- **Primary Color**: Yellow (#FFE333)
+- **Fonts**: 
+  - Headers: DelaGothicOne
+  - Body: Chivo Regular
+- **UI Elements**: Black borders, consistent spacing
+- **Icons**: Custom PNG assets for navigation and actions
+
+## Firebase Configuration
+
+### Firestore Security Rules
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /items/{document} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+```
+
+### Quotas (Spark Plan)
+Monitor usage to stay within free tier limits:
+- **Firestore**: 50K reads, 20K writes per day
+- **Authentication**: Unlimited anonymous users
+- **Storage**: No file storage used (text-only)
+
+## Troubleshooting
+
+### Common Build Issues
+
+1. **"Command not found: flutter"**:
    ```bash
-   export PATH="/Users/[username]/code/flutter/bin:$PATH"
+   export PATH="/path/to/flutter/bin:$PATH"
    ```
 
-2. **Erreur de compatibilité Java/Gradle** :
+2. **Java/Gradle compatibility errors**:
+   - Use Java 17 (not Java 21 or 24)
+   - Ensure Gradle 8.7+ is configured
+   - Clean cache: `rm -rf ~/.gradle/caches/`
 
-   - Utiliser Java 17 (pas Java 21 ou 24)
-   - Vérifier que Gradle 8.7+ est configuré
-   - Nettoyer le cache : `rm -rf ~/.gradle/caches/`
+3. **"minSdkVersion cannot be smaller than version 23"**:
+   - Firebase requires Android API 23+
+   - Update `minSdkVersion 23` in `android/app/build.gradle`
 
-3. **Erreur "minSdkVersion 21 cannot be smaller than version 23"** :
+4. **Firebase configuration errors**:
+   - Ensure `google-services.json` is in `android/app/`
+   - Verify `firebase_options.dart` is properly configured
+   - Check Firebase project settings
 
-   - Mettre à jour `minSdkVersion 23` dans `android/app/build.gradle`
+### Tested Environment
 
-4. **Erreur de version Kotlin** :
+- **Flutter**: 3.1.0+
+- **Java**: OpenJDK 17 (Temurin)
+- **Gradle**: 8.7
+- **Android Gradle Plugin**: 8.5.0
+- **Kotlin**: 2.1.0
+- **Android SDK**: API 23+ (Android 6.0+)
 
-   - Mettre à jour vers Kotlin 2.1.0 dans `android/settings.gradle`
+## Performance & Optimization
 
-5. **Ressources manquantes (ic_launcher, styles.xml)** :
-   ```bash
-   flutter create --platforms android . --project-name scrountch
-   ```
+- **Offline-first**: Firebase caching enabled
+- **Efficient widgets**: ValueListenableBuilder for minimal rebuilds
+- **Optimized search**: Keyword-based Firestore queries
+- **Memory management**: Proper disposal of controllers
+- **Tree shaking**: Unused code eliminated in release builds
 
-#### Versions testées et compatibles
+## Key Specifications
 
-- **Java** : OpenJDK 17 (Temurin)
-- **Gradle** : 8.7
-- **Android Gradle Plugin** : 8.5.0
-- **Kotlin** : 2.1.0
-- **Android SDK** : API 23+ (Android 6.0+)
+- **Target Users**: Small families (2-3 users, 2 devices)
+- **Storage**: Text-only, no images (cost optimization)
+- **Network**: Works offline, syncs when connected
+- **Maintenance**: Zero-maintenance design
+- **Cost**: 100% free with Firebase Spark plan
 
-### 5. Installation APK
+## Security Features
 
-1. **Transférer l'APK** sur l'appareil Android (email, AirDrop, USB)
-2. **Autoriser les sources inconnues** dans Paramètres > Sécurité
-3. **Installer** en tapant sur le fichier APK
-4. **Lancer** l'application "Scrountch"
+- **Anonymous Authentication**: No personal data collection
+- **Firestore Rules**: Authenticated access only
+- **Local Storage**: Secure Firebase caching
+- **Public Repository**: Sensitive credentials excluded via templates
 
-## Spécifications Clés
+## Contributing
 
-- **Utilisateurs Maximum**: 3 utilisateurs sur 2 appareils Android
-- **Pas de Photos**: Application 100% gratuite sans coûts de stockage
-- **Offline First**: Fonctionne sans connexion internet
-- **Zéro Maintenance**: Conçu pour la stabilité à long terme
-- **Plan Firebase Spark**: Reste dans les limites du tier gratuit
+This is a family project, but contributions are welcome! Please:
 
-## Utilisation
+1. Fork the repository
+2. Create a feature branch
+3. Follow the existing code style and architecture
+4. Test thoroughly on Android devices
+5. Update documentation if needed
+6. Submit a pull request
 
-### Créer des Objets
+## Build Information
 
-1. Appuyer sur "RANGER" sur l'écran d'accueil
-2. Appuyer sur "NOUVEL OBJET"
-3. Remplir les champs obligatoires (Nom, Pièce)
-4. Optionnellement ajouter location, catégorie, propriétaire, etc.
-5. Appuyer sur "Enregistrer"
+- **Package**: com.famille.scrountch
+- **Version**: 1.0.0+1
+- **Min SDK**: Android API 23 (Android 6.0)
+- **Target SDK**: Latest Android SDK
+- **Build Tools**: Android Gradle Plugin 8.5.0
 
-### Trouver des Objets
+## Roadmap
 
-1. Appuyer sur "TROUVER" sur l'écran d'accueil
-2. Saisir le nom de l'objet
-3. Appuyer sur "RECHERCHER"
-4. Voir les résultats ou détails de l'objet
+- [ ] iOS support (future consideration)
+- [ ] Advanced filtering options
+- [ ] Barcode scanning integration
+- [ ] Multi-language support
+- [ ] Enhanced CSV import validation
 
-### Gérer les Objets
+## License
 
-- Modifier les objets en appuyant sur l'icône d'édition dans les détails
-- Ajouter des sous-catégories personnalisées quand "Autre..." est sélectionné
-- Navigation contextuelle selon le flux utilisateur
+Private family application - not for commercial distribution.
 
-## Modèle de Données
+---
 
-Les objets contiennent :
+**Made with ❤️ for family organization**
 
-- **Nom** (obligatoire)
-- **Pièce** (obligatoire) - 13 pièces disponibles
-- **Location** (optionnel) - Meuble/zone spécifique
-- **Sous-location** (optionnel) - Emplacement précis
-- **Propriétaire** (optionnel)
-- **Catégorie Principale** (optionnel)
-- **Sous-catégorie** (optionnel)
-- **Tags** (optionnel) - Maximum 5 tags
-- **Description** (optionnel)
-
-## Hiérarchie de Localisation
-
-- **13 Pièces** : Salon, Cuisine, Salle de bain, Bureau, Chambres, etc.
-- **~92 Locations** : Meubles et zones spécifiques par pièce
-- **~400 Sous-locations** : Emplacements précis (tiroirs, étagères, etc.)
-
-## Quotas Firebase
-
-Surveiller l'utilisation pour rester dans les limites du plan Spark :
-
-- Firestore : 50K lectures, 20K écritures par jour
-- Authentification : Utilisateurs anonymes illimités
-
-## Informations de Build
-
-- **Package** : com.famille.scrountch
-- **Version** : 1.0.0+1
-- **SDK Min** : Android API 21 (Android 5.0)
-- **Cible** : Dernier SDK Android
-
-## Licence
-
-Application familiale privée - pas de distribution.
+*Last updated: January 2025*
