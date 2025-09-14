@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/navigation_service.dart';
 import '../theme/app_theme.dart';
 import 'results_screen.dart';
 import 'home_screen.dart';
@@ -40,11 +41,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
     try {
       // Navigate to ResultsScreen with search query
-      await Navigator.push(
+      await NavigationService.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => ResultsScreen(searchQuery: query),
-        ),
+        ResultsScreen(searchQuery: query),
       );
     } finally {
       if (mounted) {
