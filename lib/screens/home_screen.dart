@@ -111,9 +111,9 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _navigateToImportCsv(BuildContext context) async {
-    final result = await Navigator.push(
+    final result = await NavigationService.push(
       context,
-      MaterialPageRoute(builder: (context) => const CsvImportScreen()),
+      const CsvImportScreen(),
     );
 
     // Si l'import a réussi, on pourrait rafraîchir l'écran ou afficher un message
