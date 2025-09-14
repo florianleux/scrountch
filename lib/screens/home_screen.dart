@@ -6,15 +6,23 @@ import 'item_form_screen.dart';
 import 'csv_import_screen.dart';
 import '../widgets/custom_buttons.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   // Constantes de dimensions spécifiques à l'écran d'accueil
   static const double _buttonHeight = UnifiedTheme.buttonHeight;
   static const double _iconSize = UnifiedTheme.iconSize;
   static const double _buttonSpacing = 24;
   static const int _topSpacerFlex = 55;
   static const int _bottomSpacerFlex = 45;
+
+  // État pour afficher/cacher le bouton CSV
+  bool _showCsvButton = false;
 
   @override
   Widget build(BuildContext context) {
@@ -45,11 +53,26 @@ class HomeScreen extends StatelessWidget {
       left: 0,
       right: 0,
       child: Center(
-        child: Image.asset(
-          'assets/images/logo.png',
-          width: 306,
-          height: 117,
-          fit: BoxFit.contain,
+        child: GestureDetector(
+          onDoubleTap: () {
+            setState(() {
+              _showCsvButton = !_showCsvButton;
+            });
+            // Feedback visuel pour confirmer l'activation
+            ScaffoldMessenger.of(context).showSnackBar(
+              UnifiedTheme.successSnackBar(
+                _showCsvButton 
+                  ? 'Mode administrateur activé !' 
+                  : 'Mode administrateur désactivé'
+              ),
+            );
+          },
+          child: Image.asset(
+            'assets/images/logo.png',
+            width: 306,
+            height: 117,
+            fit: BoxFit.contain,
+          ),
         ),
       ),
     );
@@ -87,15 +110,17 @@ class HomeScreen extends StatelessWidget {
                     height: _buttonHeight,
                     iconSize: _iconSize,
                   ),
-                  const SizedBox(height: _buttonSpacing),
-                  // Bouton IMPORT CSV
-                  SecondaryButton(
-                    onPressed: () => _navigateToImportCsv(context),
-                    text: 'IMPORT CSV',
-                    iconPath: 'assets/images/plus_icon.png',
-                    height: _buttonHeight,
-                    iconSize: _iconSize,
-                  ),
+                  // Bouton IMPORT CSV (affiché seulement si activé)
+                  if (_showCsvButton) ...[
+                    const SizedBox(height: _buttonSpacing),
+                    SecondaryButton(
+                      onPressed: () => _navigateToImportCsv(context),
+                      text: 'IMPORT CSV',
+                      iconPath: 'assets/images/plus_icon.png',
+                      height: _buttonHeight,
+                      iconSize: _iconSize,
+                    ),
+                  ],
                 ],
               ),
             ),

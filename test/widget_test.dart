@@ -17,6 +17,20 @@ void main() {
     // Verify that the home screen loads with expected buttons
     expect(find.text('TROUVER'), findsOneWidget);
     expect(find.text('RANGER'), findsOneWidget);
-    expect(find.text('IMPORT CSV'), findsOneWidget);
+    
+    // Le bouton IMPORT CSV ne doit pas être visible par défaut
+    expect(find.text('IMPORT CSV'), findsNothing);
+  });
+
+  testWidgets('CSV import button hidden by default', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const ScrountchApp());
+
+    // Vérifier que le bouton CSV n'est pas visible par défaut
+    expect(find.text('IMPORT CSV'), findsNothing);
+    
+    // Vérifier que les autres boutons sont bien présents
+    expect(find.text('TROUVER'), findsOneWidget);
+    expect(find.text('RANGER'), findsOneWidget);
   });
 }
