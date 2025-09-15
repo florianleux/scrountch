@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -499,9 +500,20 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
       
       // Obtenir le répertoire de téléchargement
       Directory? directory;
-      if (Platform.isAndroid) {
-        directory = await getExternalStorageDirectory();
-      } else {
+      try {
+        if (Platform.isAndroid) {
+          // Essayer d'abord le répertoire des téléchargements
+          directory = Directory('/storage/emulated/0/Download');
+          if (!await directory.exists()) {
+            // Fallback vers le répertoire externe de l'app
+            directory = await getExternalStorageDirectory();
+          }
+        } else {
+          // Pour iOS/autres plateformes
+          directory = await getApplicationDocumentsDirectory();
+        }
+      } catch (e) {
+        // Fallback vers le répertoire de l'application
         directory = await getApplicationDocumentsDirectory();
       }
       
@@ -509,10 +521,16 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
         // Créer le fichier CSV
         final fileName = 'exemple_scrountch.csv';
         final file = File('${directory.path}/$fileName');
-        await file.writeAsString(example);
         
-        // Afficher un message de succès
-        _showSuccess('Fichier CSV téléchargé: ${file.path}');
+        // Écrire le fichier avec encodage UTF-8
+        await file.writeAsString(example, encoding: utf8);
+        
+        // Afficher un message de succès avec le chemin
+        if (Platform.isAndroid && directory.path.contains('Download')) {
+          _showSuccess('Fichier CSV téléchargé dans le dossier Téléchargements: $fileName');
+        } else {
+          _showSuccess('Fichier CSV créé: ${file.path}');
+        }
       } else {
         _showError('Impossible d\'accéder au répertoire de téléchargement');
       }
