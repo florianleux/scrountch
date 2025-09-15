@@ -161,9 +161,11 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          TertiaryButton(
-            text: 'TÉLÉCHARGER EXEMPLE CSV',
-            onPressed: _downloadExample,
+          Center(
+            child: TertiaryButton(
+              text: 'TÉLÉCHARGER EXEMPLE CSV',
+              onPressed: _downloadExample,
+            ),
           ),
         ],
       ),
@@ -213,9 +215,11 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TertiaryButton(
-                text: 'CHOISIR FICHIER CSV',
-                onPressed: _isLoading ? null : _selectFile,
+              Center(
+                child: TertiaryButton(
+                  text: 'CHOISIR FICHIER CSV',
+                  onPressed: _isLoading ? null : _selectFile,
+                ),
               ),
               const SizedBox(height: 12),
               if (_selectedFile != null)
