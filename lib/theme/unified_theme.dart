@@ -105,6 +105,7 @@ class UnifiedTheme {
   static ButtonStyle get tertiaryButtonStyle => ElevatedButton.styleFrom(
         backgroundColor: primaryYellow,
         foregroundColor: textBlack,
+        side: BorderSide.none, // Pas de bordure pour les boutons tertiary
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
         ),
