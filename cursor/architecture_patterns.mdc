@@ -1,12 +1,12 @@
 # Architecture Patterns & Design Decisions
-*Based on Scrountch Project - Extracted from production codebase*
+*Universal Flutter/Dart architectural patterns for any application*
 
 ## 1. OVERALL ARCHITECTURE
 
 ### Layered Architecture Pattern
 **Priority**: High
-**Source**: Entire codebase structure
-**Implementation**: Clean separation of concerns
+**Applicability**: All Flutter applications
+**Benefits**: Clear separation of concerns, testability, maintainability
 
 ```
 ┌─────────────────────────────────────┐
@@ -17,37 +17,55 @@
 │         (services/)                 │
 ├─────────────────────────────────────┤
 │           Data Layer                │
-│    (models/, constants/)            │
+│    (models/, repositories/)         │
 └─────────────────────────────────────┘
 ```
 
-**Implementation Example**:
+**Implementation Template**:
 ```dart
-// Presentation Layer - lib/screens/home_screen.dart
-class HomeScreen extends StatefulWidget {
+// Presentation Layer - UI components
+class FeatureScreen extends StatefulWidget {
   // UI logic only, delegates to service layer
-  void _navigateToImportCsv(BuildContext context) async {
-    final result = await NavigationService.push(context, const CsvImportScreen());
+  void _handleUserAction() async {
+    final result = await _featureService.performAction();
     // Handle UI response
   }
 }
 
-// Business Logic Layer - lib/services/firebase_service.dart
-class FirebaseService {
-  // Business rules and external API integration
-  Future<Item> createItem(Item item) async {
-    await _ensureAuthenticated();
-    final docRef = await _firestore.collection('items').add(item.toFirestore());
-    return Item(/* ... */);
+// Business Logic Layer - Services
+class FeatureService {
+  final ApiRepository _apiRepository;
+  
+  FeatureService(this._apiRepository);
+  
+  Future<Result> performAction() async {
+    // Business rules and orchestration
+    final data = await _apiRepository.fetchData();
+    return _processBusinessLogic(data);
   }
 }
 
-// Data Layer - lib/models/item.dart
-class Item {
-  // Pure data model with serialization logic
-  factory Item.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return Item(/* ... */);
+// Data Layer - Models and Repositories
+class ApiRepository {
+  final ApiClient _apiClient;
+  
+  Future<List<DataModel>> fetchData() async {
+    final response = await _apiClient.get('/endpoint');
+    return response.map((json) => DataModel.fromJson(json)).toList();
+  }
+}
+
+class DataModel {
+  final String id;
+  final String name;
+  
+  DataModel({required this.id, required this.name});
+  
+  factory DataModel.fromJson(Map<String, dynamic> json) {
+    return DataModel(
+      id: json['id'],
+      name: json['name'],
+    );
   }
 }
 ```
@@ -56,338 +74,112 @@ class Item {
 
 ### Singleton Service Pattern
 **Priority**: High
-**Source**: Refactored files
-**Found in**: lib/services/firebase_service.dart
+**Use Case**: Stateful external integrations (APIs, databases, device services)
 
-**Pattern**: Single instance services for stateful external integrations
+**Template**:
 ```dart
-class FirebaseService {
-  static final FirebaseService _instance = FirebaseService._internal();
-  factory FirebaseService() => _instance;
-  FirebaseService._internal();
+class ExternalService {
+  static final ExternalService _instance = ExternalService._internal();
+  factory ExternalService() => _instance;
+  ExternalService._internal();
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // Service state
+  bool _isInitialized = false;
+  final ApiClient _apiClient = ApiClient();
   
-  // Service methods...
+  Future<void> initialize() async {
+    if (!_isInitialized) {
+      await _apiClient.configure();
+      _isInitialized = true;
+    }
+  }
+  
+  Future<Result> performOperation() async {
+    await initialize();
+    return await _apiClient.request();
+  }
 }
 ```
 
-**When to use**: External services (Firebase, APIs, databases)
-**When NOT to use**: Stateless utility functions
+**When to use**: 
+- External API services
+- Database connections
+- Device hardware access
+- Authentication services
 
 ### Static Utility Service Pattern
 **Priority**: High
-**Source**: Refactored files
-**Found in**: lib/services/navigation_service.dart, lib/services/csv_service.dart
+**Use Case**: Stateless operations, pure functions
 
-**Pattern**: Static methods for stateless operations
+**Template**:
 ```dart
-class NavigationService {
+class UtilityService {
   // No constructor - pure static utility
   
-  static Future<T?> push<T>(BuildContext context, Widget screen) {
-    return Navigator.push<T>(
-      context,
-      MaterialPageRoute(builder: (context) => screen),
-    );
+  static String formatCurrency(double amount, {String currency = 'USD'}) {
+    return NumberFormat.currency(symbol: currency).format(amount);
+  }
+  
+  static DateTime parseDate(String dateString) {
+    return DateTime.parse(dateString);
+  }
+  
+  static bool validateEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 }
 
-class CsvService {
-  // Static methods for file processing
-  static Future<File?> pickCsvFile() async {
-    // Implementation
+class FileService {
+  static Future<File?> pickFile({List<String>? allowedExtensions}) async {
+    final result = await FilePicker.platform.pickFiles(
+      type: allowedExtensions != null ? FileType.custom : FileType.any,
+      allowedExtensions: allowedExtensions,
+    );
+    
+    return result?.files.single.path != null 
+        ? File(result!.files.single.path!) 
+        : null;
   }
   
-  static Future<CsvImportResult> parseCsvFile(File file) async {
-    // Implementation
+  static Future<String> readFileContent(File file) async {
+    return await file.readAsString();
   }
 }
 ```
 
-**When to use**: Stateless operations, utilities, pure functions
+**When to use**:
+- File operations
+- Data formatting/validation
+- Calculations
+- String manipulations
 
-## 3. STATE MANAGEMENT STRATEGY
+## 3. STATE MANAGEMENT STRATEGIES
 
-### Local State + Service Layer Pattern
+### Local State + Service Layer (Recommended for Small-Medium Apps)
 **Priority**: High
-**Source**: All screen implementations
-**Decision**: Chosen over complex state management for simplicity
+**Complexity**: Low
+**Best for**: Simple apps, prototypes, family/personal apps
 
-**Rationale**:
-- Simple family app with limited complexity
-- Clear separation between UI state and business logic
-- Easy to understand and maintain
-- No need for global state sharing
-
-**Implementation**:
 ```dart
 class _ScreenState extends State<Screen> {
   // Local UI state
   bool _isLoading = false;
   String? _errorMessage;
-  List<Item> _items = [];
+  List<DataModel> _items = [];
   
-  // Service dependency
-  final FirebaseService _firebaseService = FirebaseService();
-  
-  Future<void> _loadData() async {
-    setState(() => _isLoading = true);
-    
-    try {
-      final items = await _firebaseService.searchItems(query);
-      setState(() {
-        _items = items;
-        _errorMessage = null;
-      });
-    } catch (e) {
-      setState(() => _errorMessage = e.toString());
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-}
-```
-
-### State Synchronization Pattern
-**Priority**: Medium
-**Source**: lib/screens/home_screen.dart
-**Found in**: CSV import success handling
-
-```dart
-void _navigateToImportCsv(BuildContext context) async {
-  final result = await NavigationService.push(
-    context,
-    const CsvImportScreen(),
-  );
-
-  // Synchronize state after returning from child screen
-  if (result == true && context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      UnifiedTheme.successSnackBar('Import CSV terminé avec succès !'),
-    );
-  }
-}
-```
-
-## 4. NAVIGATION ARCHITECTURE
-
-### Centralized Navigation Service
-**Priority**: High
-**Source**: Refactored files - Created during cleanup
-**Found in**: lib/services/navigation_service.dart
-
-**Before refactoring** (scattered navigation logic):
-```dart
-// Duplicated across multiple screens
-Navigator.push(context, MaterialPageRoute(builder: (context) => NextScreen()));
-Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-```
-
-**After refactoring** (centralized service):
-```dart
-class NavigationService {
-  static Future<T?> push<T>(BuildContext context, Widget screen) {
-    return Navigator.push<T>(
-      context,
-      MaterialPageRoute(builder: (context) => screen),
-    );
-  }
-  
-  static Future<T?> pushAndRemoveUntil<T>(
-    BuildContext context, 
-    Widget screen, {
-    bool Function(Route<dynamic>)? predicate,
-  }) {
-    return Navigator.pushAndRemoveUntil<T>(
-      context,
-      MaterialPageRoute(builder: (context) => screen),
-      predicate ?? (route) => false,
-    );
-  }
-}
-```
-
-**Benefits**:
-- Consistent navigation behavior
-- Easy to modify navigation logic globally
-- Type-safe navigation with generics
-- Centralized route management
-
-### Navigation Patterns by Use Case
-**Priority**: Medium
-**Source**: Various screen implementations
-
-```dart
-// Feature navigation (can return to previous screen)
-NavigationService.push(context, const SearchScreen());
-
-// Replace current screen (login -> home)
-NavigationService.pushReplacement(context, const HomeScreen());
-
-// Reset navigation stack (any screen -> home)
-NavigationService.pushAndRemoveUntil(context, const HomeScreen());
-
-// Simple back navigation
-NavigationService.pop(context);
-
-// Back with result
-NavigationService.pop(context, result);
-```
-
-## 5. DEPENDENCY INJECTION PATTERN
-
-### Service Locator Pattern (Implicit)
-**Priority**: Medium
-**Source**: All screen implementations
-**Pattern**: Direct service instantiation
-
-```dart
-class _ScreenState extends State<Screen> {
-  // Direct instantiation - services are singletons
-  final FirebaseService _firebaseService = FirebaseService();
-  
-  // Usage
-  await _firebaseService.createItem(item);
-}
-```
-
-**Rationale**: 
-- Simple app with few dependencies
-- Services are singletons with clear lifecycle
-- No complex dependency graphs
-- Easy testing with service mocking
-
-### Future: Constructor Injection Template
-**Priority**: Low
-**For larger applications**:
-
-```dart
-class Screen extends StatefulWidget {
-  final FirebaseService firebaseService;
-  
-  const Screen({
-    super.key,
-    required this.firebaseService,
-  });
-}
-
-// Usage
-const Screen(firebaseService: FirebaseService());
-```
-
-## 6. ERROR HANDLING ARCHITECTURE
-
-### Layered Error Handling
-**Priority**: High
-**Source**: Service layer implementations
-**Found in**: lib/services/firebase_service.dart
-
-**Pattern**: Transform technical errors to user-friendly messages
-
-```dart
-// Service Layer - Technical error handling
-Future<Item> createItem(Item item) async {
-  try {
-    await _ensureAuthenticated();
-    final docRef = await _firestore.collection('items').add(item.toFirestore());
-    return Item(/* ... */);
-  } catch (e) {
-    debugPrint("FirebaseService: Create item error - $e");
-    throw Exception(AppConstants.errorSaveFailed);  // User-friendly message
-  }
-}
-
-// Presentation Layer - UI error handling
-try {
-  await _firebaseService.createItem(item);
-  // Show success feedback
-} catch (e) {
-  setState(() => _errorMessage = e.toString());
-  ScaffoldMessenger.of(context).showSnackBar(
-    UnifiedTheme.errorSnackBar(e.toString()),
-  );
-}
-```
-
-### Error Message Strategy
-**Priority**: High
-**Source**: lib/constants/app_constants.dart
-
-```dart
-class AppConstants {
-  // Centralized error messages
-  static const String errorNoConnection = 'Pas de connexion internet';
-  static const String errorSaveFailed = 'Erreur lors de la sauvegarde';
-  static const String errorLoadFailed = 'Erreur lors du chargement';
-  static const String errorDeleteFailed = 'Erreur lors de la suppression';
-}
-```
-
-## 7. DATA FLOW PATTERNS
-
-### Unidirectional Data Flow
-**Priority**: High
-**Source**: All screen implementations
-
-```
-User Action → UI Event Handler → Service Call → State Update → UI Rebuild
-```
-
-**Implementation Example**:
-```dart
-// 1. User Action (button tap)
-PrimaryButton(
-  onPressed: _performSearch,  // 2. UI Event Handler
-  text: 'SEARCH',
-),
-
-// 2. Event Handler
-void _performSearch() async {
-  setState(() => _isLoading = true);
-  
-  try {
-    // 3. Service Call
-    final items = await _firebaseService.searchItems(query);
-    
-    // 4. State Update
-    setState(() {
-      _items = items;
-      _isLoading = false;
-    });
-    // 5. UI Rebuild happens automatically
-  } catch (e) {
-    setState(() {
-      _errorMessage = e.toString();
-      _isLoading = false;
-    });
-  }
-}
-```
-
-### Async State Management Pattern
-**Priority**: High
-**Source**: All async operations in screens
-
-```dart
-class _ScreenState extends State<Screen> {
-  bool _isLoading = false;
-  String? _errorMessage;
-  List<Data>? _data;
+  // Service dependencies
+  final DataService _dataService = DataService();
   
   Future<void> _loadData() async {
     setState(() {
       _isLoading = true;
-      _errorMessage = null;  // Clear previous errors
+      _errorMessage = null;
     });
     
     try {
-      final result = await _service.fetchData();
+      final items = await _dataService.fetchItems();
       setState(() {
-        _data = result;
+        _items = items;
         _isLoading = false;
       });
     } catch (e) {
@@ -397,214 +189,892 @@ class _ScreenState extends State<Screen> {
       });
     }
   }
-  
-  @override
-  Widget build(BuildContext context) {
-    if (_isLoading) return const CircularProgressIndicator();
-    if (_errorMessage != null) return ErrorWidget(_errorMessage!);
-    if (_data == null) return const EmptyStateWidget();
-    return DataWidget(_data!);
-  }
 }
 ```
 
-## 8. SECURITY ARCHITECTURE
-
-### Firebase Security Pattern
-**Priority**: High
-**Source**: Refactored files - Created during cleanup
-**Found in**: lib/firebase_options_template.dart, FIREBASE_SETUP.md
-
-**Pattern**: Template-based configuration for public repositories
-
-**Before refactoring** (security risk):
-```dart
-// firebase_options.dart with real API keys committed to repo
-class DefaultFirebaseOptions {
-  static FirebaseOptions get currentPlatform {
-    return const FirebaseOptions(
-      apiKey: "AIzaSyReal_API_Key_Exposed",  // SECURITY RISK
-      projectId: "real-project-id",
-      // ...
-    );
-  }
-}
-```
-
-**After refactoring** (secure):
-```dart
-// firebase_options_template.dart (safe to commit)
-class DefaultFirebaseOptions {
-  static FirebaseOptions get currentPlatform {
-    return const FirebaseOptions(
-      apiKey: "YOUR_API_KEY_HERE",  // Template placeholder
-      projectId: "YOUR_PROJECT_ID_HERE",
-      // ...
-    );
-  }
-}
-
-// .gitignore ensures real firebase_options.dart is never committed
-# Firebase configuration
-lib/firebase_options.dart
-android/app/google-services.json
-```
-
-### Anonymous Authentication Pattern
+### Provider Pattern (Recommended for Medium Apps)
 **Priority**: Medium
-**Source**: lib/services/firebase_service.dart
+**Complexity**: Medium
+**Best for**: Apps with shared state, user sessions, shopping carts
 
 ```dart
-class FirebaseService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+// State model
+class UserState extends ChangeNotifier {
+  User? _currentUser;
+  bool _isLoading = false;
   
-  Future<void> _signInAnonymously() async {
+  User? get currentUser => _currentUser;
+  bool get isLoading => _isLoading;
+  bool get isLoggedIn => _currentUser != null;
+  
+  Future<void> login(String email, String password) async {
+    _isLoading = true;
+    notifyListeners();
+    
     try {
-      if (_auth.currentUser == null) {
-        await _auth.signInAnonymously();
-        debugPrint("FirebaseService: Anonymous authentication successful");
-      }
+      _currentUser = await AuthService().login(email, password);
     } catch (e) {
-      debugPrint("FirebaseService: Authentication error - $e");
-      throw Exception(AppConstants.errorNoConnection);
+      _currentUser = null;
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
   
-  bool get isAuthenticated => _auth.currentUser != null;
+  void logout() {
+    _currentUser = null;
+    notifyListeners();
+  }
+}
+
+// App setup
+void main() {
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserState()),
+        ChangeNotifierProvider(create: (_) => CartState()),
+      ],
+      child: MyApp(),
+    ),
+  );
+}
+
+// Widget usage
+class ProfileScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<UserState>(
+      builder: (context, userState, child) {
+        if (userState.isLoading) {
+          return LoadingIndicator();
+        }
+        
+        if (!userState.isLoggedIn) {
+          return LoginScreen();
+        }
+        
+        return ProfileContent(user: userState.currentUser!);
+      },
+    );
+  }
 }
 ```
 
-## 9. TESTING ARCHITECTURE
-
-### Testing Strategy
+### Riverpod Pattern (Recommended for Large Apps)
 **Priority**: Medium
-**Source**: test/widget_test.dart
-
-**Pattern**: Widget testing with MaterialApp wrapper
+**Complexity**: High
+**Best for**: Large apps, complex business logic, team development
 
 ```dart
+// Providers
+final userRepositoryProvider = Provider<UserRepository>((ref) {
+  return UserRepository(ApiClient());
+});
+
+final currentUserProvider = StateNotifierProvider<UserNotifier, AsyncValue<User?>>((ref) {
+  return UserNotifier(ref.watch(userRepositoryProvider));
+});
+
+// State notifier
+class UserNotifier extends StateNotifier<AsyncValue<User?>> {
+  final UserRepository _repository;
+  
+  UserNotifier(this._repository) : super(const AsyncValue.loading());
+  
+  Future<void> login(String email, String password) async {
+    state = const AsyncValue.loading();
+    
+    try {
+      final user = await _repository.login(email, password);
+      state = AsyncValue.data(user);
+    } catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+    }
+  }
+}
+
+// Widget usage
+class ProfileScreen extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userState = ref.watch(currentUserProvider);
+    
+    return userState.when(
+      loading: () => LoadingIndicator(),
+      error: (error, stack) => ErrorDisplay(error.toString()),
+      data: (user) => user != null 
+          ? ProfileContent(user: user)
+          : LoginScreen(),
+    );
+  }
+}
+```
+
+## 4. NAVIGATION ARCHITECTURE
+
+### Centralized Navigation Service
+**Priority**: High
+**Benefits**: Consistent behavior, easy to modify globally, type-safe
+
+```dart
+class NavigationService {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  
+  static BuildContext get context => navigatorKey.currentContext!;
+  
+  // Basic navigation
+  static Future<T?> push<T>(Widget screen) {
+    return Navigator.of(context).push<T>(
+      MaterialPageRoute(builder: (_) => screen),
+    );
+  }
+  
+  static Future<T?> pushReplacement<T>(Widget screen) {
+    return Navigator.of(context).pushReplacement<T, void>(
+      MaterialPageRoute(builder: (_) => screen),
+    );
+  }
+  
+  static Future<T?> pushAndRemoveUntil<T>(
+    Widget screen, {
+    bool Function(Route<dynamic>)? predicate,
+  }) {
+    return Navigator.of(context).pushAndRemoveUntil<T>(
+      MaterialPageRoute(builder: (_) => screen),
+      predicate ?? (route) => false,
+    );
+  }
+  
+  static void pop<T>([T? result]) {
+    Navigator.of(context).pop(result);
+  }
+  
+  // Named routes
+  static Future<T?> pushNamed<T>(String routeName, {Object? arguments}) {
+    return Navigator.of(context).pushNamed<T>(routeName, arguments: arguments);
+  }
+  
+  // Dialog navigation
+  static Future<T?> showDialogCustom<T>(Widget dialog) {
+    return showDialog<T>(
+      context: context,
+      builder: (_) => dialog,
+    );
+  }
+  
+  // Bottom sheet navigation
+  static Future<T?> showBottomSheetCustom<T>(Widget sheet) {
+    return showModalBottomSheet<T>(
+      context: context,
+      builder: (_) => sheet,
+    );
+  }
+}
+
+// App setup
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      navigatorKey: NavigationService.navigatorKey,
+      home: HomeScreen(),
+      routes: {
+        '/profile': (context) => ProfileScreen(),
+        '/settings': (context) => SettingsScreen(),
+      },
+    );
+  }
+}
+```
+
+### Route Generation Pattern
+**Priority**: Medium
+**Use Case**: Type-safe navigation with parameters
+
+```dart
+// Route definitions
+abstract class AppRoutes {
+  static const String home = '/';
+  static const String profile = '/profile';
+  static const String productDetail = '/product';
+  static const String settings = '/settings';
+}
+
+// Route arguments
+class ProductDetailArguments {
+  final String productId;
+  final String? category;
+  
+  ProductDetailArguments({
+    required this.productId,
+    this.category,
+  });
+}
+
+// Route generator
+class RouteGenerator {
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case AppRoutes.home:
+        return MaterialPageRoute(builder: (_) => HomeScreen());
+        
+      case AppRoutes.profile:
+        return MaterialPageRoute(builder: (_) => ProfileScreen());
+        
+      case AppRoutes.productDetail:
+        if (settings.arguments is ProductDetailArguments) {
+          final args = settings.arguments as ProductDetailArguments;
+          return MaterialPageRoute(
+            builder: (_) => ProductDetailScreen(
+              productId: args.productId,
+              category: args.category,
+            ),
+          );
+        }
+        return _errorRoute();
+        
+      default:
+        return _errorRoute();
+    }
+  }
+  
+  static Route<dynamic> _errorRoute() {
+    return MaterialPageRoute(
+      builder: (_) => Scaffold(
+        body: Center(
+          child: Text('Route not found'),
+        ),
+      ),
+    );
+  }
+}
+
+// Usage
+NavigationService.pushNamed(
+  AppRoutes.productDetail,
+  arguments: ProductDetailArguments(
+    productId: 'product-123',
+    category: 'electronics',
+  ),
+);
+```
+
+## 5. DEPENDENCY INJECTION PATTERNS
+
+### Service Locator Pattern (Simple)
+**Priority**: Medium
+**Use Case**: Small to medium apps with clear service dependencies
+
+```dart
+class ServiceLocator {
+  static final ServiceLocator _instance = ServiceLocator._internal();
+  factory ServiceLocator() => _instance;
+  ServiceLocator._internal();
+
+  final Map<Type, dynamic> _services = {};
+
+  void register<T>(T service) {
+    _services[T] = service;
+  }
+
+  T get<T>() {
+    final service = _services[T];
+    if (service == null) {
+      throw Exception('Service of type $T not registered');
+    }
+    return service as T;
+  }
+
+  void reset() {
+    _services.clear();
+  }
+}
+
+// Setup (in main.dart)
 void main() {
-  testWidgets('Feature test description', (WidgetTester tester) async {
-    // Arrange - Build widget tree
-    await tester.pumpWidget(const ScrountchApp());
+  _setupServices();
+  runApp(MyApp());
+}
+
+void _setupServices() {
+  final locator = ServiceLocator();
+  locator.register<ApiClient>(ApiClient());
+  locator.register<UserRepository>(UserRepository(locator.get<ApiClient>()));
+  locator.register<UserService>(UserService(locator.get<UserRepository>()));
+}
+
+// Usage
+class UserScreen extends StatefulWidget {
+  @override
+  State<UserScreen> createState() => _UserScreenState();
+}
+
+class _UserScreenState extends State<UserScreen> {
+  late final UserService _userService = ServiceLocator().get<UserService>();
+  
+  // Use _userService...
+}
+```
+
+### Constructor Injection Pattern (Testable)
+**Priority**: High
+**Use Case**: Large apps, team development, high testability requirements
+
+```dart
+// Abstract interfaces
+abstract class UserRepository {
+  Future<User> getUser(String id);
+  Future<void> updateUser(User user);
+}
+
+abstract class NotificationService {
+  Future<void> sendNotification(String message);
+}
+
+// Concrete implementations
+class ApiUserRepository implements UserRepository {
+  final ApiClient _apiClient;
+  
+  ApiUserRepository(this._apiClient);
+  
+  @override
+  Future<User> getUser(String id) async {
+    final response = await _apiClient.get('/users/$id');
+    return User.fromJson(response.data);
+  }
+  
+  @override
+  Future<void> updateUser(User user) async {
+    await _apiClient.put('/users/${user.id}', user.toJson());
+  }
+}
+
+// Service with dependencies
+class UserService {
+  final UserRepository _userRepository;
+  final NotificationService _notificationService;
+  
+  UserService(this._userRepository, this._notificationService);
+  
+  Future<void> updateUserProfile(User user) async {
+    await _userRepository.updateUser(user);
+    await _notificationService.sendNotification('Profile updated');
+  }
+}
+
+// Screen with dependency injection
+class UserProfileScreen extends StatefulWidget {
+  final UserService userService;
+  
+  const UserProfileScreen({
+    super.key,
+    required this.userService,
+  });
+  
+  @override
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
+}
+
+// Testing becomes easy
+class MockUserRepository implements UserRepository {
+  @override
+  Future<User> getUser(String id) async {
+    return User(id: id, name: 'Test User');
+  }
+  
+  @override
+  Future<void> updateUser(User user) async {
+    // Mock implementation
+  }
+}
+
+void main() {
+  testWidgets('UserProfileScreen updates user', (tester) async {
+    final mockRepo = MockUserRepository();
+    final mockNotification = MockNotificationService();
+    final userService = UserService(mockRepo, mockNotification);
     
-    // Act - Perform user interactions
-    await tester.tap(find.text('TROUVER'));
-    await tester.pump();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: UserProfileScreen(userService: userService),
+      ),
+    );
     
-    // Assert - Verify expected outcomes
-    expect(find.byType(SearchScreen), findsOneWidget);
+    // Test interactions...
   });
 }
 ```
 
-### Mock Service Pattern (Future)
-**Template for service testing**:
+## 6. ERROR HANDLING ARCHITECTURE
+
+### Layered Error Handling
+**Priority**: High
+**Pattern**: Transform technical errors to user-friendly messages at each layer
+
 ```dart
-class MockFirebaseService extends FirebaseService {
+// Custom exception hierarchy
+abstract class AppException implements Exception {
+  final String message;
+  final String? code;
+  final dynamic originalError;
+  
+  AppException(this.message, {this.code, this.originalError});
+  
   @override
-  Future<List<Item>> searchItems(String query) async {
-    // Return mock data for testing
-    return [
-      Item.create(name: 'Test Item', room: 'Test Room'),
-    ];
+  String toString() => message;
+}
+
+class NetworkException extends AppException {
+  NetworkException(String message, {String? code, dynamic originalError})
+      : super(message, code: code ?? 'NETWORK_ERROR', originalError: originalError);
+}
+
+class ValidationException extends AppException {
+  ValidationException(String message, {String? code})
+      : super(message, code: code ?? 'VALIDATION_ERROR');
+}
+
+class BusinessLogicException extends AppException {
+  BusinessLogicException(String message, {String? code})
+      : super(message, code: code ?? 'BUSINESS_ERROR');
+}
+
+// Repository layer - Technical error handling
+class ApiRepository {
+  Future<Result> fetchData() async {
+    try {
+      final response = await _apiClient.get('/data');
+      return Result.fromJson(response.data);
+    } on SocketException {
+      throw NetworkException('No internet connection');
+    } on TimeoutException {
+      throw NetworkException('Request timeout');
+    } on HttpException catch (e) {
+      throw NetworkException('Server error: ${e.message}');
+    } catch (e) {
+      throw NetworkException('Network error occurred', originalError: e);
+    }
+  }
+}
+
+// Service layer - Business logic error handling
+class DataService {
+  final ApiRepository _repository;
+  
+  DataService(this._repository);
+  
+  Future<ProcessedResult> processData(String input) async {
+    // Validation
+    if (input.isEmpty) {
+      throw ValidationException('Input cannot be empty');
+    }
+    
+    try {
+      final rawData = await _repository.fetchData();
+      
+      // Business logic
+      if (rawData.isEmpty) {
+        throw BusinessLogicException('No data available for processing');
+      }
+      
+      return _processBusinessLogic(rawData, input);
+    } catch (AppException) {
+      rethrow; // Re-throw known exceptions
+    } catch (e) {
+      throw BusinessLogicException('Processing failed', originalError: e);
+    }
+  }
+}
+
+// Presentation layer - UI error handling
+class _ScreenState extends State<Screen> {
+  String? _errorMessage;
+  
+  Future<void> _loadData() async {
+    try {
+      await _dataService.processData(input);
+      // Success handling
+    } on NetworkException catch (e) {
+      setState(() => _errorMessage = 'Connection problem: ${e.message}');
+    } on ValidationException catch (e) {
+      setState(() => _errorMessage = 'Input error: ${e.message}');
+    } on BusinessLogicException catch (e) {
+      setState(() => _errorMessage = 'Processing error: ${e.message}');
+    } on AppException catch (e) {
+      setState(() => _errorMessage = 'Error: ${e.message}');
+    }
   }
 }
 ```
 
-## 10. PERFORMANCE ARCHITECTURE
-
-### Widget Performance Patterns
-**Priority**: High
-**Source**: Refactored files
-**Found in**: lib/widgets/tag_input_field.dart
-
-**Optimization**: Localized rebuilds with ValueListenableBuilder
-```dart
-// Instead of full widget rebuild with setState
-suffixIcon: ValueListenableBuilder<TextEditingValue>(
-  valueListenable: _controller,
-  builder: (context, value, child) {
-    return value.text.isNotEmpty
-        ? IconButton(/* ... */)
-        : const SizedBox.shrink();
-  },
-),
-```
-
-### Asset Loading Strategy
+### Global Error Handler
 **Priority**: Medium
-**Source**: All screen implementations
+**Use Case**: Centralized error logging and crash reporting
 
-**Pattern**: Consistent asset loading with proper sizing
 ```dart
-Image.asset(
-  'assets/images/icon.png',
-  width: 50,
-  height: 50,
-  fit: BoxFit.contain,  // Prevent distortion
-)
+class GlobalErrorHandler {
+  static void initialize() {
+    // Handle Flutter framework errors
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      _logError(details.exception, details.stack);
+    };
+    
+    // Handle async errors
+    PlatformDispatcher.instance.onError = (error, stack) {
+      _logError(error, stack);
+      return true;
+    };
+  }
+  
+  static void _logError(dynamic error, StackTrace? stack) {
+    // Log to console
+    debugPrint('Error: $error');
+    if (stack != null) {
+      debugPrint('Stack trace: $stack');
+    }
+    
+    // Send to crash reporting service
+    // CrashReporting.recordError(error, stack);
+    
+    // Send to analytics
+    // Analytics.logError(error.toString());
+  }
+  
+  static void handleError(AppException error, {StackTrace? stack}) {
+    _logError(error, stack);
+    
+    // Additional handling based on error type
+    if (error is NetworkException) {
+      // Handle network errors
+    } else if (error is ValidationException) {
+      // Handle validation errors
+    }
+  }
+}
+
+// Usage in main.dart
+void main() {
+  GlobalErrorHandler.initialize();
+  runApp(MyApp());
+}
 ```
 
-### Memory Management Architecture
-**Priority**: High
-**Source**: All StatefulWidget implementations
+## 7. DATA FLOW PATTERNS
 
-**Pattern**: Proper resource disposal
+### Unidirectional Data Flow
+**Priority**: High
+**Pattern**: User Action → Event Handler → Service Call → State Update → UI Rebuild
+
 ```dart
-class _ScreenState extends State<Screen> {
-  final TextEditingController _controller = TextEditingController();
+// Event types
+abstract class UserEvent {}
+class LoadDataEvent extends UserEvent {}
+class RefreshDataEvent extends UserEvent {}
+class FilterDataEvent extends UserEvent {
+  final String filter;
+  FilterDataEvent(this.filter);
+}
+
+// State management with events
+class DataScreenController {
+  final DataService _dataService;
+  
+  // State
+  final ValueNotifier<bool> isLoading = ValueNotifier(false);
+  final ValueNotifier<List<DataModel>> items = ValueNotifier([]);
+  final ValueNotifier<String?> error = ValueNotifier(null);
+  
+  DataScreenController(this._dataService);
+  
+  void handleEvent(UserEvent event) {
+    switch (event.runtimeType) {
+      case LoadDataEvent:
+        _loadData();
+        break;
+      case RefreshDataEvent:
+        _refreshData();
+        break;
+      case FilterDataEvent:
+        _filterData((event as FilterDataEvent).filter);
+        break;
+    }
+  }
+  
+  Future<void> _loadData() async {
+    isLoading.value = true;
+    error.value = null;
+    
+    try {
+      final data = await _dataService.fetchData();
+      items.value = data;
+    } catch (e) {
+      error.value = e.toString();
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  
+  void dispose() {
+    isLoading.dispose();
+    items.dispose();
+    error.dispose();
+  }
+}
+
+// UI implementation
+class DataScreen extends StatefulWidget {
+  @override
+  State<DataScreen> createState() => _DataScreenState();
+}
+
+class _DataScreenState extends State<DataScreen> {
+  late final DataScreenController _controller;
+  
+  @override
+  void initState() {
+    super.initState();
+    _controller = DataScreenController(DataService());
+    _controller.handleEvent(LoadDataEvent());
+  }
   
   @override
   void dispose() {
-    _controller.dispose();  // Prevent memory leaks
+    _controller.dispose();
     super.dispose();
   }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          // Loading indicator
+          ValueListenableBuilder<bool>(
+            valueListenable: _controller.isLoading,
+            builder: (context, isLoading, child) {
+              return isLoading 
+                  ? LinearProgressIndicator()
+                  : SizedBox.shrink();
+            },
+          ),
+          
+          // Error display
+          ValueListenableBuilder<String?>(
+            valueListenable: _controller.error,
+            builder: (context, error, child) {
+              return error != null
+                  ? ErrorBanner(
+                      message: error,
+                      onRetry: () => _controller.handleEvent(LoadDataEvent()),
+                    )
+                  : SizedBox.shrink();
+            },
+          ),
+          
+          // Data list
+          Expanded(
+            child: ValueListenableBuilder<List<DataModel>>(
+              valueListenable: _controller.items,
+              builder: (context, items, child) {
+                return ListView.builder(
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    return DataItemWidget(item: items[index]);
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _controller.handleEvent(RefreshDataEvent()),
+        child: Icon(Icons.refresh),
+      ),
+    );
+  }
+}
+```
+
+## 8. TESTING ARCHITECTURE
+
+### Testing Strategy
+**Priority**: High
+**Layers**: Unit tests for services, Widget tests for UI, Integration tests for flows
+
+```dart
+// Unit test template for services
+class MockApiClient extends Mock implements ApiClient {}
+
+void main() {
+  group('UserService Tests', () {
+    late UserService userService;
+    late MockApiClient mockApiClient;
+    late UserRepository userRepository;
+
+    setUp(() {
+      mockApiClient = MockApiClient();
+      userRepository = ApiUserRepository(mockApiClient);
+      userService = UserService(userRepository);
+    });
+
+    test('getUserProfile returns user on success', () async {
+      // Arrange
+      final expectedUser = User(id: '1', name: 'John Doe');
+      when(mockApiClient.get('/users/1')).thenAnswer(
+        (_) async => ApiResponse(data: expectedUser.toJson()),
+      );
+
+      // Act
+      final result = await userService.getUserProfile('1');
+
+      // Assert
+      expect(result.id, equals('1'));
+      expect(result.name, equals('John Doe'));
+      verify(mockApiClient.get('/users/1')).called(1);
+    });
+
+    test('getUserProfile throws NetworkException on network error', () async {
+      // Arrange
+      when(mockApiClient.get('/users/1')).thenThrow(SocketException('No internet'));
+
+      // Act & Assert
+      expect(
+        () => userService.getUserProfile('1'),
+        throwsA(isA<NetworkException>()),
+      );
+    });
+  });
+}
+
+// Widget test template
+void main() {
+  group('UserProfileScreen Tests', () {
+    late MockUserService mockUserService;
+
+    setUp(() {
+      mockUserService = MockUserService();
+    });
+
+    testWidgets('displays user profile when loaded', (tester) async {
+      // Arrange
+      final user = User(id: '1', name: 'John Doe');
+      when(mockUserService.getUserProfile('1')).thenAnswer((_) async => user);
+
+      // Act
+      await tester.pumpWidget(
+        MaterialApp(
+          home: UserProfileScreen(
+            userId: '1',
+            userService: mockUserService,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('John Doe'), findsOneWidget);
+      verify(mockUserService.getUserProfile('1')).called(1);
+    });
+
+    testWidgets('displays error message on service failure', (tester) async {
+      // Arrange
+      when(mockUserService.getUserProfile('1')).thenThrow(
+        NetworkException('Network error'),
+      );
+
+      // Act
+      await tester.pumpWidget(
+        MaterialApp(
+          home: UserProfileScreen(
+            userId: '1',
+            userService: mockUserService,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Network error'), findsOneWidget);
+    });
+  });
+}
+
+// Integration test template
+void main() {
+  group('User Flow Integration Tests', () {
+    testWidgets('complete user login and profile view flow', (tester) async {
+      // Arrange
+      await tester.pumpWidget(MyApp());
+
+      // Act - Navigate to login
+      await tester.tap(find.text('Login'));
+      await tester.pumpAndSettle();
+
+      // Act - Enter credentials
+      await tester.enterText(find.byType(TextFormField).at(0), 'user@example.com');
+      await tester.enterText(find.byType(TextFormField).at(1), 'password');
+      await tester.tap(find.text('Submit'));
+      await tester.pumpAndSettle();
+
+      // Assert - Profile screen is displayed
+      expect(find.text('Profile'), findsOneWidget);
+      expect(find.text('Welcome'), findsOneWidget);
+    });
+  });
 }
 ```
 
 ---
 
-## ARCHITECTURAL DECISIONS RECORD
+## ARCHITECTURAL DECISIONS FRAMEWORK
 
-### Decision: Local State Management
-**Date**: During refactoring
-**Status**: Accepted
-**Context**: Simple family app with limited state sharing needs
-**Decision**: Use StatefulWidget + setState instead of complex state management
+### Decision Template
+```markdown
+### Decision: [Title]
+**Date**: [Date]
+**Status**: [Proposed/Accepted/Deprecated]
+**Context**: [What is the issue that we're seeing?]
+**Decision**: [What is the change that we're proposing/doing?]
 **Consequences**: 
-- ✅ Simple to understand and maintain
-- ✅ No additional dependencies
-- ❌ May need refactoring if app grows significantly
+- ✅ Positive consequences
+- ❌ Negative consequences
+- 🔄 Neutral consequences
+```
 
-### Decision: Service Layer Pattern
-**Date**: During refactoring  
-**Status**: Accepted
-**Context**: Need to separate business logic from UI
-**Decision**: Create service classes for external integrations
-**Consequences**:
-- ✅ Clear separation of concerns
-- ✅ Testable business logic
-- ✅ Reusable across screens
+### Common Architectural Decisions
 
-### Decision: Centralized Navigation
-**Date**: During refactoring
-**Status**: Accepted
-**Context**: Duplicated navigation logic across screens
-**Decision**: Create NavigationService with static methods
-**Consequences**:
-- ✅ Consistent navigation behavior
-- ✅ Easy to modify globally
-- ✅ Type-safe navigation
+#### State Management Choice
+**Context**: Need to manage application state
+**Options**: setState, Provider, Riverpod, Bloc, Redux
+**Decision Factors**:
+- App complexity
+- Team size and experience
+- Testability requirements
+- Performance needs
 
-### Decision: Template-based Security
-**Date**: During refactoring
-**Status**: Accepted
-**Context**: Need to share code publicly without exposing Firebase credentials
-**Decision**: Use template files with setup documentation
-**Consequences**:
-- ✅ Safe public repository sharing
-- ✅ Clear setup instructions
-- ❌ Additional setup step for new developers
+#### Navigation Strategy
+**Context**: Need to handle screen navigation
+**Options**: Navigator 1.0, Navigator 2.0, Auto Route, Go Router
+**Decision Factors**:
+- Deep linking requirements
+- Web support needs
+- Route complexity
+- Type safety requirements
 
+#### Dependency Injection
+**Context**: Need to manage service dependencies
+**Options**: Service Locator, Constructor Injection, Provider-based DI
+**Decision Factors**:
+- Testability requirements
+- App complexity
+- Team preferences
+- Build-time vs runtime resolution
+
+---
+
+*Universal architectural patterns for Flutter/Dart applications*
 *Last updated: January 2025*

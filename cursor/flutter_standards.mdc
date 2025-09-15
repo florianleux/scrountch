@@ -1,35 +1,34 @@
 # Flutter Development Standards & Best Practices
-*Based on Scrountch Project - Generated from refactored codebase*
+*Universal Flutter/Dart coding standards for any application*
 
 ## 1. PROJECT ARCHITECTURE
 
-### Folder Structure
+### Standard Folder Structure
 **Priority**: High
-**Source**: Refactored files + Existing codebase
-**Found in**: Project root structure
+**Rationale**: Consistent organization across all Flutter projects
 
 ```
 lib/
 ├── main.dart                    # App entry point
 ├── constants/                   # Static data and configuration
 │   ├── app_constants.dart       # Business logic constants
-│   └── location_data.dart       # Hierarchical data structures
+│   └── [domain]_data.dart       # Domain-specific data structures
 ├── models/                      # Data models
-│   └── item.dart               # Domain entities
+│   └── [entity].dart           # Domain entities (User, Product, etc.)
 ├── services/                    # Business logic layer
-│   ├── firebase_service.dart   # External service integration
+│   ├── [external]_service.dart # External service integrations
 │   ├── navigation_service.dart # Centralized navigation
-│   └── csv_service.dart        # File processing utilities
+│   └── [utility]_service.dart  # File processing, utilities
 ├── screens/                     # UI screens
-│   ├── home_screen.dart        # Main navigation screens
-│   ├── search_screen.dart      # Feature-specific screens
+│   ├── [main]_screen.dart      # Main navigation screens
+│   ├── [feature]_screen.dart   # Feature-specific screens
 │   └── ...
 ├── widgets/                     # Reusable UI components
-│   ├── app_header.dart         # Layout components
-│   ├── custom_buttons.dart     # Input components
+│   ├── [layout]_widget.dart    # Layout components
+│   ├── [input]_widget.dart     # Input components
 │   └── ...
 └── theme/                       # Design system
-    └── unified_theme.dart      # Centralized styling
+    └── app_theme.dart          # Centralized styling
 ```
 
 **Template for new features**:
@@ -46,54 +45,52 @@ lib/
 
 ### File Naming Conventions
 **Priority**: High
-**Source**: Refactored files
-**Found in**: All .dart files
+**Standard**: Use snake_case with descriptive suffixes
 
-**Rule**: Use snake_case with descriptive suffixes
 ```dart
 // Screens: [feature]_screen.dart
 home_screen.dart
-item_detail_screen.dart
-csv_import_screen.dart
+user_profile_screen.dart
+product_detail_screen.dart
 
 // Widgets: [purpose]_[type].dart
 custom_buttons.dart
 app_header.dart
-background_image.dart
+loading_indicator.dart
 
 // Services: [domain]_service.dart
-firebase_service.dart
+api_service.dart
 navigation_service.dart
-csv_service.dart
+storage_service.dart
 
 // Models: [entity].dart (singular)
-item.dart
-user.dart (future)
+user.dart
+product.dart
+order.dart
 
 // Constants: [domain]_[type].dart
 app_constants.dart
-location_data.dart
+api_endpoints.dart
+theme_constants.dart
 ```
 
 ### Import Organization
 **Priority**: Medium
-**Source**: Refactored files
-**Found in**: lib/main.dart, lib/screens/search_screen.dart
-
 **Standard order**:
+
 ```dart
 // 1. Flutter framework imports
 import 'package:flutter/material.dart';
 
 // 2. Third-party package imports
-import 'package:firebase_core/firebase_core.dart';
-import 'package:csv/csv.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 // 3. Local imports - absolute paths from lib/
-import 'firebase_options.dart';
-import 'services/firebase_service.dart';
+import 'config/app_config.dart';
+import 'services/api_service.dart';
 import 'screens/home_screen.dart';
-import 'theme/unified_theme.dart';
+import 'theme/app_theme.dart';
 
 // 4. Relative imports (only when necessary)
 import '../widgets/custom_buttons.dart';
@@ -103,111 +100,120 @@ import '../widgets/custom_buttons.dart';
 
 ### StatefulWidget vs StatelessWidget Rules
 **Priority**: High
-**Source**: Refactored files
-**Found in**: lib/widgets/background_image.dart, lib/widgets/app_header.dart
-
 **Rule**: Use StatelessWidget unless state is required
 
-**StatelessWidget Example** (from lib/widgets/background_image.dart):
+**StatelessWidget Template**:
 ```dart
-/// Reusable background image widget
-class BackgroundImage extends StatelessWidget {
-  final String imagePath;
-  final double opacity;
+/// Brief description of widget purpose
+class CustomWidget extends StatelessWidget {
+  final String title;
+  final VoidCallback? onPressed;
+  final bool isEnabled;
 
-  const BackgroundImage({
+  const CustomWidget({
     super.key,
-    required this.imagePath,
-    this.opacity = 0.2,
+    required this.title,
+    this.onPressed,
+    this.isEnabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: Opacity(
-        opacity: opacity,
-        child: Image.asset(
-          imagePath,
-          fit: BoxFit.cover,
-        ),
-      ),
+    return Container(
+      child: isEnabled
+          ? ElevatedButton(
+              onPressed: onPressed,
+              child: Text(title),
+            )
+          : const Text('Disabled'),
     );
   }
 }
 ```
 
-**StatefulWidget Only When Needed** (from lib/screens/home_screen.dart):
+**StatefulWidget Only When Needed**:
 ```dart
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class InteractiveWidget extends StatefulWidget {
+  const InteractiveWidget({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<InteractiveWidget> createState() => _InteractiveWidgetState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  // State is needed for CSV button visibility
-  bool _showCsvButton = false;
+class _InteractiveWidgetState extends State<InteractiveWidget> {
+  bool _isExpanded = false;
   
   @override
   Widget build(BuildContext context) {
     // Implementation with state management
+    return ExpansionTile(
+      title: Text('Title'),
+      initiallyExpanded: _isExpanded,
+      onExpansionChanged: (expanded) {
+        setState(() => _isExpanded = expanded);
+      },
+    );
   }
 }
 ```
 
 ### Const Constructor Standards
 **Priority**: High
-**Source**: Refactored files
-**Found in**: All widget files
-
 **Rule**: Always use const constructors when possible
 
 **Template**:
 ```dart
-class CustomWidget extends StatelessWidget {
+class ReusableWidget extends StatelessWidget {
   final String title;
   final VoidCallback? onPressed;
+  final bool isEnabled;
 
-  const CustomWidget({
+  const ReusableWidget({
     super.key,  // Always use super.key
     required this.title,
     this.onPressed,
+    this.isEnabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(); // Use const for static widgets
+    return Container(
+      child: isEnabled
+          ? ElevatedButton(onPressed: onPressed, child: Text(title))
+          : const Text('Disabled'), // Use const for static widgets
+    );
   }
 }
 ```
 
 ### Widget Extraction Guidelines
 **Priority**: High
-**Source**: Refactored files - Created during cleanup
-**Found in**: lib/widgets/app_header.dart, lib/widgets/background_image.dart
+**Extraction Criteria**:
+- Used in 2+ places
+- Self-contained functionality
+- Clear single responsibility
+- Configurable through parameters
 
-**Before refactoring** (duplicated code across screens):
+**Before (duplicated code)**:
 ```dart
-// In search_screen.dart, results_screen.dart, etc.
+// Repeated across multiple screens
 Row(
   children: [
-    GestureDetector(
-      onTap: () => Navigator.pop(context),
-      child: Image.asset('assets/images/back_icon.png', width: 50, height: 50),
+    IconButton(
+      onPressed: () => Navigator.pop(context),
+      icon: Icon(Icons.arrow_back),
     ),
     const Spacer(),
-    GestureDetector(
-      onTap: () => NavigationService.pushAndRemoveUntil(context, const HomeScreen()),
-      child: Image.asset('assets/images/home_icon.png', width: 50, height: 50),
+    IconButton(
+      onPressed: () => Navigator.pushAndRemoveUntil(/*...*/),
+      icon: Icon(Icons.home),
     ),
   ],
 )
 ```
 
-**After refactoring** (extracted to reusable widget):
+**After (extracted reusable widget)**:
 ```dart
-// lib/widgets/app_header.dart
 class AppHeader extends StatelessWidget {
   final bool showBackButton;
   final bool showHomeButton;
@@ -221,68 +227,77 @@ class AppHeader extends StatelessWidget {
     this.onBackPressed,
     this.onHomePressed,
   });
-  // ... implementation
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        if (showBackButton)
+          IconButton(
+            onPressed: onBackPressed ?? () => Navigator.pop(context),
+            icon: Icon(Icons.arrow_back),
+          ),
+        const Spacer(),
+        if (showHomeButton)
+          IconButton(
+            onPressed: onHomePressed ?? () => _navigateToHome(context),
+            icon: Icon(Icons.home),
+          ),
+      ],
+    );
+  }
 }
 
-// Usage in screens:
+// Usage:
 const AppHeader(), // Simple usage with defaults
+const AppHeader(showBackButton: false), // Customized
 ```
-
-**Extraction Criteria**:
-- Used in 2+ places
-- Self-contained functionality
-- Clear single responsibility
-- Configurable through parameters
 
 ## 3. CODE STYLE & CONVENTIONS
 
 ### Naming Conventions
 **Priority**: High
-**Source**: Refactored files
-**Found in**: All .dart files
 
 **Classes**: PascalCase
 ```dart
-class NavigationService {}
+class UserService {}
 class CustomTextField {}
-class CsvImportResult {}
+class ApiResponse {}
 ```
 
 **Variables/Methods**: camelCase
 ```dart
-bool showCsvButton = false;
-void navigateToScreen() {}
-final TextEditingController searchController;
+bool isLoading = false;
+void performAction() {}
+final TextEditingController userController;
 ```
 
 **Constants**: camelCase with descriptive prefixes
 ```dart
-// From lib/screens/home_screen.dart
-static const double _buttonHeight = UnifiedTheme.buttonHeight;
-static const double _iconSize = UnifiedTheme.iconSize;
-static const int _topSpacerFlex = 55;
+// Theme constants
+static const double defaultPadding = 16.0;
+static const Color primaryColor = Color(0xFF2196F3);
+static const String defaultFontFamily = 'Roboto';
 
-// From lib/theme/unified_theme.dart
-static const Color primaryYellow = Color(0xFFFFE333);
-static const String titleFont = 'DelaGothicOne';
+// API constants
+static const String baseUrl = 'https://api.example.com';
+static const Duration defaultTimeout = Duration(seconds: 30);
 ```
 
 **Private Members**: Leading underscore
 ```dart
-class _HomeScreenState extends State<HomeScreen> {
-  bool _showCsvButton = false;
+class _ScreenState extends State<Screen> {
+  bool _isLoading = false;
   
-  Widget _buildBackground() {}
-  void _navigateToScreen() {}
+  Widget _buildContent() {}
+  void _handleUserAction() {}
 }
 ```
 
 ### Method Organization
 **Priority**: Medium
-**Source**: Refactored files
-**Found in**: lib/screens/home_screen.dart
-
 **Standard order within classes**:
+
 ```dart
 class ExampleScreen extends StatefulWidget {
   // 1. Constructor
@@ -295,7 +310,7 @@ class ExampleScreen extends StatefulWidget {
 
 class _ExampleScreenState extends State<ExampleScreen> {
   // 1. Static constants
-  static const double _buttonHeight = 75.0;
+  static const double _defaultPadding = 16.0;
   
   // 2. Instance variables
   bool _isLoading = false;
@@ -334,85 +349,114 @@ class _ExampleScreenState extends State<ExampleScreen> {
 
 ### Documentation Standards
 **Priority**: Medium
-**Source**: Refactored files
-**Found in**: lib/widgets/app_header.dart, lib/services/navigation_service.dart
 
 **Widget Documentation**:
 ```dart
-/// Reusable header widget with back and home navigation
-/// Used across multiple screens for consistent navigation
-class AppHeader extends StatelessWidget {
-  // Implementation
+/// Brief description of widget purpose and usage
+/// 
+/// Used across multiple screens for consistent [functionality]
+class CustomWidget extends StatelessWidget {
+  /// Description of important parameter
+  final String title;
+  
+  /// Optional callback for user interaction
+  final VoidCallback? onPressed;
+  
+  /// Creates a [CustomWidget] with the given [title]
+  /// 
+  /// The [onPressed] callback is called when user interacts with widget
+  const CustomWidget({
+    super.key,
+    required this.title,
+    this.onPressed,
+  });
 }
 ```
 
 **Service Documentation**:
 ```dart
-/// Service de navigation centralisé pour éviter la duplication
-class NavigationService {
-  /// Navigation simple vers un nouvel écran
-  static Future<T?> push<T>(BuildContext context, Widget screen) {
+/// Service for handling [domain] operations
+/// 
+/// Provides methods for CRUD operations and business logic
+class DomainService {
+  /// Performs [operation] with given [parameters]
+  /// 
+  /// Returns [ResultType] on success
+  /// 
+  /// Throws [ExceptionType] when [condition] occurs
+  Future<ResultType> performOperation(Parameters params) async {
     // Implementation
   }
 }
-```
-
-**Method Documentation Template**:
-```dart
-/// Brief description of what the method does
-/// 
-/// [parameter1] Description of parameter
-/// [parameter2] Description of parameter
-/// 
-/// Returns description of return value
-/// 
-/// Throws [ExceptionType] when condition occurs
 ```
 
 ## 4. PERFORMANCE OPTIMIZATIONS
 
 ### Widget Optimization Techniques
 **Priority**: High
-**Source**: Refactored files
-**Found in**: lib/widgets/tag_input_field.dart
 
-**Before refactoring** (inefficient setState):
+**Use ValueListenableBuilder for localized updates**:
 ```dart
-onChanged: (value) {
-  setState(() {}); // Pour mettre à jour l'icône plus
-},
-```
+// ❌ INEFFICIENT - Full widget rebuild
+class _FormState extends State<Form> {
+  final TextEditingController _controller = TextEditingController();
+  
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: _controller,
+      decoration: InputDecoration(
+        suffixIcon: _controller.text.isNotEmpty
+            ? IconButton(onPressed: _clearText, icon: Icon(Icons.clear))
+            : null,
+      ),
+      onChanged: (value) {
+        setState(() {}); // Rebuilds entire widget
+      },
+    );
+  }
+}
 
-**After refactoring** (optimized with ValueListenableBuilder):
-```dart
-suffixIcon: ValueListenableBuilder<TextEditingValue>(
-  valueListenable: _controller,
-  builder: (context, value, child) {
-    return value.text.isNotEmpty
-        ? IconButton(
-            icon: Image.asset('assets/images/plus_icon.png'),
-            onPressed: () => _addTag(_controller.text),
-          )
-        : const SizedBox.shrink();
-  },
-),
+// ✅ OPTIMIZED - Localized rebuild
+class _FormState extends State<Form> {
+  final TextEditingController _controller = TextEditingController();
+  
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: _controller,
+      decoration: InputDecoration(
+        suffixIcon: ValueListenableBuilder<TextEditingValue>(
+          valueListenable: _controller,
+          builder: (context, value, child) {
+            return value.text.isNotEmpty
+                ? IconButton(onPressed: _clearText, icon: Icon(Icons.clear))
+                : const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+  }
+}
 ```
-
-**Rule**: Use ValueListenableBuilder instead of setState for localized updates
 
 ### Memory Management Rules
 **Priority**: High
-**Source**: Existing codebase
-**Found in**: lib/screens/search_screen.dart
 
 **Controller Disposal Template**:
 ```dart
 class _ScreenState extends State<Screen> {
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
+  final AnimationController _animController = AnimationController();
+  final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
   
   @override
   void dispose() {
-    _controller.dispose();
+    _textController.dispose();
+    _animController.dispose();
+    _scrollController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 }
@@ -420,75 +464,16 @@ class _ScreenState extends State<Screen> {
 
 **Async Operation Safety**:
 ```dart
-void _performAsyncOperation() async {
-  setState(() => _isLoading = true);
-  
-  try {
-    await someAsyncOperation();
-  } finally {
-    if (mounted) {  // Check if widget is still mounted
-      setState(() => _isLoading = false);
-    }
-  }
-}
-```
-
-### Const Widget Usage
-**Priority**: Medium
-**Source**: Refactored files
-**Found in**: All widget files
-
-**Template**:
-```dart
-// Use const for static widgets
-const SizedBox(height: 24),
-const Spacer(),
-const Text('Static text'),
-
-// Use const constructors
-const CustomWidget(
-  title: 'Static title',
-  isEnabled: true,
-),
-```
-
-## 5. STATE MANAGEMENT
-
-### Chosen Pattern
-**Priority**: High
-**Source**: Existing codebase
-**Found in**: All screen files
-
-**Pattern**: Local State with StatefulWidget
-- Simple setState for UI state
-- Service classes for business logic
-- No complex state management library needed
-
-**Implementation Guidelines**:
-```dart
 class _ScreenState extends State<Screen> {
-  // UI state
   bool _isLoading = false;
-  String? _errorMessage;
-  
-  // Business logic through services
-  final FirebaseService _firebaseService = FirebaseService();
-  
-  void _performAction() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+
+  Future<void> _performAsyncOperation() async {
+    setState(() => _isLoading = true);
     
     try {
-      await _firebaseService.someOperation();
-      // Handle success
-    } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-      });
+      await someAsyncOperation();
     } finally {
-      if (mounted) {
+      if (mounted) {  // Check if widget is still mounted
         setState(() => _isLoading = false);
       }
     }
@@ -496,185 +481,302 @@ class _ScreenState extends State<Screen> {
 }
 ```
 
-## 6. REUSABLE COMPONENTS
+### Const Widget Usage
+**Priority**: Medium
 
-### Custom Widgets Created
+```dart
+// ✅ GOOD - Use const for static widgets
+const SizedBox(height: 16),
+const Spacer(),
+const Divider(),
+
+// ✅ GOOD - Use const constructors
+const CustomWidget(
+  title: 'Static Title',
+  isEnabled: true,
+)
+
+// ❌ AVOID - Missing const when possible
+SizedBox(height: 16),  // Should be const
+CustomWidget(title: 'Static Title'),  // Should be const
+```
+
+## 5. STATE MANAGEMENT
+
+### Recommended Pattern
 **Priority**: High
-**Source**: Refactored files - Created during cleanup
+**Pattern**: Local State + Service Layer
 
-#### AppHeader
-**File**: lib/widgets/app_header.dart
-**Purpose**: Consistent navigation across screens
+**Rationale**:
+- Simple and maintainable for most applications
+- Clear separation between UI state and business logic
+- Easy to test and understand
+- Scales well for small to medium applications
+
+**Implementation Template**:
 ```dart
-const AppHeader(
-  showBackButton: true,
-  showHomeButton: true,
-  onBackPressed: customBackAction, // Optional custom action
-)
-```
-
-#### BackgroundImage
-**File**: lib/widgets/background_image.dart
-**Purpose**: Consistent background styling
-```dart
-const BackgroundImage(
-  imagePath: 'assets/images/search_bg.png',
-  opacity: 0.2,
-)
-```
-
-#### Custom Buttons
-**File**: lib/widgets/custom_buttons.dart
-**Purpose**: Themed button variants
-```dart
-// Primary: Black background, yellow text
-PrimaryButton(
-  onPressed: () {},
-  text: 'PRIMARY',
-  iconPath: 'assets/images/icon.png',
-)
-
-// Secondary: Yellow background, black border
-SecondaryButton(
-  onPressed: () {},
-  text: 'SECONDARY',
-  iconPath: 'assets/images/icon.png',
-)
-
-// Tertiary: Yellow background, smaller size
-TertiaryButton(
-  onPressed: () {},
-  text: 'TERTIARY',
-  height: 50,
-)
-```
-
-### Utility Classes
-**Priority**: High
-**Source**: Refactored files
-**Found in**: lib/services/navigation_service.dart
-
-#### NavigationService
-**Purpose**: Centralized navigation logic
-```dart
-// Simple navigation
-NavigationService.push(context, const NextScreen());
-
-// Replace current screen
-NavigationService.pushReplacement(context, const NewScreen());
-
-// Clear stack and navigate
-NavigationService.pushAndRemoveUntil(context, const HomeScreen());
-
-// Go back
-NavigationService.pop(context);
-```
-
-#### UnifiedTheme
-**File**: lib/theme/unified_theme.dart
-**Purpose**: Centralized design system
-```dart
-// Colors
-UnifiedTheme.primaryYellow
-UnifiedTheme.textBlack
-
-// Text styles
-UnifiedTheme.headingStyle
-UnifiedTheme.buttonTextStyle
-UnifiedTheme.bodyTextStyle
-
-// Button styles
-UnifiedTheme.primaryButtonStyle
-UnifiedTheme.secondaryButtonStyle
-
-// Helpers
-UnifiedTheme.buildButtonContent(
-  iconPath: 'assets/images/icon.png',
-  text: 'Button Text',
-  iconColor: Colors.black,
-)
-```
-
-## 7. ARCHITECTURE PATTERNS
-
-### Service Layer Pattern
-**Priority**: High
-**Source**: Existing codebase
-**Found in**: lib/services/firebase_service.dart
-
-**Template for new services**:
-```dart
-class ExampleService {
-  // Singleton pattern
-  static final ExampleService _instance = ExampleService._internal();
-  factory ExampleService() => _instance;
-  ExampleService._internal();
+class _ScreenState extends State<Screen> {
+  // UI state
+  bool _isLoading = false;
+  String? _errorMessage;
+  List<DataModel> _items = [];
   
-  // Public API methods
-  Future<Result> performOperation(Parameters params) async {
+  // Service dependency
+  final ApiService _apiService = ApiService();
+  
+  Future<void> _loadData() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    
     try {
-      // Implementation
-      return result;
+      final items = await _apiService.fetchItems();
+      setState(() {
+        _items = items;
+        _isLoading = false;
+      });
     } catch (e) {
-      debugPrint("ExampleService: Error - $e");
-      throw Exception("User-friendly error message");
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
     }
   }
-  
-  // Private helper methods
-  Future<void> _helperMethod() async {
-    // Implementation
+}
+```
+
+### Alternative Patterns
+**For larger applications, consider**:
+- **Provider**: For shared state across widgets
+- **Riverpod**: For dependency injection and state management
+- **Bloc**: For complex business logic and state transitions
+
+## 6. REUSABLE COMPONENTS
+
+### Navigation Header Template
+```dart
+/// Reusable header widget with navigation controls
+class AppHeader extends StatelessWidget {
+  final bool showBackButton;
+  final bool showMenuButton;
+  final String? title;
+  final List<Widget>? actions;
+
+  const AppHeader({
+    super.key,
+    this.showBackButton = true,
+    this.showMenuButton = false,
+    this.title,
+    this.actions,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      leading: showBackButton
+          ? IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: Icon(Icons.arrow_back),
+            )
+          : showMenuButton
+              ? IconButton(
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                  icon: Icon(Icons.menu),
+                )
+              : null,
+      title: title != null ? Text(title!) : null,
+      actions: actions,
+    );
   }
 }
 ```
 
-### Screen Structure Pattern
-**Priority**: High
-**Source**: Refactored files
-**Found in**: lib/screens/home_screen.dart
-
-**Template**:
+### Loading Indicator Template
 ```dart
-class FeatureScreen extends StatefulWidget {
-  const FeatureScreen({super.key});
+/// Reusable loading indicator with optional message
+class LoadingIndicator extends StatelessWidget {
+  final String? message;
+  final bool showMessage;
 
-  @override
-  State<FeatureScreen> createState() => _FeatureScreenState();
-}
+  const LoadingIndicator({
+    super.key,
+    this.message,
+    this.showMessage = true,
+  });
 
-class _FeatureScreenState extends State<FeatureScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: UnifiedTheme.primaryYellow,
-      body: Stack(
-        children: [
-          _buildBackground(),
-          _buildContent(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBackground() {
-    return const BackgroundImage(
-      imagePath: 'assets/images/feature_bg.png',
-    );
-  }
-
-  Widget _buildContent() {
-    return SafeArea(
+    return Center(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          const AppHeader(),
-          Expanded(child: _buildBody()),
+          const CircularProgressIndicator(),
+          if (showMessage && message != null) ...[
+            const SizedBox(height: 16),
+            Text(
+              message!,
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+          ],
         ],
       ),
     );
   }
+}
+```
 
-  Widget _buildBody() {
-    // Feature-specific content
+### Error Display Template
+```dart
+/// Reusable error display with retry functionality
+class ErrorDisplay extends StatelessWidget {
+  final String message;
+  final VoidCallback? onRetry;
+  final String retryText;
+
+  const ErrorDisplay({
+    super.key,
+    required this.message,
+    this.onRetry,
+    this.retryText = 'Retry',
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              message,
+              style: Theme.of(context).textTheme.bodyLarge,
+              textAlign: TextAlign.center,
+            ),
+            if (onRetry != null) ...[
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: onRetry,
+                child: Text(retryText),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+## 7. SERVICE LAYER PATTERNS
+
+### API Service Template
+```dart
+class ApiService {
+  static final ApiService _instance = ApiService._internal();
+  factory ApiService() => _instance;
+  ApiService._internal();
+
+  final String _baseUrl = 'https://api.example.com';
+  final Duration _timeout = Duration(seconds: 30);
+
+  Future<List<T>> fetchList<T>(
+    String endpoint,
+    T Function(Map<String, dynamic>) fromJson,
+  ) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/$endpoint'),
+      ).timeout(_timeout);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        return data.map((item) => fromJson(item)).toList();
+      } else {
+        throw ApiException('Failed to load data: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint("ApiService: Fetch error - $e");
+      throw ApiException('Network error occurred');
+    }
+  }
+
+  Future<T> create<T>(
+    String endpoint,
+    Map<String, dynamic> data,
+    T Function(Map<String, dynamic>) fromJson,
+  ) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/$endpoint'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(data),
+      ).timeout(_timeout);
+
+      if (response.statusCode == 201) {
+        return fromJson(json.decode(response.body));
+      } else {
+        throw ApiException('Failed to create: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint("ApiService: Create error - $e");
+      throw ApiException('Failed to create item');
+    }
+  }
+}
+
+class ApiException implements Exception {
+  final String message;
+  ApiException(this.message);
+  
+  @override
+  String toString() => message;
+}
+```
+
+### Navigation Service Template
+```dart
+class NavigationService {
+  /// Navigate to new screen
+  static Future<T?> push<T>(BuildContext context, Widget screen) {
+    return Navigator.push<T>(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
+    );
+  }
+  
+  /// Replace current screen
+  static Future<T?> pushReplacement<T>(BuildContext context, Widget screen) {
+    return Navigator.pushReplacement<T, void>(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
+    );
+  }
+  
+  /// Clear stack and navigate
+  static Future<T?> pushAndRemoveUntil<T>(
+    BuildContext context, 
+    Widget screen, {
+    bool Function(Route<dynamic>)? predicate,
+  }) {
+    return Navigator.pushAndRemoveUntil<T>(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
+      predicate ?? (route) => false,
+    );
+  }
+  
+  /// Go back
+  static void pop<T>(BuildContext context, [T? result]) {
+    Navigator.pop(context, result);
   }
 }
 ```
@@ -682,30 +784,70 @@ class _FeatureScreenState extends State<FeatureScreen> {
 ## 8. TESTING STANDARDS
 
 ### Widget Testing Template
-**Priority**: Medium
-**Source**: Existing codebase
-**Found in**: test/widget_test.dart
-
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:scrountch/main.dart';
+import 'package:myapp/widgets/custom_button.dart';
 
 void main() {
-  testWidgets('Widget description', (WidgetTester tester) async {
-    // Build the widget
-    await tester.pumpWidget(const ScrountchApp());
-    
-    // Verify expected elements
-    expect(find.text('TROUVER'), findsOneWidget);
-    expect(find.text('RANGER'), findsOneWidget);
-    
-    // Interact with widgets
-    await tester.tap(find.text('TROUVER'));
-    await tester.pump();
-    
-    // Verify results
-    expect(find.byType(SearchScreen), findsOneWidget);
+  group('CustomButton Tests', () {
+    testWidgets('displays text and responds to tap', (tester) async {
+      bool tapped = false;
+      
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CustomButton(
+              onPressed: () => tapped = true,
+              text: 'Test Button',
+            ),
+          ),
+        ),
+      );
+
+      // Verify button is displayed
+      expect(find.text('Test Button'), findsOneWidget);
+      expect(find.byType(CustomButton), findsOneWidget);
+
+      // Test tap functionality
+      await tester.tap(find.byType(CustomButton));
+      expect(tapped, isTrue);
+    });
+  });
+}
+```
+
+### Service Testing Template
+```dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
+import 'package:myapp/services/api_service.dart';
+
+class MockHttpClient extends Mock implements http.Client {}
+
+void main() {
+  group('ApiService Tests', () {
+    late ApiService apiService;
+    late MockHttpClient mockClient;
+
+    setUp(() {
+      mockClient = MockHttpClient();
+      apiService = ApiService(client: mockClient);
+    });
+
+    test('fetchItems returns list of items on success', () async {
+      // Arrange
+      when(mockClient.get(any)).thenAnswer(
+        (_) async => http.Response('{"items": []}', 200),
+      );
+
+      // Act
+      final result = await apiService.fetchItems();
+
+      // Assert
+      expect(result, isA<List<Item>>());
+      verify(mockClient.get(any)).called(1);
+    });
   });
 }
 ```
@@ -713,42 +855,55 @@ void main() {
 ## 9. ERROR HANDLING
 
 ### Exception Handling Pattern
-**Priority**: High
-**Source**: Existing codebase
-**Found in**: lib/services/firebase_service.dart
-
 ```dart
+// Custom exception classes
+class AppException implements Exception {
+  final String message;
+  final String? code;
+  
+  AppException(this.message, {this.code});
+  
+  @override
+  String toString() => message;
+}
+
+class NetworkException extends AppException {
+  NetworkException(String message) : super(message, code: 'NETWORK_ERROR');
+}
+
+class ValidationException extends AppException {
+  ValidationException(String message) : super(message, code: 'VALIDATION_ERROR');
+}
+
+// Service layer error handling
 Future<Result> serviceMethod() async {
   try {
     // Business logic
     return result;
+  } on SocketException {
+    throw NetworkException('No internet connection');
+  } on TimeoutException {
+    throw NetworkException('Request timeout');
   } catch (e) {
     debugPrint("ServiceName: Method error - $e");
-    throw Exception(AppConstants.userFriendlyErrorMessage);
+    throw AppException('An unexpected error occurred');
   }
+}
+
+// UI layer error handling
+try {
+  await _service.performOperation();
+  // Show success feedback
+} on NetworkException catch (e) {
+  _showErrorDialog('Network Error', e.message);
+} on ValidationException catch (e) {
+  _showErrorDialog('Validation Error', e.message);
+} on AppException catch (e) {
+  _showErrorDialog('Error', e.message);
 }
 ```
 
-### User Feedback Pattern
-**Priority**: Medium
-**Source**: Refactored files
-**Found in**: lib/theme/unified_theme.dart
-
-```dart
-// Success feedback
-ScaffoldMessenger.of(context).showSnackBar(
-  UnifiedTheme.successSnackBar('Operation completed successfully'),
-);
-
-// Error feedback
-ScaffoldMessenger.of(context).showSnackBar(
-  UnifiedTheme.errorSnackBar('Something went wrong'),
-);
-```
-
----
-
-## IMPLEMENTATION CHECKLIST
+## 10. IMPLEMENTATION CHECKLIST
 
 ### For New Features:
 - [ ] Follow folder structure conventions
@@ -757,7 +912,7 @@ ScaffoldMessenger.of(context).showSnackBar(
 - [ ] Extract reusable widgets when used 2+ times
 - [ ] Implement proper error handling
 - [ ] Add controller disposal in dispose()
-- [ ] Use UnifiedTheme for styling
+- [ ] Use centralized theme for styling
 - [ ] Use NavigationService for navigation
 - [ ] Document public APIs
 - [ ] Add appropriate tests
@@ -771,6 +926,18 @@ ScaffoldMessenger.of(context).showSnackBar(
 - [ ] Check for memory leaks (controller disposal)
 - [ ] Ensure theme consistency
 - [ ] Verify navigation patterns
+- [ ] Check for performance optimizations
+- [ ] Validate test coverage
 
+### Performance Checklist:
+- [ ] Use ValueListenableBuilder for localized updates
+- [ ] Dispose of all controllers and resources
+- [ ] Use const widgets where possible
+- [ ] Check mounted before setState in async operations
+- [ ] Use stable keys for list items
+- [ ] Minimize setState scope
+
+---
+
+*Universal Flutter/Dart standards - applicable to any application*
 *Last updated: January 2025*
-*Based on Scrountch project refactoring and optimization*

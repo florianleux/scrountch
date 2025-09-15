@@ -1,12 +1,11 @@
 # Widget Guidelines & UI Standards
-*Based on Scrountch Project - Extracted from refactored UI components*
+*Universal Flutter widget patterns and UI component standards*
 
 ## 1. WIDGET HIERARCHY & COMPOSITION
 
-### Screen Structure Pattern
+### Screen Structure Template
 **Priority**: High
-**Source**: Refactored files
-**Found in**: lib/screens/search_screen.dart, lib/screens/home_screen.dart
+**Applicability**: All Flutter screen widgets
 
 **Standard Template**:
 ```dart
@@ -21,10 +20,10 @@ class _FeatureScreenState extends State<FeatureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: UnifiedTheme.primaryYellow,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Stack(
         children: [
-          _buildBackground(),      // Layer 1: Background
+          _buildBackground(),      // Layer 1: Background (optional)
           _buildContent(),         // Layer 2: Main content
         ],
       ),
@@ -32,9 +31,17 @@ class _FeatureScreenState extends State<FeatureScreen> {
   }
 
   Widget _buildBackground() {
-    return const BackgroundImage(
-      imagePath: 'assets/images/feature_bg.png',
-      opacity: 0.2,
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            Theme.of(context).colorScheme.surface,
+          ],
+        ),
+      ),
     );
   }
 
@@ -42,7 +49,7 @@ class _FeatureScreenState extends State<FeatureScreen> {
     return SafeArea(
       child: Column(
         children: [
-          const AppHeader(),       // Consistent navigation
+          _buildHeader(),          // Consistent navigation
           Expanded(
             child: _buildBody(),   // Feature-specific content
           ),
@@ -50,45 +57,54 @@ class _FeatureScreenState extends State<FeatureScreen> {
       ),
     );
   }
+
+  Widget _buildHeader() {
+    return const AppHeader();
+  }
+
+  Widget _buildBody() {
+    // Feature-specific implementation
+    return Container();
+  }
 }
 ```
 
-**Benefits**:
-- Consistent visual hierarchy
-- Predictable component placement
-- Reusable background and header patterns
-
 ### Widget Composition Rules
 **Priority**: High
-**Source**: Refactored files
-**Found in**: All widget implementations
 
 **Rule 1**: Single Responsibility Principle
 ```dart
 // ❌ BAD - Widget doing too many things
-class ComplexFormWidget extends StatelessWidget {
+class ComplexUserWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Header logic
-        // Form logic  
-        // Button logic
-        // Validation logic
+        // Avatar logic
+        // Name display logic
+        // Status indicator logic
+        // Action buttons logic
+        // Statistics display logic
       ],
     );
   }
 }
 
 // ✅ GOOD - Composed of focused widgets
-class UserFormScreen extends StatelessWidget {
+class UserProfileWidget extends StatelessWidget {
+  final User user;
+  
+  const UserProfileWidget({super.key, required this.user});
+  
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const AppHeader(),
-        const UserFormFields(),
-        UserFormActions(),
+        UserAvatar(user: user),
+        UserNameDisplay(user: user),
+        UserStatusIndicator(user: user),
+        UserActionButtons(user: user),
+        UserStatistics(user: user),
       ],
     );
   }
@@ -98,13 +114,34 @@ class UserFormScreen extends StatelessWidget {
 **Rule 2**: Composition over Inheritance
 ```dart
 // ✅ GOOD - Compose reusable widgets
-class PrimaryButton extends StatelessWidget {
+class ActionButton extends StatelessWidget {
+  final String text;
+  final VoidCallback? onPressed;
+  final IconData? icon;
+  final ButtonStyle? style;
+
+  const ActionButton({
+    super.key,
+    required this.text,
+    this.onPressed,
+    this.icon,
+    this.style,
+  });
+
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      style: UnifiedTheme.primaryButtonStyle,
-      child: iconPath != null
-          ? UnifiedTheme.buildButtonContent(/* ... */)  // Composed helper
+      onPressed: onPressed,
+      style: style ?? Theme.of(context).elevatedButtonTheme.style,
+      child: icon != null
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon),
+                const SizedBox(width: 8),
+                Text(text),
+              ],
+            )
           : Text(text),
     );
   }
@@ -115,177 +152,333 @@ class PrimaryButton extends StatelessWidget {
 
 ### Header Component Pattern
 **Priority**: High
-**Source**: Refactored files - Created during cleanup
-**Found in**: lib/widgets/app_header.dart
+**Use Case**: Consistent navigation across screens
 
-**Before refactoring** (duplicated across 5+ screens):
-```dart
-// Repeated in search_screen.dart, results_screen.dart, etc.
-Row(
-  children: [
-    GestureDetector(
-      onTap: () => Navigator.pop(context),
-      child: Image.asset('assets/images/back_icon.png', width: 50, height: 50),
-    ),
-    const Spacer(),
-    GestureDetector(
-      onTap: () => NavigationService.pushAndRemoveUntil(context, const HomeScreen()),
-      child: Image.asset('assets/images/home_icon.png', width: 50, height: 50),
-    ),
-  ],
-)
-```
-
-**After refactoring** (single reusable component):
+**Generic Header Template**:
 ```dart
 class AppHeader extends StatelessWidget {
+  final String? title;
   final bool showBackButton;
-  final bool showHomeButton;
+  final bool showMenuButton;
+  final List<Widget>? actions;
   final VoidCallback? onBackPressed;
-  final VoidCallback? onHomePressed;
+  final VoidCallback? onMenuPressed;
 
   const AppHeader({
     super.key,
+    this.title,
     this.showBackButton = true,
-    this.showHomeButton = true,
+    this.showMenuButton = false,
+    this.actions,
     this.onBackPressed,
-    this.onHomePressed,
+    this.onMenuPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      child: Row(
+    return AppBar(
+      title: title != null ? Text(title!) : null,
+      leading: _buildLeading(context),
+      actions: actions,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      foregroundColor: Theme.of(context).colorScheme.onSurface,
+      elevation: 0,
+    );
+  }
+
+  Widget? _buildLeading(BuildContext context) {
+    if (showBackButton) {
+      return IconButton(
+        onPressed: onBackPressed ?? () => Navigator.pop(context),
+        icon: const Icon(Icons.arrow_back),
+      );
+    }
+    
+    if (showMenuButton) {
+      return IconButton(
+        onPressed: onMenuPressed ?? () => Scaffold.of(context).openDrawer(),
+        icon: const Icon(Icons.menu),
+      );
+    }
+    
+    return null;
+  }
+}
+
+// Usage examples:
+const AppHeader(title: 'Profile'),
+const AppHeader(showBackButton: false, showMenuButton: true),
+AppHeader(
+  title: 'Settings',
+  actions: [
+    IconButton(onPressed: _save, icon: Icon(Icons.save)),
+  ],
+),
+```
+
+### Loading States Pattern
+**Priority**: High
+**Use Case**: Consistent loading indicators across app
+
+**Loading Widget Templates**:
+```dart
+/// Simple loading indicator
+class LoadingIndicator extends StatelessWidget {
+  final String? message;
+  final double? size;
+
+  const LoadingIndicator({
+    super.key,
+    this.message,
+    this.size,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          if (showBackButton)
-            GestureDetector(
-              onTap: onBackPressed ?? () => Navigator.pop(context),
-              child: Image.asset('assets/images/back_icon.png', width: 50, height: 50),
-            )
-          else
-            const SizedBox(width: 50), // Maintain spacing
-          const Spacer(),
-          if (showHomeButton)
-            GestureDetector(
-              onTap: onHomePressed ?? () => _navigateToHome(context),
-              child: Image.asset('assets/images/home_icon.png', width: 50, height: 50),
-            )
-          else
-            const SizedBox(width: 50), // Maintain spacing
+          SizedBox(
+            width: size ?? 40,
+            height: size ?? 40,
+            child: CircularProgressIndicator(
+              strokeWidth: 3,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+          if (message != null) ...[
+            const SizedBox(height: 16),
+            Text(
+              message!,
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+          ],
         ],
       ),
     );
   }
 }
 
-// Usage examples:
-const AppHeader(),                           // Default: both buttons
-const AppHeader(showBackButton: false),     // Only home button
-const AppHeader(onBackPressed: customAction), // Custom back action
-```
+/// Loading overlay for buttons
+class LoadingButton extends StatelessWidget {
+  final String text;
+  final VoidCallback? onPressed;
+  final bool isLoading;
+  final IconData? icon;
 
-**Design Principles**:
-- Sensible defaults with customization options
-- Maintains visual consistency when buttons are hidden
-- Allows custom actions while providing default behavior
-
-### Background Component Pattern
-**Priority**: High
-**Source**: Refactored files - Created during cleanup
-**Found in**: lib/widgets/background_image.dart
-
-**Reusable Background Widget**:
-```dart
-class BackgroundImage extends StatelessWidget {
-  final String imagePath;
-  final double opacity;
-
-  const BackgroundImage({
+  const LoadingButton({
     super.key,
-    required this.imagePath,
-    this.opacity = 0.2,
+    required this.text,
+    this.onPressed,
+    this.isLoading = false,
+    this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: Opacity(
-        opacity: opacity,
-        child: Image.asset(
-          imagePath,
-          fit: BoxFit.cover,
+    return ElevatedButton(
+      onPressed: isLoading ? null : onPressed,
+      child: isLoading
+          ? const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : icon != null
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(icon),
+                    const SizedBox(width: 8),
+                    Text(text),
+                  ],
+                )
+              : Text(text),
+    );
+  }
+}
+```
+
+### Error Display Pattern
+**Priority**: High
+**Use Case**: Consistent error handling across app
+
+**Error Widget Templates**:
+```dart
+/// Generic error display widget
+class ErrorDisplay extends StatelessWidget {
+  final String message;
+  final VoidCallback? onRetry;
+  final String retryText;
+  final IconData? icon;
+
+  const ErrorDisplay({
+    super.key,
+    required this.message,
+    this.onRetry,
+    this.retryText = 'Retry',
+    this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon ?? Icons.error_outline,
+              size: 64,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              message,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (onRetry != null) ...[
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: onRetry,
+                child: Text(retryText),
+              ),
+            ],
+          ],
         ),
       ),
     );
   }
 }
 
-// Usage across screens:
-const BackgroundImage(imagePath: 'assets/images/search_bg.png'),
-const BackgroundImage(imagePath: 'assets/images/results_bg.png', opacity: 0.3),
-```
+/// Error banner for inline errors
+class ErrorBanner extends StatelessWidget {
+  final String message;
+  final VoidCallback? onDismiss;
+  final VoidCallback? onRetry;
 
-### Button System Pattern
-**Priority**: High
-**Source**: Refactored files
-**Found in**: lib/widgets/custom_buttons.dart
-
-**Three-Tier Button System**:
-```dart
-// Primary: Black background, yellow text/icons
-PrimaryButton(
-  onPressed: () => _performMainAction(),
-  text: 'MAIN ACTION',
-  iconPath: 'assets/images/search_icon.png',
-  height: 75,
-  iconSize: 55,
-)
-
-// Secondary: Yellow background, black border and text/icons  
-SecondaryButton(
-  onPressed: () => _performSecondaryAction(),
-  text: 'SECONDARY',
-  iconPath: 'assets/images/store_icon.png',
-  height: 75,
-  iconSize: 55,
-)
-
-// Tertiary: Yellow background, smaller, no border
-TertiaryButton(
-  onPressed: () => _performMinorAction(),
-  text: 'MINOR ACTION',
-  height: 50,
-  iconSize: 40,
-)
-```
-
-**Button Customization Pattern**:
-```dart
-class PrimaryButton extends StatelessWidget {
-  final VoidCallback? onPressed;
-  final String text;
-  final String? iconPath;
-  final double height;
-  final double iconSize;
+  const ErrorBanner({
+    super.key,
+    required this.message,
+    this.onDismiss,
+    this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: UnifiedTheme.primaryButtonStyle.copyWith(
-          minimumSize: WidgetStateProperty.all(Size(double.infinity, height)),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.errorContainer,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.error_outline,
+            color: Theme.of(context).colorScheme.error,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onErrorContainer,
+              ),
+            ),
+          ),
+          if (onRetry != null) ...[
+            TextButton(
+              onPressed: onRetry,
+              child: Text('Retry'),
+            ),
+          ],
+          if (onDismiss != null) ...[
+            IconButton(
+              onPressed: onDismiss,
+              icon: Icon(Icons.close),
+              iconSize: 20,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+```
+
+### Empty State Pattern
+**Priority**: Medium
+**Use Case**: When lists or content areas are empty
+
+```dart
+class EmptyState extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  final IconData? icon;
+  final String? actionText;
+  final VoidCallback? onAction;
+
+  const EmptyState({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.icon,
+    this.actionText,
+    this.onAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: 80,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+              const SizedBox(height: 24),
+            ],
+            Text(
+              title,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (subtitle != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                subtitle!,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+            if (actionText != null && onAction != null) ...[
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: onAction,
+                child: Text(actionText!),
+              ),
+            ],
+          ],
         ),
-        child: iconPath != null
-            ? UnifiedTheme.buildButtonContent(
-                iconPath: iconPath!,
-                text: text,
-                iconColor: UnifiedTheme.primaryYellow,
-                iconSize: iconSize,
-              )
-            : Text(text),
       ),
     );
   }
@@ -296,258 +489,514 @@ class PrimaryButton extends StatelessWidget {
 
 ### Form Field Pattern
 **Priority**: High
-**Source**: Refactored files
-**Found in**: lib/widgets/custom_text_field.dart
+**Use Case**: Consistent form inputs across app
 
-**Unified Text Field**:
+**Text Field Template**:
 ```dart
-class CustomTextField extends StatelessWidget {
+class AppTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String? labelText;
   final String? hintText;
+  final String? helperText;
   final int? maxLength;
   final int? maxLines;
   final String? Function(String?)? validator;
   final TextInputAction? textInputAction;
-  final void Function(String)? onFieldSubmitted;
+  final TextInputType? keyboardType;
   final void Function(String)? onChanged;
-  final bool filled;
-  final Color? fillColor;
+  final void Function(String)? onFieldSubmitted;
+  final bool obscureText;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
+  final bool enabled;
+  final bool readOnly;
 
-  const CustomTextField({
+  const AppTextField({
     super.key,
     this.controller,
     this.labelText,
     this.hintText,
+    this.helperText,
     this.maxLength,
     this.maxLines = 1,
     this.validator,
     this.textInputAction,
-    this.onFieldSubmitted,
+    this.keyboardType,
     this.onChanged,
-    this.filled = true,
-    this.fillColor,
+    this.onFieldSubmitted,
+    this.obscureText = false,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.enabled = true,
+    this.readOnly = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
-      style: Theme.of(context).textTheme.bodySmall,
       maxLength: maxLength,
       maxLines: maxLines,
       validator: validator,
       textInputAction: textInputAction,
-      onFieldSubmitted: onFieldSubmitted,
+      keyboardType: keyboardType,
       onChanged: onChanged,
+      onFieldSubmitted: onFieldSubmitted,
+      obscureText: obscureText,
+      enabled: enabled,
+      readOnly: readOnly,
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,
-        filled: filled,
-        fillColor: fillColor,
-        // Theme provides the rest of the styling
+        helperText: helperText,
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
     );
   }
 }
-```
 
-**Usage Examples**:
-```dart
-// Simple text input
-CustomTextField(
+// Usage examples:
+AppTextField(
   controller: _nameController,
-  labelText: 'Nom de l\'objet',
-  maxLength: 100,
-  validator: (value) => value?.isEmpty == true ? 'Requis' : null,
+  labelText: 'Full Name',
+  validator: (value) => value?.isEmpty == true ? 'Name is required' : null,
 )
 
-// Multi-line description
-CustomTextField(
-  controller: _descriptionController,
-  labelText: 'Description',
-  maxLines: 3,
-  maxLength: 500,
+AppTextField(
+  controller: _emailController,
+  labelText: 'Email',
+  keyboardType: TextInputType.emailAddress,
+  prefixIcon: Icon(Icons.email),
+  validator: _validateEmail,
+)
+
+AppTextField(
+  controller: _passwordController,
+  labelText: 'Password',
+  obscureText: true,
+  suffixIcon: IconButton(
+    onPressed: _togglePasswordVisibility,
+    icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
+  ),
 )
 ```
 
 ### Dropdown Pattern
 **Priority**: High
-**Source**: Existing codebase
-**Found in**: lib/widgets/custom_dropdown.dart
+**Use Case**: Consistent dropdown selections
 
-**Two Dropdown Variants**:
+**Dropdown Templates**:
 ```dart
-// Simple dropdown without icon
-CustomDropdown<String>(
-  value: selectedRoom,
-  labelText: 'Pièce',
-  isRequired: true,
-  items: roomItems,
-  onChanged: (value) => setState(() => selectedRoom = value),
-  validator: (value) => value == null ? 'Veuillez choisir une pièce' : null,
-)
+class AppDropdown<T> extends StatelessWidget {
+  final T? value;
+  final String? labelText;
+  final String? hintText;
+  final List<DropdownMenuItem<T>> items;
+  final void Function(T?)? onChanged;
+  final String? Function(T?)? validator;
+  final bool isExpanded;
+  final Widget? prefixIcon;
 
-// Dropdown with icon
-CustomIconDropdown<String>(
-  value: selectedCategory,
-  labelText: 'Catégorie',
-  iconAsset: 'assets/images/room_icon.png',
-  items: categoryItems,
-  onChanged: (value) => setState(() => selectedCategory = value),
-)
-```
+  const AppDropdown({
+    super.key,
+    this.value,
+    this.labelText,
+    this.hintText,
+    required this.items,
+    this.onChanged,
+    this.validator,
+    this.isExpanded = true,
+    this.prefixIcon,
+  });
 
-### Advanced Input: Tag Field Pattern
-**Priority**: Medium
-**Source**: Refactored files (performance optimized)
-**Found in**: lib/widgets/tag_input_field.dart
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<T>(
+      value: value,
+      items: items,
+      onChanged: onChanged,
+      validator: validator,
+      isExpanded: isExpanded,
+      decoration: InputDecoration(
+        labelText: labelText,
+        hintText: hintText,
+        prefixIcon: prefixIcon,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+}
 
-**Optimized Tag Input with ValueListenableBuilder**:
-```dart
-class TagInputField extends StatefulWidget {
-  final List<String>? initialTags;
-  final ValueChanged<List<String>> onTagsChanged;
-  final String labelText;
-  final int maxTags;
-  final int maxTagLength;
+// Searchable dropdown for large lists
+class SearchableDropdown<T> extends StatefulWidget {
+  final T? value;
+  final String? labelText;
+  final List<T> items;
+  final String Function(T) itemLabel;
+  final void Function(T?)? onChanged;
+  final String? Function(T?)? validator;
+
+  const SearchableDropdown({
+    super.key,
+    this.value,
+    this.labelText,
+    required this.items,
+    required this.itemLabel,
+    this.onChanged,
+    this.validator,
+  });
+
+  @override
+  State<SearchableDropdown<T>> createState() => _SearchableDropdownState<T>();
+}
+
+class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
+  final TextEditingController _searchController = TextEditingController();
+  List<T> _filteredItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _filteredItems = widget.items;
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterItems(String query) {
+    setState(() {
+      _filteredItems = widget.items
+          .where((item) => widget.itemLabel(item)
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextFormField(
-          controller: _controller,
+        if (widget.labelText != null) ...[
+          Text(
+            widget.labelText!,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 8),
+        ],
+        TextField(
+          controller: _searchController,
           decoration: InputDecoration(
-            labelText: widget.labelText,
-            suffixIcon: ValueListenableBuilder<TextEditingValue>(
-              valueListenable: _controller,
-              builder: (context, value, child) {
-                return value.text.isNotEmpty
-                    ? IconButton(
-                        icon: Image.asset('assets/images/plus_icon.png'),
-                        onPressed: () => _addTag(_controller.text),
-                      )
-                    : const SizedBox.shrink();
-              },
+            hintText: 'Search...',
+            prefixIcon: Icon(Icons.search),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
             ),
           ),
-          onChanged: (value) {
-            // No setState needed - ValueListenableBuilder handles UI updates
-          },
+          onChanged: _filterItems,
         ),
-        if (_tags.isNotEmpty) _buildTagChips(),
+        const SizedBox(height: 8),
+        Container(
+          height: 200,
+          decoration: BoxDecoration(
+            border: Border.all(color: Theme.of(context).dividerColor),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: ListView.builder(
+            itemCount: _filteredItems.length,
+            itemBuilder: (context, index) {
+              final item = _filteredItems[index];
+              return ListTile(
+                title: Text(widget.itemLabel(item)),
+                selected: widget.value == item,
+                onTap: () {
+                  widget.onChanged?.call(item);
+                  _searchController.clear();
+                  _filteredItems = widget.items;
+                },
+              );
+            },
+          ),
+        ),
       ],
     );
   }
 }
 ```
 
-**Performance Optimization**: Uses ValueListenableBuilder instead of setState for localized updates.
+### Switch and Checkbox Patterns
+**Priority**: Medium
 
-## 4. LIST & CARD PATTERNS
-
-### Item Card Pattern
-**Priority**: High
-**Source**: Existing codebase
-**Found in**: lib/widgets/item_card.dart
-
-**Consistent Card Design**:
 ```dart
-class ItemCard extends StatelessWidget {
-  final Item item;
-  final VoidCallback onTap;
+class AppSwitch extends StatelessWidget {
+  final bool value;
+  final void Function(bool)? onChanged;
+  final String? title;
+  final String? subtitle;
+
+  const AppSwitch({
+    super.key,
+    required this.value,
+    this.onChanged,
+    this.title,
+    this.subtitle,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      splashColor: Colors.black.withOpacity(0.1),
-      highlightColor: Colors.black.withOpacity(0.1),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
-        padding: const EdgeInsets.all(5),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title
-                  Text(
-                    item.name.toUpperCase(),
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w900,
-                          fontFamily: 'DelaGothicOne',
-                          fontSize: 24,
-                        ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  // Subtitle
-                  Text(
-                    item.fullCategory,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'Chivo',
-                          fontSize: 12,
-                        ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 20,
-              color: Colors.black.withOpacity(0.7),
-            ),
-          ],
-        ),
-      ),
+    return SwitchListTile(
+      value: value,
+      onChanged: onChanged,
+      title: title != null ? Text(title!) : null,
+      subtitle: subtitle != null ? Text(subtitle!) : null,
+      contentPadding: EdgeInsets.zero,
+    );
+  }
+}
+
+class AppCheckbox extends StatelessWidget {
+  final bool value;
+  final void Function(bool?)? onChanged;
+  final String? title;
+  final String? subtitle;
+
+  const AppCheckbox({
+    super.key,
+    required this.value,
+    this.onChanged,
+    this.title,
+    this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CheckboxListTile(
+      value: value,
+      onChanged: onChanged,
+      title: title != null ? Text(title!) : null,
+      subtitle: subtitle != null ? Text(subtitle!) : null,
+      contentPadding: EdgeInsets.zero,
+      controlAffinity: ListTileControlAffinity.leading,
     );
   }
 }
 ```
 
-**Design Principles**:
-- Consistent visual feedback (InkWell with custom colors)
-- Proper text overflow handling
-- Clear visual hierarchy (title/subtitle)
-- Accessible touch targets
+## 4. LIST & CARD PATTERNS
+
+### List Item Pattern
+**Priority**: High
+**Use Case**: Consistent list item display
+
+```dart
+class AppListItem extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  final Widget? leading;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+  final bool selected;
+  final EdgeInsetsGeometry? contentPadding;
+
+  const AppListItem({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.leading,
+    this.trailing,
+    this.onTap,
+    this.onLongPress,
+    this.selected = false,
+    this.contentPadding,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+          fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+        ),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: subtitle != null
+          ? Text(
+              subtitle!,
+              style: Theme.of(context).textTheme.bodyMedium,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            )
+          : null,
+      leading: leading,
+      trailing: trailing ?? (onTap != null ? Icon(Icons.chevron_right) : null),
+      onTap: onTap,
+      onLongPress: onLongPress,
+      selected: selected,
+      contentPadding: contentPadding ?? EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    );
+  }
+}
+```
+
+### Card Pattern
+**Priority**: High
+**Use Case**: Consistent card layouts
+
+```dart
+class AppCard extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry? margin;
+  final EdgeInsetsGeometry? padding;
+  final VoidCallback? onTap;
+  final double? elevation;
+  final Color? color;
+
+  const AppCard({
+    super.key,
+    required this.child,
+    this.margin,
+    this.padding,
+    this.onTap,
+    this.elevation,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Widget card = Card(
+      margin: margin ?? EdgeInsets.all(8),
+      elevation: elevation ?? 2,
+      color: color,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: padding ?? EdgeInsets.all(16),
+        child: child,
+      ),
+    );
+
+    if (onTap != null) {
+      card = InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: card,
+      );
+    }
+
+    return card;
+  }
+}
+
+// Usage examples:
+AppCard(
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text('Card Title', style: Theme.of(context).textTheme.headlineSmall),
+      SizedBox(height: 8),
+      Text('Card content goes here...'),
+    ],
+  ),
+  onTap: () => print('Card tapped'),
+)
+```
 
 ## 5. DIALOG & MODAL PATTERNS
 
-### Confirmation Dialog Pattern
-**Priority**: Medium
-**Source**: Existing codebase
-**Found in**: lib/widgets/confirmation_dialog.dart
+### Dialog Templates
+**Priority**: High
 
-**Reusable Confirmation Dialog**:
 ```dart
+class AppDialog extends StatelessWidget {
+  final String title;
+  final Widget content;
+  final List<Widget>? actions;
+  final bool barrierDismissible;
+
+  const AppDialog({
+    super.key,
+    required this.title,
+    required this.content,
+    this.actions,
+    this.barrierDismissible = true,
+  });
+
+  static Future<T?> show<T>(
+    BuildContext context, {
+    required String title,
+    required Widget content,
+    List<Widget>? actions,
+    bool barrierDismissible = true,
+  }) {
+    return showDialog<T>(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      builder: (context) => AppDialog(
+        title: title,
+        content: content,
+        actions: actions,
+        barrierDismissible: barrierDismissible,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(title),
+      content: content,
+      actions: actions,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    );
+  }
+}
+
+// Confirmation dialog
 class ConfirmationDialog extends StatelessWidget {
   final String title;
-  final String content;
+  final String message;
   final String confirmText;
   final String cancelText;
   final VoidCallback onConfirm;
 
+  const ConfirmationDialog({
+    super.key,
+    required this.title,
+    required this.message,
+    this.confirmText = 'Confirm',
+    this.cancelText = 'Cancel',
+    required this.onConfirm,
+  });
+
   static Future<bool?> show(
     BuildContext context, {
     required String title,
-    required String content,
-    String confirmText = 'Confirmer',
-    String cancelText = 'Annuler',
+    required String message,
+    String confirmText = 'Confirm',
+    String cancelText = 'Cancel',
     required VoidCallback onConfirm,
   }) {
     return showDialog<bool>(
       context: context,
       builder: (context) => ConfirmationDialog(
         title: title,
-        content: content,
+        message: message,
         confirmText: confirmText,
         cancelText: cancelText,
         onConfirm: onConfirm,
@@ -558,20 +1007,19 @@ class ConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: UnifiedTheme.primaryYellow,
       title: Text(title),
-      content: Text(content),
+      content: Text(message),
       actions: [
-        TertiaryButton(
+        TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          text: cancelText,
+          child: Text(cancelText),
         ),
-        PrimaryButton(
+        ElevatedButton(
           onPressed: () {
             onConfirm();
             Navigator.of(context).pop(true);
           },
-          text: confirmText,
+          child: Text(confirmText),
         ),
       ],
     );
@@ -579,174 +1027,243 @@ class ConfirmationDialog extends StatelessWidget {
 }
 
 // Usage:
-await ConfirmationDialog.show(
+final confirmed = await ConfirmationDialog.show(
   context,
-  title: 'Supprimer l\'objet',
-  content: 'Cette action est irréversible.',
+  title: 'Delete Item',
+  message: 'Are you sure you want to delete this item?',
   onConfirm: () => _deleteItem(),
 );
 ```
 
-## 6. RESPONSIVE DESIGN PATTERNS
+### Bottom Sheet Pattern
+**Priority**: Medium
 
-### Safe Area Pattern
-**Priority**: High
-**Source**: All screen implementations
-**Found in**: Every screen widget
-
-**Standard SafeArea Usage**:
 ```dart
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    body: SafeArea(
+class AppBottomSheet extends StatelessWidget {
+  final String? title;
+  final Widget child;
+  final bool showDragHandle;
+  final bool isScrollControlled;
+
+  const AppBottomSheet({
+    super.key,
+    this.title,
+    required this.child,
+    this.showDragHandle = true,
+    this.isScrollControlled = false,
+  });
+
+  static Future<T?> show<T>(
+    BuildContext context, {
+    String? title,
+    required Widget child,
+    bool showDragHandle = true,
+    bool isScrollControlled = false,
+  }) {
+    return showModalBottomSheet<T>(
+      context: context,
+      isScrollControlled: isScrollControlled,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => AppBottomSheet(
+        title: title,
+        child: child,
+        showDragHandle: showDragHandle,
+        isScrollControlled: isScrollControlled,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          const AppHeader(),
-          Expanded(child: _buildContent()),
+          if (showDragHandle) ...[
+            Container(
+              width: 40,
+              height: 4,
+              margin: EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).dividerColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ],
+          if (title != null) ...[
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title!,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(Icons.close),
+                  ),
+                ],
+              ),
+            ),
+            Divider(),
+          ],
+          Flexible(child: child),
         ],
       ),
-    ),
-  );
+    );
+  }
 }
 ```
 
-### Flexible Layout Pattern
-**Priority**: Medium
-**Source**: lib/screens/home_screen.dart
+## 6. RESPONSIVE DESIGN PATTERNS
 
-**Proportional Spacing**:
+### Breakpoint System
+**Priority**: Medium
+**Use Case**: Responsive layouts across different screen sizes
+
 ```dart
+class Breakpoints {
+  static const double mobile = 600;
+  static const double tablet = 900;
+  static const double desktop = 1200;
+
+  static bool isMobile(BuildContext context) =>
+      MediaQuery.of(context).size.width < mobile;
+
+  static bool isTablet(BuildContext context) =>
+      MediaQuery.of(context).size.width >= mobile &&
+      MediaQuery.of(context).size.width < desktop;
+
+  static bool isDesktop(BuildContext context) =>
+      MediaQuery.of(context).size.width >= desktop;
+}
+
+class ResponsiveBuilder extends StatelessWidget {
+  final Widget mobile;
+  final Widget? tablet;
+  final Widget? desktop;
+
+  const ResponsiveBuilder({
+    super.key,
+    required this.mobile,
+    this.tablet,
+    this.desktop,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (Breakpoints.isDesktop(context) && desktop != null) {
+      return desktop!;
+    }
+    if (Breakpoints.isTablet(context) && tablet != null) {
+      return tablet!;
+    }
+    return mobile;
+  }
+}
+
+// Usage:
+ResponsiveBuilder(
+  mobile: Column(children: widgets),
+  tablet: Row(children: widgets),
+  desktop: GridView.count(crossAxisCount: 3, children: widgets),
+)
+```
+
+### Adaptive Layouts
+**Priority**: Medium
+
+```dart
+class AdaptiveContainer extends StatelessWidget {
+  final Widget child;
+  final double? maxWidth;
+
+  const AdaptiveContainer({
+    super.key,
+    required this.child,
+    this.maxWidth,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: double.infinity,
+        constraints: BoxConstraints(
+          maxWidth: maxWidth ?? 
+              (Breakpoints.isMobile(context) ? double.infinity : 800),
+        ),
+        child: child,
+      ),
+    );
+  }
+}
+
+class AdaptivePadding extends StatelessWidget {
+  final Widget child;
+
+  const AdaptivePadding({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final padding = Breakpoints.isMobile(context) ? 16.0 : 32.0;
+    return Padding(
+      padding: EdgeInsets.all(padding),
+      child: child,
+    );
+  }
+}
+```
+
+## 7. PERFORMANCE OPTIMIZATION PATTERNS
+
+### Const Widget Usage
+**Priority**: High
+
+```dart
+// ✅ GOOD - Use const for static widgets
+const SizedBox(height: 16),
+const Divider(),
+const CircularProgressIndicator(),
+
+// ✅ GOOD - Const constructors
+const AppCard(
+  child: Text('Static content'),
+)
+
+// ✅ GOOD - Const in lists
 Column(
   children: [
-    const Spacer(flex: 55),  // 55% of available space
-    _buildButtons(),
-    const Spacer(flex: 45),  // 45% of available space
+    const AppHeader(title: 'Static Title'),
+    Expanded(child: _buildDynamicContent()),
+    const SizedBox(height: 16),
   ],
 )
 ```
 
-### Padding Consistency
+### ValueListenableBuilder Optimization
 **Priority**: High
-**Source**: UnifiedTheme + all screens
-**Found in**: lib/theme/unified_theme.dart
 
-**Standard Padding Values**:
 ```dart
-class UnifiedTheme {
-  static const double horizontalPadding = 24.0;
-  static const double verticalPadding = 24.0;
-  static const double buttonSpacing = 24.0;
-}
-
-// Usage:
-Padding(
-  padding: const EdgeInsets.symmetric(
-    horizontal: UnifiedTheme.horizontalPadding,
-    vertical: UnifiedTheme.verticalPadding,
-  ),
-  child: content,
-)
-```
-
-## 7. ANIMATION & INTERACTION PATTERNS
-
-### Navigation Transitions
-**Priority**: Low
-**Source**: lib/services/navigation_service.dart
-**Current**: Standard MaterialPageRoute
-
-**Future Enhancement Template**:
-```dart
-static Future<T?> pushWithSlideTransition<T>(
-  BuildContext context,
-  Widget screen,
-) {
-  return Navigator.push<T>(
-    context,
-    PageRouteBuilder<T>(
-      pageBuilder: (context, animation, secondaryAnimation) => screen,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return SlideTransition(
-          position: animation.drive(
-            Tween(begin: const Offset(1.0, 0.0), end: Offset.zero),
-          ),
-          child: child,
-        );
-      },
-    ),
-  );
-}
-```
-
-### Loading States Pattern
-**Priority**: High
-**Source**: All async operations in screens
-
-**Standard Loading Pattern**:
-```dart
-class _ScreenState extends State<Screen> {
-  bool _isLoading = false;
-
+class OptimizedWidget extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _buildContent(),
-    );
-  }
-
-  Future<void> _performAsyncAction() async {
-    setState(() => _isLoading = true);
-    
-    try {
-      await someAsyncOperation();
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
+  State<OptimizedWidget> createState() => _OptimizedWidgetState();
 }
-```
 
-## 8. ACCESSIBILITY PATTERNS
-
-### Semantic Labels
-**Priority**: Medium
-**Template for future implementation**:
-
-```dart
-// Button accessibility
-PrimaryButton(
-  onPressed: _search,
-  text: 'SEARCH',
-  // Add semantic labels for screen readers
-  semanticLabel: 'Search for items in inventory',
-)
-
-// Image accessibility
-Image.asset(
-  'assets/images/search_icon.png',
-  semanticLabel: 'Search icon',
-  excludeFromSemantics: false,
-)
-```
-
-### Focus Management
-**Priority**: Medium
-**Template for form focus**:
-
-```dart
-class _FormScreenState extends State<FormScreen> {
-  final FocusNode _nameFocus = FocusNode();
-  final FocusNode _descriptionFocus = FocusNode();
-
+class _OptimizedWidgetState extends State<OptimizedWidget> {
+  final ValueNotifier<int> _counter = ValueNotifier(0);
+  
   @override
   void dispose() {
-    _nameFocus.dispose();
-    _descriptionFocus.dispose();
+    _counter.dispose();
     super.dispose();
   }
 
@@ -754,14 +1271,21 @@ class _FormScreenState extends State<FormScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        CustomTextField(
-          focusNode: _nameFocus,
-          textInputAction: TextInputAction.next,
-          onFieldSubmitted: (_) => _descriptionFocus.requestFocus(),
+        // Static part - never rebuilds
+        const Text('Counter App'),
+        
+        // Dynamic part - only rebuilds when counter changes
+        ValueListenableBuilder<int>(
+          valueListenable: _counter,
+          builder: (context, count, child) {
+            return Text('Count: $count');
+          },
         ),
-        CustomTextField(
-          focusNode: _descriptionFocus,
-          textInputAction: TextInputAction.done,
+        
+        // Static part - never rebuilds
+        ElevatedButton(
+          onPressed: () => _counter.value++,
+          child: const Text('Increment'),
         ),
       ],
     );
@@ -769,122 +1293,54 @@ class _FormScreenState extends State<FormScreen> {
 }
 ```
 
-## 9. WIDGET TESTING PATTERNS
-
-### Widget Test Template
-**Priority**: Medium
-**Source**: test/widget_test.dart
-
-```dart
-void main() {
-  group('CustomButton Tests', () {
-    testWidgets('PrimaryButton displays text and responds to tap', (tester) async {
-      bool tapped = false;
-      
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PrimaryButton(
-              onPressed: () => tapped = true,
-              text: 'TEST BUTTON',
-            ),
-          ),
-        ),
-      );
-
-      // Verify button is displayed
-      expect(find.text('TEST BUTTON'), findsOneWidget);
-      expect(find.byType(PrimaryButton), findsOneWidget);
-
-      // Test tap functionality
-      await tester.tap(find.byType(PrimaryButton));
-      expect(tapped, isTrue);
-    });
-
-    testWidgets('PrimaryButton with icon displays both icon and text', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PrimaryButton(
-              onPressed: () {},
-              text: 'ICON BUTTON',
-              iconPath: 'assets/images/search_icon.png',
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('ICON BUTTON'), findsOneWidget);
-      expect(find.byType(Image), findsOneWidget);
-    });
-  });
-}
-```
-
-## 10. WIDGET PERFORMANCE GUIDELINES
-
-### Const Widget Usage
-**Priority**: High
-**Source**: All refactored widgets
-
-```dart
-// ✅ GOOD - Use const for static widgets
-const SizedBox(height: 24),
-const Spacer(),
-const AppHeader(),
-
-// ✅ GOOD - Use const constructors
-const CustomTextField(
-  labelText: 'Static Label',
-  maxLength: 100,
-)
-
-// ❌ AVOID - Non-const when const is possible
-SizedBox(height: 24),  // Missing const
-AppHeader(),           // Missing const
-```
-
-### ValueListenableBuilder Optimization
-**Priority**: High
-**Source**: Refactored files
-**Found in**: lib/widgets/tag_input_field.dart
-
-```dart
-// ✅ GOOD - Localized rebuilds
-ValueListenableBuilder<TextEditingValue>(
-  valueListenable: _controller,
-  builder: (context, value, child) {
-    return value.text.isNotEmpty
-        ? IconButton(onPressed: _addTag)
-        : const SizedBox.shrink();
-  },
-)
-
-// ❌ AVOID - Full widget rebuild
-TextField(
-  onChanged: (value) {
-    setState(() {}); // Rebuilds entire widget
-  },
-)
-```
-
 ### List Performance
-**Priority**: Medium
-**Template for large lists**:
+**Priority**: High
 
 ```dart
-// For large lists, use ListView.builder
-ListView.builder(
-  itemCount: items.length,
-  itemBuilder: (context, index) {
-    final item = items[index];
-    return ItemCard(
-      key: ValueKey(item.id), // Important for performance
-      item: item,
-      onTap: () => _navigateToDetail(item),
+// For large lists
+class OptimizedListView extends StatelessWidget {
+  final List<Item> items;
+  final void Function(Item) onItemTap;
+
+  const OptimizedListView({
+    super.key,
+    required this.items,
+    required this.onItemTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return AppListItem(
+          key: ValueKey(item.id), // Stable key for performance
+          title: item.title,
+          subtitle: item.subtitle,
+          onTap: () => onItemTap(item),
+        );
+      },
     );
-  },
-)
+  }
+}
+
+// For small lists with complex items
+class OptimizedColumn extends StatelessWidget {
+  final List<Item> items;
+
+  const OptimizedColumn({super.key, required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: items.map((item) => ItemWidget(
+        key: ValueKey(item.id),
+        item: item,
+      )).toList(),
+    );
+  }
+}
 ```
 
 ---
@@ -893,25 +1349,39 @@ ListView.builder(
 
 ### For New Widgets:
 - [ ] Use const constructor when possible
-- [ ] Add required and optional parameters appropriately
-- [ ] Include proper documentation comments
-- [ ] Follow naming conventions (PascalCase for classes)
+- [ ] Add proper key parameter (super.key)
+- [ ] Handle null safety appropriately
+- [ ] Follow naming conventions (PascalCase)
 - [ ] Use theme values instead of hardcoded styles
-- [ ] Handle null safety properly
-- [ ] Add semantic labels for accessibility
-- [ ] Dispose of controllers and focus nodes
+- [ ] Add documentation comments
+- [ ] Dispose of resources in StatefulWidget
 - [ ] Use ValueListenableBuilder for localized updates
-- [ ] Test widget behavior with unit tests
+- [ ] Handle different screen sizes appropriately
+- [ ] Add semantic labels for accessibility
 
 ### For Widget Composition:
 - [ ] Single responsibility principle
 - [ ] Compose instead of inherit
 - [ ] Extract reusable components (2+ usage rule)
-- [ ] Use consistent spacing from theme
+- [ ] Use consistent spacing and sizing
 - [ ] Follow established visual hierarchy
 - [ ] Maintain consistent interaction patterns
 - [ ] Use proper key values for list items
-- [ ] Handle loading and error states
+- [ ] Handle loading, error, and empty states
+- [ ] Test widget behavior across different screen sizes
+- [ ] Ensure proper color contrast for accessibility
 
+### Performance Checklist:
+- [ ] Use const widgets where possible
+- [ ] Implement ValueListenableBuilder for localized updates
+- [ ] Use stable keys for list items
+- [ ] Avoid creating widgets in build methods unnecessarily
+- [ ] Cache expensive computations
+- [ ] Dispose of controllers and notifiers
+- [ ] Use ListView.builder for large lists
+- [ ] Minimize widget tree depth
+
+---
+
+*Universal Flutter widget patterns and UI standards*
 *Last updated: January 2025*
-*Based on Scrountch project widget refactoring*
