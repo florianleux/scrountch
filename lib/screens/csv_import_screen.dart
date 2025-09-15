@@ -161,7 +161,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          SecondaryButton(
+          TertiaryButton(
             text: 'TÉLÉCHARGER EXEMPLE CSV',
             onPressed: _downloadExample,
           ),
@@ -213,7 +213,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SecondaryButton(
+              TertiaryButton(
                 text: 'CHOISIR FICHIER CSV',
                 onPressed: _isLoading ? null : _selectFile,
               ),
@@ -378,7 +378,8 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
                         ? _importProgress / _parseResult!.validCount
                         : 0,
                     backgroundColor: Colors.black.withOpacity(0.2),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(Colors.green),
                   ),
                   const SizedBox(height: 12),
                   Text(
