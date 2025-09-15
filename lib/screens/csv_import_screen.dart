@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../services/csv_service.dart';
 import '../services/firebase_service.dart';
 import '../widgets/custom_buttons.dart';
@@ -498,45 +499,187 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
       // Générer le contenu CSV d'exemple
       final example = CsvService.generateExampleCsv();
       
-      // Obtenir le répertoire de téléchargement
-      Directory? directory;
-      try {
-        if (Platform.isAndroid) {
-          // Essayer d'abord le répertoire des téléchargements
-          directory = Directory('/storage/emulated/0/Download');
-          if (!await directory.exists()) {
-            // Fallback vers le répertoire externe de l'app
-            directory = await getExternalStorageDirectory();
-          }
-        } else {
-          // Pour iOS/autres plateformes
-          directory = await getApplicationDocumentsDirectory();
-        }
-      } catch (e) {
-        // Fallback vers le répertoire de l'application
-        directory = await getApplicationDocumentsDirectory();
-      }
-      
-      if (directory != null) {
-        // Créer le fichier CSV
-        final fileName = 'exemple_scrountch.csv';
-        final file = File('${directory.path}/$fileName');
-        
-        // Écrire le fichier avec encodage UTF-8
-        await file.writeAsString(example, encoding: utf8);
-        
-        // Afficher un message de succès avec le chemin
-        if (Platform.isAndroid && directory.path.contains('Download')) {
-          _showSuccess('Fichier CSV téléchargé dans le dossier Téléchargements: $fileName');
-        } else {
-          _showSuccess('Fichier CSV créé: ${file.path}');
-        }
+      if (Platform.isAndroid) {
+        // Sur Android, demander les permissions et télécharger
+        await _downloadOnAndroid(example);
+      } else if (Platform.isIOS) {
+        // Sur iOS, utiliser le répertoire documents (pas de permissions nécessaires)
+        await _downloadOnIOS(example);
       } else {
-        _showError('Impossible d\'accéder au répertoire de téléchargement');
+        // Sur desktop, utiliser le répertoire documents
+        await _downloadOnDesktop(example);
       }
     } catch (e) {
-      _showError('Erreur lors du téléchargement: $e');
+      _showError('ERREUR LORS DU TÉLÉCHARGEMENT: $e');
     }
+  }
+
+  Future<void> _downloadOnAndroid(String csvContent) async {
+    try {
+      // Vérifier et demander les permissions de stockage
+      PermissionStatus permission = await Permission.storage.status;
+      
+      if (permission.isDenied) {
+        // Demander la permission avec un dialogue explicatif
+        final bool shouldRequest = await _showPermissionDialog();
+        if (!shouldRequest) {
+          _showError('PERMISSION REQUISE POUR TÉLÉCHARGER LE FICHIER');
+          return;
+        }
+        
+        permission = await Permission.storage.request();
+      }
+
+      if (permission.isGranted) {
+        // Permission accordée, procéder au téléchargement
+        Directory? directory;
+        
+        // Essayer d'abord le dossier Downloads
+        try {
+          directory = Directory('/storage/emulated/0/Download');
+          if (!await directory.exists()) {
+            directory = await getExternalStorageDirectory();
+          }
+        } catch (e) {
+          directory = await getApplicationDocumentsDirectory();
+        }
+
+        if (directory != null) {
+          final fileName = 'exemple_scrountch.csv';
+          final file = File('${directory.path}/$fileName');
+          await file.writeAsString(csvContent, encoding: utf8);
+          
+          if (directory.path.contains('Download')) {
+            _showSuccess('FICHIER TÉLÉCHARGÉ DANS TÉLÉCHARGEMENTS: $fileName');
+          } else {
+            _showSuccess('FICHIER CRÉÉ: ${file.path}');
+          }
+        }
+      } else if (permission.isPermanentlyDenied) {
+        _showPermissionDeniedDialog();
+      } else {
+        _showError('PERMISSION DE STOCKAGE REFUSÉE');
+      }
+    } catch (e) {
+      _showError('ERREUR ANDROID: $e');
+    }
+  }
+
+  Future<void> _downloadOnIOS(String csvContent) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName = 'exemple_scrountch.csv';
+      final file = File('${directory.path}/$fileName');
+      
+      await file.writeAsString(csvContent, encoding: utf8);
+      _showSuccess('FICHIER CSV CRÉÉ: ${file.path}');
+    } catch (e) {
+      _showError('ERREUR IOS: $e');
+    }
+  }
+
+  Future<void> _downloadOnDesktop(String csvContent) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName = 'exemple_scrountch.csv';
+      final file = File('${directory.path}/$fileName');
+      
+      await file.writeAsString(csvContent, encoding: utf8);
+      _showSuccess('FICHIER CSV CRÉÉ: ${file.path}');
+    } catch (e) {
+      _showError('ERREUR DESKTOP: $e');
+    }
+  }
+
+  Future<bool> _showPermissionDialog() async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFFFFE333),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: const BorderSide(color: Colors.black, width: 1),
+          ),
+          title: const Text(
+            'PERMISSION REQUISE',
+            style: TextStyle(
+              fontFamily: 'DelaGothicOne',
+              fontSize: 20,
+              color: Colors.black,
+            ),
+          ),
+          content: const Text(
+            'Cette application a besoin d\'accéder au stockage pour télécharger le fichier CSV d\'exemple.\n\nVoulez-vous autoriser l\'accès ?',
+            style: TextStyle(
+              fontFamily: 'Chivo',
+              fontSize: 16,
+              color: Colors.black,
+            ),
+          ),
+          actions: [
+            TertiaryButton(
+              text: 'REFUSER',
+              onPressed: () => Navigator.of(context).pop(false),
+              iconPath: 'assets/images/cross_icon.png',
+            ),
+            const SizedBox(height: 8),
+            TertiaryButton(
+              text: 'AUTORISER',
+              onPressed: () => Navigator.of(context).pop(true),
+              iconPath: 'assets/images/check_icon.png',
+            ),
+          ],
+        );
+      },
+    ) ?? false;
+  }
+
+  void _showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFFFFE333),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: const BorderSide(color: Colors.black, width: 1),
+          ),
+          title: const Text(
+            'PERMISSION BLOQUÉE',
+            style: TextStyle(
+              fontFamily: 'DelaGothicOne',
+              fontSize: 20,
+              color: Colors.black,
+            ),
+          ),
+          content: const Text(
+            'L\'accès au stockage a été définitivement refusé. Pour télécharger le fichier CSV, veuillez aller dans les paramètres de l\'application et autoriser l\'accès au stockage.',
+            style: TextStyle(
+              fontFamily: 'Chivo',
+              fontSize: 16,
+              color: Colors.black,
+            ),
+          ),
+          actions: [
+            TertiaryButton(
+              text: 'FERMER',
+              onPressed: () => Navigator.of(context).pop(),
+              iconPath: 'assets/images/cross_icon.png',
+            ),
+            const SizedBox(height: 8),
+            TertiaryButton(
+              text: 'OUVRIR PARAMÈTRES',
+              onPressed: () {
+                Navigator.of(context).pop();
+                openAppSettings();
+              },
+              iconPath: 'assets/images/pen_icon.png',
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showError(String message) {
