@@ -13,10 +13,9 @@ class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Initialize Firebase and anonymous authentication
+  // Initialize Firebase service (Firebase app already initialized in main.dart)
   Future<void> initialize() async {
     try {
-      await Firebase.initializeApp();
       await _signInAnonymously();
       debugPrint("FirebaseService: Initialized successfully");
     } catch (e) {

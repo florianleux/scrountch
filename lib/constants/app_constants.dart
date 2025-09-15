@@ -1,12 +1,9 @@
 class AppConstants {
-  // App Version Information
+  // App Information
   static const String appName = 'Scrountch';
-  static const String version = '3.3.0';
-  static const String buildNumber = '46';
-  static const String fullVersion = '$version+$buildNumber';
   
-  // Display version in UI
-  static String get displayVersion => 'v$version ($buildNumber)';
+  // Note: Version info is managed in pubspec.yaml
+  // Use PackageInfo.fromPlatform() to get version at runtime if needed
 
   static const List<String> rooms = [
     'Salon',

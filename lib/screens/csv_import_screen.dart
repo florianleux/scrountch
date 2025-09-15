@@ -6,6 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../services/csv_service.dart';
 import '../services/firebase_service.dart';
 import '../widgets/custom_buttons.dart';
+import '../theme/unified_theme.dart';
 
 class CsvImportScreen extends StatefulWidget {
   const CsvImportScreen({super.key});
@@ -24,15 +25,15 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFE333),
+      backgroundColor: UnifiedTheme.primaryYellow,
       body: Stack(
         children: [
           // Image de fond avec opacité
-          Positioned.fill(
+          const Positioned.fill(
             child: Opacity(
               opacity: 0.2,
-              child: Image.asset(
-                'assets/images/search_bg.png',
+              child: Image(
+                image: AssetImage('assets/images/search_bg.png'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -87,7 +88,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
                       style: TextStyle(
                         fontFamily: 'DelaGothicOne',
                         fontSize: 38,
-                        color: Colors.black,
+                        color: UnifiedTheme.textBlack,
                         height: 1.1,
                       ),
                     ),
@@ -135,9 +136,9 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFE333),
+        color: UnifiedTheme.primaryYellow,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black, width: 1),
+        border: Border.all(color: UnifiedTheme.textBlack, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,7 +148,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
             style: TextStyle(
               fontFamily: 'DelaGothicOne',
               fontSize: 20,
-              color: Colors.black,
+              color: UnifiedTheme.textBlack,
             ),
           ),
           const SizedBox(height: 16),
@@ -160,7 +161,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
             style: TextStyle(
               fontFamily: 'Chivo',
               fontSize: 16,
-              color: Colors.black,
+              color: UnifiedTheme.textBlack,
             ),
           ),
           const SizedBox(height: 20),
@@ -179,9 +180,9 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFE333),
+        color: UnifiedTheme.primaryYellow,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black, width: 1),
+        border: Border.all(color: UnifiedTheme.textBlack, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,7 +192,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
             style: TextStyle(
               fontFamily: 'DelaGothicOne',
               fontSize: 20,
-              color: Colors.black,
+              color: UnifiedTheme.textBlack,
             ),
           ),
           const SizedBox(height: 16),
@@ -201,7 +202,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
               style: const TextStyle(
                 fontFamily: 'Chivo',
                 fontSize: 16,
-                color: Colors.green,
+                color: UnifiedTheme.successGreen,
                 fontWeight: FontWeight.w600,
               ),
             )
@@ -211,7 +212,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
               style: TextStyle(
                 fontFamily: 'Chivo',
                 fontSize: 16,
-                color: Colors.black54,
+                color: UnifiedTheme.textBlack54,
               ),
             ),
           const SizedBox(height: 20),
@@ -243,9 +244,9 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFE333),
+        color: UnifiedTheme.primaryYellow,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black, width: 1),
+        border: Border.all(color: UnifiedTheme.textBlack, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -255,7 +256,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
             style: TextStyle(
               fontFamily: 'DelaGothicOne',
               fontSize: 20,
-              color: Colors.black,
+              color: UnifiedTheme.textBlack,
             ),
           ),
           const SizedBox(height: 20),
@@ -267,7 +268,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
                 child: _buildStatCard(
                   'VALIDES',
                   _parseResult!.validCount.toString(),
-                  Colors.green,
+                  UnifiedTheme.successGreen,
                 ),
               ),
               const SizedBox(width: 12),
@@ -275,7 +276,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
                 child: _buildStatCard(
                   'ERREURS',
                   _parseResult!.errorCount.toString(),
-                  Colors.red,
+                  UnifiedTheme.errorRed,
                 ),
               ),
               const SizedBox(width: 12),
@@ -297,7 +298,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
               style: TextStyle(
                 fontFamily: 'DelaGothicOne',
                 fontSize: 16,
-                color: Colors.red,
+                color: UnifiedTheme.errorRed,
               ),
             ),
             const SizedBox(height: 12),
@@ -305,9 +306,9 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
               height: 120,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: UnifiedTheme.errorRed.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Colors.red.withOpacity(0.3)),
+                border: Border.all(color: UnifiedTheme.errorRed.withOpacity(0.3)),
               ),
               child: ListView.builder(
                 itemCount: _parseResult!.errors.length,
@@ -320,7 +321,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
                       style: const TextStyle(
                         fontFamily: 'Chivo',
                         fontSize: 14,
-                        color: Colors.red,
+                        color: UnifiedTheme.errorRed,
                       ),
                     ),
                   );
@@ -374,9 +375,9 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFE333),
+                color: UnifiedTheme.primaryYellow,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.black, width: 1),
+                border: Border.all(color: UnifiedTheme.textBlack, width: 1),
               ),
               child: Column(
                 children: [
@@ -384,9 +385,9 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
                     value: _parseResult!.validCount > 0
                         ? _importProgress / _parseResult!.validCount
                         : 0,
-                    backgroundColor: Colors.black.withOpacity(0.2),
+                    backgroundColor: UnifiedTheme.textBlack.withOpacity(0.2),
                     valueColor:
-                        const AlwaysStoppedAnimation<Color>(Colors.green),
+                        const AlwaysStoppedAnimation<Color>(UnifiedTheme.successGreen),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -394,7 +395,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
                     style: const TextStyle(
                       fontFamily: 'DelaGothicOne',
                       fontSize: 16,
-                      color: Colors.black,
+                      color: UnifiedTheme.textBlack,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -596,17 +597,17 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFFFFE333),
+          backgroundColor: UnifiedTheme.primaryYellow,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: const BorderSide(color: Colors.black, width: 1),
+            side: const BorderSide(color: UnifiedTheme.textBlack, width: 1),
           ),
           title: const Text(
             'PERMISSION REQUISE',
             style: TextStyle(
               fontFamily: 'DelaGothicOne',
               fontSize: 20,
-              color: Colors.black,
+              color: UnifiedTheme.textBlack,
             ),
           ),
           content: const Text(
@@ -614,7 +615,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
             style: TextStyle(
               fontFamily: 'Chivo',
               fontSize: 16,
-              color: Colors.black,
+              color: UnifiedTheme.textBlack,
             ),
           ),
           actions: [
@@ -640,17 +641,17 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFFFFE333),
+          backgroundColor: UnifiedTheme.primaryYellow,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: const BorderSide(color: Colors.black, width: 1),
+            side: const BorderSide(color: UnifiedTheme.textBlack, width: 1),
           ),
           title: const Text(
             'PERMISSION BLOQUÉE',
             style: TextStyle(
               fontFamily: 'DelaGothicOne',
               fontSize: 20,
-              color: Colors.black,
+              color: UnifiedTheme.textBlack,
             ),
           ),
           content: const Text(
@@ -658,7 +659,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
             style: TextStyle(
               fontFamily: 'Chivo',
               fontSize: 16,
-              color: Colors.black,
+              color: UnifiedTheme.textBlack,
             ),
           ),
           actions: [
@@ -697,7 +698,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
             textAlign: TextAlign.center,
           ),
         ),
-        backgroundColor: Colors.red,
+        backgroundColor: UnifiedTheme.errorRed,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
@@ -722,7 +723,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
             textAlign: TextAlign.center,
           ),
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: UnifiedTheme.successGreen,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(

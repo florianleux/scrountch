@@ -186,7 +186,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                       vertical: 6.0,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFFFE333),
+                                      color: UnifiedTheme.primaryYellow,
                                       border: Border.all(
                                           color: Colors.black, width: 1.0),
                                       borderRadius: BorderRadius.circular(20.0),

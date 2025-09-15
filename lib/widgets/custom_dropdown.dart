@@ -36,7 +36,7 @@ class CustomDropdown<T> extends StatelessWidget {
         fontSize: fontSize,
       ),
       iconEnabledColor: Colors.black,
-      dropdownColor: const Color(0xFFFFE333), // Couleur de fond du dropdown
+      dropdownColor: UnifiedTheme.primaryYellow, // Couleur de fond du dropdown
       decoration: InputDecoration(
         labelText: isRequired ? '$labelText *' : labelText,
         labelStyle: const TextStyle(
@@ -46,7 +46,7 @@ class CustomDropdown<T> extends StatelessWidget {
         ),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: const Color(0xFFFFE333), // Couleur de fond du champ
+        fillColor: UnifiedTheme.primaryYellow, // Couleur de fond du champ
         // Le contentPadding vient du thème global
       ),
       items: items,
@@ -94,7 +94,7 @@ class CustomIconDropdown<T> extends StatelessWidget {
         fontSize: fontSize,
       ),
       iconEnabledColor: Colors.black,
-      dropdownColor: const Color(0xFFFFE333), // Couleur de fond du dropdown
+      dropdownColor: UnifiedTheme.primaryYellow, // Couleur de fond du dropdown
       decoration: InputDecoration(
         labelText: isRequired ? '$labelText *' : labelText,
         labelStyle: const TextStyle(
@@ -118,7 +118,7 @@ class CustomIconDropdown<T> extends StatelessWidget {
         ),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: const Color(0xFFFFE333), // Couleur de fond du champ
+        fillColor: UnifiedTheme.primaryYellow, // Couleur de fond du champ
       ),
       items: items,
       onChanged: onChanged,

@@ -28,7 +28,7 @@ class ConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: const Color(0xFFFFE333),
+      backgroundColor: UnifiedTheme.primaryYellow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4),
       ),

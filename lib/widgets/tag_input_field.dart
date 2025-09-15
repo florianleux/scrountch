@@ -107,7 +107,7 @@ class _TagInputFieldState extends State<TagInputField> {
               },
             ),
             filled: true,
-            fillColor: const Color(0xFFFFE333),
+            fillColor: UnifiedTheme.primaryYellow,
           ),
           enabled: _tags.length < widget.maxTags,
           onFieldSubmitted: _onSubmitted,
@@ -132,7 +132,7 @@ class _TagInputFieldState extends State<TagInputField> {
                     fontSize: 14,
                   ),
                 ),
-                backgroundColor: const Color(0xFFFFE333),
+                backgroundColor: UnifiedTheme.primaryYellow,
                 side: const BorderSide(
                   color: Colors.black,
                   width: 1,

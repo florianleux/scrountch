@@ -16,8 +16,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // Constantes de dimensions spécifiques à l'écran d'accueil
-  static const double _buttonHeight = UnifiedTheme.buttonHeight;
-  static const double _iconSize = UnifiedTheme.iconSize;
   static const double _buttonSpacing = 24;
   static const int _topSpacerFlex = 55;
   static const int _bottomSpacerFlex = 45;
@@ -93,8 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         _navigateToScreen(context, const SearchScreen()),
                     text: 'TROUVER',
                     iconPath: 'assets/images/search_icon.png',
-                    height: _buttonHeight,
-                    iconSize: _iconSize,
                   ),
                   const SizedBox(height: _buttonSpacing),
                   // Bouton RANGER
@@ -106,8 +102,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         )),
                     text: 'RANGER',
                     iconPath: 'assets/images/store_icon.png',
-                    height: _buttonHeight,
-                    iconSize: _iconSize,
                   ),
                   // Bouton IMPORT CSV (affiché seulement si activé)
                   if (_showCsvButton) ...[
@@ -116,8 +110,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () => _navigateToImportCsv(context),
                       text: 'IMPORT CSV',
                       iconPath: 'assets/images/plus_icon.png',
-                      height: _buttonHeight,
-                      iconSize: _iconSize,
                     ),
                   ],
                 ],
