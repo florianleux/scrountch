@@ -1,4 +1,13 @@
 class AppConstants {
+  // App Version Information
+  static const String appName = 'Scrountch';
+  static const String version = '3.3.0';
+  static const String buildNumber = '46';
+  static const String fullVersion = '$version+$buildNumber';
+  
+  // Display version in UI
+  static String get displayVersion => 'v$version ($buildNumber)';
+
   static const List<String> rooms = [
     'Salon',
     'Cuisine',
@@ -239,8 +248,7 @@ class AppConstants {
   static const String errorTagLength =
       "Chaque tag ne peut pas dépasser 25 caractères";
   static const String errorChooseRoomFirst = "Choisissez d'abord une pièce";
-  static const String errorChooseLocationFirst =
-      "Choisissez d'abord un meuble";
+  static const String errorChooseLocationFirst = "Choisissez d'abord un meuble";
   static const String errorNoSublocation = "Aucun emplacement disponible";
 
   // CONFIRMATIONS
@@ -253,8 +261,7 @@ class AppConstants {
   static const String successSaved = "Objet enregistré avec succès";
   static const String successUpdated = "Objet modifié avec succès";
   static const String errorSaveFailed = "Erreur lors de la sauvegarde";
-  static const String errorLoadFailed =
-      "Erreur lors du chargement des données";
+  static const String errorLoadFailed = "Erreur lors du chargement des données";
   static const String errorDeleteFailed = "Erreur lors de la suppression";
   static const String errorNoConnection =
       "Pas de connexion internet. Vérifiez votre réseau.";

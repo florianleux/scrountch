@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/navigation_service.dart';
 import '../theme/unified_theme.dart';
+import '../constants/app_constants.dart';
 import 'search_screen.dart';
 import 'item_form_screen.dart';
 import 'csv_import_screen.dart';
@@ -60,11 +61,9 @@ class _HomeScreenState extends State<HomeScreen> {
             });
             // Feedback visuel pour confirmer l'activation
             ScaffoldMessenger.of(context).showSnackBar(
-              UnifiedTheme.successSnackBar(
-                _showCsvButton 
-                  ? 'Mode administrateur activé !' 
-                  : 'Mode administrateur désactivé'
-              ),
+              UnifiedTheme.successSnackBar(_showCsvButton
+                  ? 'Mode administrateur activé !'
+                  : 'Mode administrateur désactivé'),
             );
           },
           child: Image.asset(
@@ -125,7 +124,41 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const Spacer(flex: _bottomSpacerFlex),
+            // Copyright and version display at bottom
+            _buildCopyrightDisplay(),
+            const SizedBox(height: 4),
+            _buildVersionDisplay(),
+            const SizedBox(height: 8),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCopyrightDisplay() {
+    final currentYear = DateTime.now().year;
+    return Center(
+      child: Text(
+        'CRAPOLO STUDIOS - $currentYear',
+        style: const TextStyle(
+          fontFamily: 'DelaGothicOne',
+          fontSize: 13,
+          color: Colors.black,
+          fontWeight: FontWeight.normal,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVersionDisplay() {
+    return Center(
+      child: Text(
+        'v${AppConstants.version}',
+        style: const TextStyle(
+          fontFamily: 'Chivo',
+          fontSize: 12,
+          color: Colors.black54,
+          fontWeight: FontWeight.normal,
         ),
       ),
     );

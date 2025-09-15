@@ -6,12 +6,12 @@ This collection contains universal Flutter/Dart development patterns that can be
 
 ## 📋 Quick Reference
 
-| Document                                                 | Priority   | Use Case                   | Time to Implement |
-| -------------------------------------------------------- | ---------- | -------------------------- | ----------------- |
-| [`architecture_patterns.mdc`](architecture_patterns.mdc) | **High**   | Project architecture setup | 2-4 hours         |
-| [`flutter_standards.mdc`](flutter_standards.mdc)         | **High**   | Team coding standards      | 1-2 hours         |
-| [`widget_guidelines.mdc`](widget_guidelines.mdc)         | **High**   | UI component consistency   | 3-5 hours         |
-| [`performance_rules.mdc`](performance_rules.mdc)         | **Medium** | Performance optimization   | 4-8 hours         |
+| Document                                                 | Priority   | Use Case                           | Time to Implement |
+| -------------------------------------------------------- | ---------- | ---------------------------------- | ----------------- |
+| [`architecture_patterns.mdc`](architecture_patterns.mdc) | **High**   | Project architecture setup         | 2-4 hours         |
+| [`flutter_standards.mdc`](flutter_standards.mdc)         | **High**   | Team coding standards              | 1-2 hours         |
+| [`widget_guidelines.mdc`](widget_guidelines.mdc)         | **High**   | UI components & homepage standards | 3-5 hours         |
+| [`performance_rules.mdc`](performance_rules.mdc)         | **Medium** | Performance optimization           | 4-8 hours         |
 
 ## 🚀 Implementation Path
 

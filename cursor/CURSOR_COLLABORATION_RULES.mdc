@@ -630,11 +630,13 @@ Documentation: "## Patterns de Gestion d'Erreur"
 - Files changed: lib/screens/search_screen.dart, lib/services/search_service.dart
 - Change type: New feature (advanced search functionality)
 - Impact: New user-facing functionality
-- Recommendation: MINOR version bump (1.0.0 -> 1.1.0)
+- Recommendation: MINOR version bump (3.2.0 -> 3.3.0)
 - Reason: Added new search capabilities without breaking existing features
 
 Proceed with MINOR bump? (y/n)
 ```
+
+**Current Project Version**: `3.2.0+45` (calculated retroactively from complete git history)
 
 This ensures consistent and logical version management based on actual code changes rather than manual guesswork.
 

@@ -9,7 +9,23 @@ alwaysApply: true
 ### Semantic Versioning (SemVer)
 
 **Format**: `MAJOR.MINOR.PATCH+BUILD`
-**Exemple**: `1.2.3+45`
+**Version actuelle**: `3.2.0+45`
+
+### Historique des Versions Calculé Rétroactivement
+
+**Version calculée** : `3.2.0+45` (basée sur l'analyse complète de l'historique git)
+
+**Évolution** :
+
+- 🚀 **2 MAJOR bumps** : Design overhaul complet (v2.0.0) + Architecture documentation agnostique (v3.0.0)
+- ✨ **12 MINOR bumps** : Nouvelles fonctionnalités, améliorations UI, nouveaux systèmes
+- 🐛 **30 PATCH bumps** : Corrections, refactoring, documentation, optimisations
+
+**Commits majeurs** :
+
+- `v2.0.0` : Uniformisation complète du design
+- `v3.0.0` : Documentation Flutter agnostique et universelle
+- `v3.2.0` : Système de versioning automatique intelligent
 
 - **MAJOR** (1) : Changements majeurs, breaking changes
 - **MINOR** (2) : Nouvelles fonctionnalités, améliorations UI

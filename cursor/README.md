@@ -90,7 +90,11 @@ Contains project-specific configurations, design systems, build processes, and i
 
 ### [`widget_guidelines.mdc`](agnostic/widget_guidelines.mdc)
 
-**Universal Flutter widget patterns and UI component standards**
+**Universal Flutter widget patterns, UI component standards, and homepage footer guidelines**
+
+- **Homepage Footer Standards**: Copyright and version display patterns for main screens
+- **UI Component Patterns**: Reusable widget templates and consistency guidelines
+- **Brand Integration**: Font and styling consistency across components
 
 - **Widget Hierarchy**: Screen structure templates and composition rules
 - **Reusable Patterns**: Header, loading, error display, and empty state components
