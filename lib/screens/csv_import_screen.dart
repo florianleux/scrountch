@@ -150,8 +150,8 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
           ),
           const SizedBox(height: 16),
           const Text(
-            '• Colonnes obligatoires: nom, piece\n'
-            '• Colonnes optionnelles: meuble_zone, emplacement_precis, categorie_principale, sous_categorie, proprietaire, tags, description\n'
+            '• Colonnes obligatoires: nom, piece, categorie_principale\n'
+            '• Colonnes optionnelles: meuble_zone, emplacement_precis, sous_categorie, proprietaire, tags, description\n'
             '• Tags séparés par des virgules (max 4 + tag automatique "import-csv")\n'
             '• Tous les objets importés auront automatiquement le tag "import-csv"\n'
             '• Encodage UTF-8 recommandé',

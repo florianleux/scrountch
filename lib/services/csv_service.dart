@@ -136,7 +136,7 @@ class CsvService {
 
   /// Valider les en-têtes CSV
   static String? _validateHeaders(List<String> headers) {
-    final requiredHeaders = ['nom', 'piece'];
+    final requiredHeaders = ['nom', 'piece', 'categorie_principale'];
 
     for (final required in requiredHeaders) {
       if (!headers.contains(required)) {
@@ -201,6 +201,10 @@ class CsvService {
       if (piece.isEmpty) {
         return CsvParseResult(
             error: 'La pièce est obligatoire', lineNumber: lineNumber);
+      }
+      if (categoriePrincipale == null || categoriePrincipale.isEmpty) {
+        return CsvParseResult(
+            error: 'La catégorie principale est obligatoire', lineNumber: lineNumber);
       }
 
       // Validation des valeurs
@@ -282,10 +286,12 @@ class CsvService {
       }
     }
 
-    // Validation de la catégorie principale
-    if (categoriePrincipale != null &&
-        !AppConstants.mainCategories.contains(categoriePrincipale)) {
-      return 'Catégorie principale invalide: "$categoriePrincipale"';
+    // Validation de la catégorie principale (maintenant obligatoire)
+    if (categoriePrincipale == null || categoriePrincipale.isEmpty) {
+      return 'La catégorie principale est obligatoire';
+    }
+    if (!AppConstants.mainCategories.contains(categoriePrincipale)) {
+      return 'Catégorie principale invalide: "$categoriePrincipale". Valeurs autorisées: ${AppConstants.mainCategories.join(", ")}';
     }
 
     // Validation de la sous-catégorie
