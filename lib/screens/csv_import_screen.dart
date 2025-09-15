@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import '../services/csv_service.dart';
 import '../services/firebase_service.dart';
 import '../widgets/custom_buttons.dart';
@@ -491,47 +492,33 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
     }
   }
 
-  void _downloadExample() {
-    // Pour l'instant, on affiche juste le CSV d'exemple
-    // Dans une vraie app, on pourrait utiliser un package comme path_provider
-    // pour sauvegarder le fichier
-    final example = CsvService.generateExampleCsv();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFFFFE333),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: Colors.black, width: 1),
-        ),
-        title: const Text(
-          'EXEMPLE CSV',
-          style: TextStyle(
-            fontFamily: 'DelaGothicOne',
-            fontSize: 24,
-            color: Colors.black,
-          ),
-        ),
-        content: SingleChildScrollView(
-          child: Text(
-            example,
-            style: const TextStyle(
-              fontFamily: 'Chivo',
-              fontSize: 12,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        actions: [
-          TertiaryButton(
-            text: 'FERMER',
-            onPressed: () => Navigator.pop(context),
-            iconPath: 'assets/images/cross_icon.png',
-          ),
-        ],
-      ),
-    );
+  Future<void> _downloadExample() async {
+    try {
+      // Générer le contenu CSV d'exemple
+      final example = CsvService.generateExampleCsv();
+      
+      // Obtenir le répertoire de téléchargement
+      Directory? directory;
+      if (Platform.isAndroid) {
+        directory = await getExternalStorageDirectory();
+      } else {
+        directory = await getApplicationDocumentsDirectory();
+      }
+      
+      if (directory != null) {
+        // Créer le fichier CSV
+        final fileName = 'exemple_scrountch.csv';
+        final file = File('${directory.path}/$fileName');
+        await file.writeAsString(example);
+        
+        // Afficher un message de succès
+        _showSuccess('Fichier CSV téléchargé: ${file.path}');
+      } else {
+        _showError('Impossible d\'accéder au répertoire de téléchargement');
+      }
+    } catch (e) {
+      _showError('Erreur lors du téléchargement: $e');
+    }
   }
 
   void _showError(String message) {

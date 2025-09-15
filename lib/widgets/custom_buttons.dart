@@ -131,7 +131,7 @@ class TertiaryButton extends StatelessWidget {
                 ],
               )
             : Text(
-                text, 
+                text,
                 style: tertiaryTextStyle,
                 textAlign: TextAlign.center,
               ),
