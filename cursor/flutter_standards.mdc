@@ -1,0 +1,776 @@
+# Flutter Development Standards & Best Practices
+*Based on Scrountch Project - Generated from refactored codebase*
+
+## 1. PROJECT ARCHITECTURE
+
+### Folder Structure
+**Priority**: High
+**Source**: Refactored files + Existing codebase
+**Found in**: Project root structure
+
+```
+lib/
+├── main.dart                    # App entry point
+├── constants/                   # Static data and configuration
+│   ├── app_constants.dart       # Business logic constants
+│   └── location_data.dart       # Hierarchical data structures
+├── models/                      # Data models
+│   └── item.dart               # Domain entities
+├── services/                    # Business logic layer
+│   ├── firebase_service.dart   # External service integration
+│   ├── navigation_service.dart # Centralized navigation
+│   └── csv_service.dart        # File processing utilities
+├── screens/                     # UI screens
+│   ├── home_screen.dart        # Main navigation screens
+│   ├── search_screen.dart      # Feature-specific screens
+│   └── ...
+├── widgets/                     # Reusable UI components
+│   ├── app_header.dart         # Layout components
+│   ├── custom_buttons.dart     # Input components
+│   └── ...
+└── theme/                       # Design system
+    └── unified_theme.dart      # Centralized styling
+```
+
+**Template for new features**:
+```dart
+// New feature structure
+lib/
+├── screens/
+│   └── feature_screen.dart
+├── widgets/
+│   └── feature_widget.dart
+└── services/
+    └── feature_service.dart (if needed)
+```
+
+### File Naming Conventions
+**Priority**: High
+**Source**: Refactored files
+**Found in**: All .dart files
+
+**Rule**: Use snake_case with descriptive suffixes
+```dart
+// Screens: [feature]_screen.dart
+home_screen.dart
+item_detail_screen.dart
+csv_import_screen.dart
+
+// Widgets: [purpose]_[type].dart
+custom_buttons.dart
+app_header.dart
+background_image.dart
+
+// Services: [domain]_service.dart
+firebase_service.dart
+navigation_service.dart
+csv_service.dart
+
+// Models: [entity].dart (singular)
+item.dart
+user.dart (future)
+
+// Constants: [domain]_[type].dart
+app_constants.dart
+location_data.dart
+```
+
+### Import Organization
+**Priority**: Medium
+**Source**: Refactored files
+**Found in**: lib/main.dart, lib/screens/search_screen.dart
+
+**Standard order**:
+```dart
+// 1. Flutter framework imports
+import 'package:flutter/material.dart';
+
+// 2. Third-party package imports
+import 'package:firebase_core/firebase_core.dart';
+import 'package:csv/csv.dart';
+
+// 3. Local imports - absolute paths from lib/
+import 'firebase_options.dart';
+import 'services/firebase_service.dart';
+import 'screens/home_screen.dart';
+import 'theme/unified_theme.dart';
+
+// 4. Relative imports (only when necessary)
+import '../widgets/custom_buttons.dart';
+```
+
+## 2. WIDGET PATTERNS
+
+### StatefulWidget vs StatelessWidget Rules
+**Priority**: High
+**Source**: Refactored files
+**Found in**: lib/widgets/background_image.dart, lib/widgets/app_header.dart
+
+**Rule**: Use StatelessWidget unless state is required
+
+**StatelessWidget Example** (from lib/widgets/background_image.dart):
+```dart
+/// Reusable background image widget
+class BackgroundImage extends StatelessWidget {
+  final String imagePath;
+  final double opacity;
+
+  const BackgroundImage({
+    super.key,
+    required this.imagePath,
+    this.opacity = 0.2,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: Opacity(
+        opacity: opacity,
+        child: Image.asset(
+          imagePath,
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+}
+```
+
+**StatefulWidget Only When Needed** (from lib/screens/home_screen.dart):
+```dart
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  // State is needed for CSV button visibility
+  bool _showCsvButton = false;
+  
+  @override
+  Widget build(BuildContext context) {
+    // Implementation with state management
+  }
+}
+```
+
+### Const Constructor Standards
+**Priority**: High
+**Source**: Refactored files
+**Found in**: All widget files
+
+**Rule**: Always use const constructors when possible
+
+**Template**:
+```dart
+class CustomWidget extends StatelessWidget {
+  final String title;
+  final VoidCallback? onPressed;
+
+  const CustomWidget({
+    super.key,  // Always use super.key
+    required this.title,
+    this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(); // Use const for static widgets
+  }
+}
+```
+
+### Widget Extraction Guidelines
+**Priority**: High
+**Source**: Refactored files - Created during cleanup
+**Found in**: lib/widgets/app_header.dart, lib/widgets/background_image.dart
+
+**Before refactoring** (duplicated code across screens):
+```dart
+// In search_screen.dart, results_screen.dart, etc.
+Row(
+  children: [
+    GestureDetector(
+      onTap: () => Navigator.pop(context),
+      child: Image.asset('assets/images/back_icon.png', width: 50, height: 50),
+    ),
+    const Spacer(),
+    GestureDetector(
+      onTap: () => NavigationService.pushAndRemoveUntil(context, const HomeScreen()),
+      child: Image.asset('assets/images/home_icon.png', width: 50, height: 50),
+    ),
+  ],
+)
+```
+
+**After refactoring** (extracted to reusable widget):
+```dart
+// lib/widgets/app_header.dart
+class AppHeader extends StatelessWidget {
+  final bool showBackButton;
+  final bool showHomeButton;
+  final VoidCallback? onBackPressed;
+  final VoidCallback? onHomePressed;
+
+  const AppHeader({
+    super.key,
+    this.showBackButton = true,
+    this.showHomeButton = true,
+    this.onBackPressed,
+    this.onHomePressed,
+  });
+  // ... implementation
+}
+
+// Usage in screens:
+const AppHeader(), // Simple usage with defaults
+```
+
+**Extraction Criteria**:
+- Used in 2+ places
+- Self-contained functionality
+- Clear single responsibility
+- Configurable through parameters
+
+## 3. CODE STYLE & CONVENTIONS
+
+### Naming Conventions
+**Priority**: High
+**Source**: Refactored files
+**Found in**: All .dart files
+
+**Classes**: PascalCase
+```dart
+class NavigationService {}
+class CustomTextField {}
+class CsvImportResult {}
+```
+
+**Variables/Methods**: camelCase
+```dart
+bool showCsvButton = false;
+void navigateToScreen() {}
+final TextEditingController searchController;
+```
+
+**Constants**: camelCase with descriptive prefixes
+```dart
+// From lib/screens/home_screen.dart
+static const double _buttonHeight = UnifiedTheme.buttonHeight;
+static const double _iconSize = UnifiedTheme.iconSize;
+static const int _topSpacerFlex = 55;
+
+// From lib/theme/unified_theme.dart
+static const Color primaryYellow = Color(0xFFFFE333);
+static const String titleFont = 'DelaGothicOne';
+```
+
+**Private Members**: Leading underscore
+```dart
+class _HomeScreenState extends State<HomeScreen> {
+  bool _showCsvButton = false;
+  
+  Widget _buildBackground() {}
+  void _navigateToScreen() {}
+}
+```
+
+### Method Organization
+**Priority**: Medium
+**Source**: Refactored files
+**Found in**: lib/screens/home_screen.dart
+
+**Standard order within classes**:
+```dart
+class ExampleScreen extends StatefulWidget {
+  // 1. Constructor
+  const ExampleScreen({super.key});
+
+  // 2. createState (for StatefulWidget)
+  @override
+  State<ExampleScreen> createState() => _ExampleScreenState();
+}
+
+class _ExampleScreenState extends State<ExampleScreen> {
+  // 1. Static constants
+  static const double _buttonHeight = 75.0;
+  
+  // 2. Instance variables
+  bool _isLoading = false;
+  final TextEditingController _controller = TextEditingController();
+  
+  // 3. Lifecycle methods
+  @override
+  void initState() {
+    super.initState();
+  }
+  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+  
+  // 4. Build method
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(/* ... */);
+  }
+  
+  // 5. Private build helper methods
+  Widget _buildHeader() {}
+  Widget _buildBody() {}
+  
+  // 6. Event handlers
+  void _onButtonPressed() {}
+  void _onTextChanged(String value) {}
+  
+  // 7. Navigation methods
+  void _navigateToNextScreen() {}
+}
+```
+
+### Documentation Standards
+**Priority**: Medium
+**Source**: Refactored files
+**Found in**: lib/widgets/app_header.dart, lib/services/navigation_service.dart
+
+**Widget Documentation**:
+```dart
+/// Reusable header widget with back and home navigation
+/// Used across multiple screens for consistent navigation
+class AppHeader extends StatelessWidget {
+  // Implementation
+}
+```
+
+**Service Documentation**:
+```dart
+/// Service de navigation centralisé pour éviter la duplication
+class NavigationService {
+  /// Navigation simple vers un nouvel écran
+  static Future<T?> push<T>(BuildContext context, Widget screen) {
+    // Implementation
+  }
+}
+```
+
+**Method Documentation Template**:
+```dart
+/// Brief description of what the method does
+/// 
+/// [parameter1] Description of parameter
+/// [parameter2] Description of parameter
+/// 
+/// Returns description of return value
+/// 
+/// Throws [ExceptionType] when condition occurs
+```
+
+## 4. PERFORMANCE OPTIMIZATIONS
+
+### Widget Optimization Techniques
+**Priority**: High
+**Source**: Refactored files
+**Found in**: lib/widgets/tag_input_field.dart
+
+**Before refactoring** (inefficient setState):
+```dart
+onChanged: (value) {
+  setState(() {}); // Pour mettre à jour l'icône plus
+},
+```
+
+**After refactoring** (optimized with ValueListenableBuilder):
+```dart
+suffixIcon: ValueListenableBuilder<TextEditingValue>(
+  valueListenable: _controller,
+  builder: (context, value, child) {
+    return value.text.isNotEmpty
+        ? IconButton(
+            icon: Image.asset('assets/images/plus_icon.png'),
+            onPressed: () => _addTag(_controller.text),
+          )
+        : const SizedBox.shrink();
+  },
+),
+```
+
+**Rule**: Use ValueListenableBuilder instead of setState for localized updates
+
+### Memory Management Rules
+**Priority**: High
+**Source**: Existing codebase
+**Found in**: lib/screens/search_screen.dart
+
+**Controller Disposal Template**:
+```dart
+class _ScreenState extends State<Screen> {
+  final TextEditingController _controller = TextEditingController();
+  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+}
+```
+
+**Async Operation Safety**:
+```dart
+void _performAsyncOperation() async {
+  setState(() => _isLoading = true);
+  
+  try {
+    await someAsyncOperation();
+  } finally {
+    if (mounted) {  // Check if widget is still mounted
+      setState(() => _isLoading = false);
+    }
+  }
+}
+```
+
+### Const Widget Usage
+**Priority**: Medium
+**Source**: Refactored files
+**Found in**: All widget files
+
+**Template**:
+```dart
+// Use const for static widgets
+const SizedBox(height: 24),
+const Spacer(),
+const Text('Static text'),
+
+// Use const constructors
+const CustomWidget(
+  title: 'Static title',
+  isEnabled: true,
+),
+```
+
+## 5. STATE MANAGEMENT
+
+### Chosen Pattern
+**Priority**: High
+**Source**: Existing codebase
+**Found in**: All screen files
+
+**Pattern**: Local State with StatefulWidget
+- Simple setState for UI state
+- Service classes for business logic
+- No complex state management library needed
+
+**Implementation Guidelines**:
+```dart
+class _ScreenState extends State<Screen> {
+  // UI state
+  bool _isLoading = false;
+  String? _errorMessage;
+  
+  // Business logic through services
+  final FirebaseService _firebaseService = FirebaseService();
+  
+  void _performAction() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    
+    try {
+      await _firebaseService.someOperation();
+      // Handle success
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+}
+```
+
+## 6. REUSABLE COMPONENTS
+
+### Custom Widgets Created
+**Priority**: High
+**Source**: Refactored files - Created during cleanup
+
+#### AppHeader
+**File**: lib/widgets/app_header.dart
+**Purpose**: Consistent navigation across screens
+```dart
+const AppHeader(
+  showBackButton: true,
+  showHomeButton: true,
+  onBackPressed: customBackAction, // Optional custom action
+)
+```
+
+#### BackgroundImage
+**File**: lib/widgets/background_image.dart
+**Purpose**: Consistent background styling
+```dart
+const BackgroundImage(
+  imagePath: 'assets/images/search_bg.png',
+  opacity: 0.2,
+)
+```
+
+#### Custom Buttons
+**File**: lib/widgets/custom_buttons.dart
+**Purpose**: Themed button variants
+```dart
+// Primary: Black background, yellow text
+PrimaryButton(
+  onPressed: () {},
+  text: 'PRIMARY',
+  iconPath: 'assets/images/icon.png',
+)
+
+// Secondary: Yellow background, black border
+SecondaryButton(
+  onPressed: () {},
+  text: 'SECONDARY',
+  iconPath: 'assets/images/icon.png',
+)
+
+// Tertiary: Yellow background, smaller size
+TertiaryButton(
+  onPressed: () {},
+  text: 'TERTIARY',
+  height: 50,
+)
+```
+
+### Utility Classes
+**Priority**: High
+**Source**: Refactored files
+**Found in**: lib/services/navigation_service.dart
+
+#### NavigationService
+**Purpose**: Centralized navigation logic
+```dart
+// Simple navigation
+NavigationService.push(context, const NextScreen());
+
+// Replace current screen
+NavigationService.pushReplacement(context, const NewScreen());
+
+// Clear stack and navigate
+NavigationService.pushAndRemoveUntil(context, const HomeScreen());
+
+// Go back
+NavigationService.pop(context);
+```
+
+#### UnifiedTheme
+**File**: lib/theme/unified_theme.dart
+**Purpose**: Centralized design system
+```dart
+// Colors
+UnifiedTheme.primaryYellow
+UnifiedTheme.textBlack
+
+// Text styles
+UnifiedTheme.headingStyle
+UnifiedTheme.buttonTextStyle
+UnifiedTheme.bodyTextStyle
+
+// Button styles
+UnifiedTheme.primaryButtonStyle
+UnifiedTheme.secondaryButtonStyle
+
+// Helpers
+UnifiedTheme.buildButtonContent(
+  iconPath: 'assets/images/icon.png',
+  text: 'Button Text',
+  iconColor: Colors.black,
+)
+```
+
+## 7. ARCHITECTURE PATTERNS
+
+### Service Layer Pattern
+**Priority**: High
+**Source**: Existing codebase
+**Found in**: lib/services/firebase_service.dart
+
+**Template for new services**:
+```dart
+class ExampleService {
+  // Singleton pattern
+  static final ExampleService _instance = ExampleService._internal();
+  factory ExampleService() => _instance;
+  ExampleService._internal();
+  
+  // Public API methods
+  Future<Result> performOperation(Parameters params) async {
+    try {
+      // Implementation
+      return result;
+    } catch (e) {
+      debugPrint("ExampleService: Error - $e");
+      throw Exception("User-friendly error message");
+    }
+  }
+  
+  // Private helper methods
+  Future<void> _helperMethod() async {
+    // Implementation
+  }
+}
+```
+
+### Screen Structure Pattern
+**Priority**: High
+**Source**: Refactored files
+**Found in**: lib/screens/home_screen.dart
+
+**Template**:
+```dart
+class FeatureScreen extends StatefulWidget {
+  const FeatureScreen({super.key});
+
+  @override
+  State<FeatureScreen> createState() => _FeatureScreenState();
+}
+
+class _FeatureScreenState extends State<FeatureScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: UnifiedTheme.primaryYellow,
+      body: Stack(
+        children: [
+          _buildBackground(),
+          _buildContent(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackground() {
+    return const BackgroundImage(
+      imagePath: 'assets/images/feature_bg.png',
+    );
+  }
+
+  Widget _buildContent() {
+    return SafeArea(
+      child: Column(
+        children: [
+          const AppHeader(),
+          Expanded(child: _buildBody()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    // Feature-specific content
+  }
+}
+```
+
+## 8. TESTING STANDARDS
+
+### Widget Testing Template
+**Priority**: Medium
+**Source**: Existing codebase
+**Found in**: test/widget_test.dart
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:scrountch/main.dart';
+
+void main() {
+  testWidgets('Widget description', (WidgetTester tester) async {
+    // Build the widget
+    await tester.pumpWidget(const ScrountchApp());
+    
+    // Verify expected elements
+    expect(find.text('TROUVER'), findsOneWidget);
+    expect(find.text('RANGER'), findsOneWidget);
+    
+    // Interact with widgets
+    await tester.tap(find.text('TROUVER'));
+    await tester.pump();
+    
+    // Verify results
+    expect(find.byType(SearchScreen), findsOneWidget);
+  });
+}
+```
+
+## 9. ERROR HANDLING
+
+### Exception Handling Pattern
+**Priority**: High
+**Source**: Existing codebase
+**Found in**: lib/services/firebase_service.dart
+
+```dart
+Future<Result> serviceMethod() async {
+  try {
+    // Business logic
+    return result;
+  } catch (e) {
+    debugPrint("ServiceName: Method error - $e");
+    throw Exception(AppConstants.userFriendlyErrorMessage);
+  }
+}
+```
+
+### User Feedback Pattern
+**Priority**: Medium
+**Source**: Refactored files
+**Found in**: lib/theme/unified_theme.dart
+
+```dart
+// Success feedback
+ScaffoldMessenger.of(context).showSnackBar(
+  UnifiedTheme.successSnackBar('Operation completed successfully'),
+);
+
+// Error feedback
+ScaffoldMessenger.of(context).showSnackBar(
+  UnifiedTheme.errorSnackBar('Something went wrong'),
+);
+```
+
+---
+
+## IMPLEMENTATION CHECKLIST
+
+### For New Features:
+- [ ] Follow folder structure conventions
+- [ ] Use appropriate StatefulWidget vs StatelessWidget
+- [ ] Add const constructors where possible
+- [ ] Extract reusable widgets when used 2+ times
+- [ ] Implement proper error handling
+- [ ] Add controller disposal in dispose()
+- [ ] Use UnifiedTheme for styling
+- [ ] Use NavigationService for navigation
+- [ ] Document public APIs
+- [ ] Add appropriate tests
+
+### For Code Reviews:
+- [ ] Check for const constructor usage
+- [ ] Verify proper import organization
+- [ ] Ensure consistent naming conventions
+- [ ] Look for widget extraction opportunities
+- [ ] Verify error handling implementation
+- [ ] Check for memory leaks (controller disposal)
+- [ ] Ensure theme consistency
+- [ ] Verify navigation patterns
+
+*Last updated: January 2025*
+*Based on Scrountch project refactoring and optimization*
