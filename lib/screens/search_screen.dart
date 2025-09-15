@@ -29,8 +29,25 @@ class _SearchScreenState extends State<SearchScreen> {
 
     if (query.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez saisir un nom d\'objet'),
+        SnackBar(
+          content: Center(
+            child: Text(
+              'VEUILLEZ SAISIR UN NOM D\'OBJET',
+              style: const TextStyle(
+                fontFamily: 'DelaGothicOne',
+                fontSize: 16,
+                color: Colors.white,
+                fontWeight: FontWeight.normal,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
       );
       return;

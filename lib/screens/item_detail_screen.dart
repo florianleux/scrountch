@@ -272,8 +272,24 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur lors de la suppression: $e'),
+            content: Center(
+              child: Text(
+                'ERREUR LORS DE LA SUPPRESSION: $e'.toUpperCase(),
+                style: const TextStyle(
+                  fontFamily: 'DelaGothicOne',
+                  fontSize: 16,
+                  color: Colors.white,
+                  fontWeight: FontWeight.normal,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         );
       }

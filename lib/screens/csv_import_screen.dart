@@ -542,8 +542,24 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Center(
+          child: Text(
+            message.toUpperCase(),
+            style: const TextStyle(
+              fontFamily: 'DelaGothicOne',
+              fontSize: 16,
+              color: Colors.white,
+              fontWeight: FontWeight.normal,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
         backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
     );
   }
@@ -551,8 +567,24 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
   void _showSuccess(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Center(
+          child: Text(
+            message.toUpperCase(),
+            style: const TextStyle(
+              fontFamily: 'DelaGothicOne',
+              fontSize: 16,
+              color: Colors.white,
+              fontWeight: FontWeight.normal,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
         backgroundColor: Colors.green,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
     );
   }

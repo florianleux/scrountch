@@ -168,17 +168,47 @@ class UnifiedTheme {
   // =================== SNACKBARS ===================
   static SnackBar successSnackBar(String message) {
     return SnackBar(
-      content: Text(message),
+      content: Center(
+        child: Text(
+          message.toUpperCase(),
+          style: const TextStyle(
+            fontFamily: titleFont,
+            fontSize: 16,
+            color: Colors.white,
+            fontWeight: FontWeight.normal,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
       backgroundColor: successGreen,
       duration: const Duration(seconds: 3),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
     );
   }
 
   static SnackBar errorSnackBar(String message) {
     return SnackBar(
-      content: Text(message),
+      content: Center(
+        child: Text(
+          message.toUpperCase(),
+          style: const TextStyle(
+            fontFamily: titleFont,
+            fontSize: 16,
+            color: Colors.white,
+            fontWeight: FontWeight.normal,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
       backgroundColor: errorRed,
       duration: const Duration(seconds: 3),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
     );
   }
 

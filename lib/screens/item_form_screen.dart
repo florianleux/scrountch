@@ -275,9 +275,24 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
   void _showSnackBar(String message, {required bool isError}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Center(
+          child: Text(
+            message.toUpperCase(),
+            style: const TextStyle(
+              fontFamily: 'DelaGothicOne',
+              fontSize: 16,
+              color: Colors.white,
+              fontWeight: FontWeight.normal,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
         backgroundColor: isError ? Colors.red : Colors.green,
         duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
     );
   }
