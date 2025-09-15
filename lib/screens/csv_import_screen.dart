@@ -22,83 +22,147 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFE333),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFFFE333),
-        elevation: 0,
-        leading: IconButton(
-          icon: Image.asset(
-            'assets/images/back_icon.png',
-            width: 24,
-            height: 24,
+      body: Stack(
+        children: [
+          // Image de fond avec opacité
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.2,
+              child: Image.asset(
+                'assets/images/search_bg.png',
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Import CSV',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+
+          // Contenu principal
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Column(
+                children: [
+                  // Header standardisé
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Row(
+                      children: [
+                        // Bouton retour (50x50px)
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Image.asset(
+                            'assets/images/back_icon.png',
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                        const Spacer(),
+                        // Bouton home (50x50px)
+                        GestureDetector(
+                          onTap: () => Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            '/',
+                            (route) => false,
+                          ),
+                          child: Image.asset(
+                            'assets/images/home_icon.png',
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Titre de la page
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Text(
+                      'IMPORT CSV',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'DelaGothicOne',
+                        fontSize: 38,
+                        color: Colors.black,
+                        height: 1.1,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Contenu scrollable
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Instructions
+                          _buildInstructions(),
+                          const SizedBox(height: 24),
+
+                          // Sélection de fichier
+                          _buildFileSelection(),
+                          const SizedBox(height: 24),
+
+                          // Résultats du parsing
+                          if (_parseResult != null) ...[
+                            _buildParseResults(),
+                            const SizedBox(height: 24),
+                          ],
+
+                          // Actions
+                          _buildActions(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Instructions
-            _buildInstructions(),
-            const SizedBox(height: 24),
-
-            // Sélection de fichier
-            _buildFileSelection(),
-            const SizedBox(height: 24),
-
-            // Résultats du parsing
-            if (_parseResult != null) ...[
-              _buildParseResults(),
-              const SizedBox(height: 24),
-            ],
-
-            // Actions
-            _buildActions(),
-          ],
-        ),
+        ],
       ),
     );
   }
 
   Widget _buildInstructions() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFFFFE333),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: Colors.black, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Format CSV attendu:',
+            'FORMAT CSV ATTENDU:',
             style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+              fontFamily: 'DelaGothicOne',
+              fontSize: 20,
+              color: Colors.black,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           const Text(
             '• Colonnes obligatoires: nom, piece\n'
             '• Colonnes optionnelles: meuble_zone, emplacement_precis, categorie_principale, sous_categorie, proprietaire, tags, description\n'
             '• Tags séparés par des virgules (max 4 + tag automatique "import-csv")\n'
             '• Tous les objets importés auront automatiquement le tag "import-csv"\n'
             '• Encodage UTF-8 recommandé',
-            style: TextStyle(fontSize: 14),
+            style: TextStyle(
+              fontFamily: 'Chivo',
+              fontSize: 16,
+              color: Colors.black,
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 20),
           SecondaryButton(
-            text: 'Télécharger exemple CSV',
+            text: 'TÉLÉCHARGER EXEMPLE CSV',
             onPressed: _downloadExample,
           ),
         ],
@@ -108,49 +172,56 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
 
   Widget _buildFileSelection() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFFFFE333),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: Colors.black, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Fichier sélectionné:',
+            'FICHIER SÉLECTIONNÉ:',
             style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+              fontFamily: 'DelaGothicOne',
+              fontSize: 20,
+              color: Colors.black,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           if (_selectedFile != null)
             Text(
               _selectedFile!.path.split('/').last,
-              style: const TextStyle(fontSize: 14, color: Colors.green),
+              style: const TextStyle(
+                fontFamily: 'Chivo',
+                fontSize: 16,
+                color: Colors.green,
+                fontWeight: FontWeight.w600,
+              ),
             )
           else
             const Text(
               'Aucun fichier sélectionné',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: SecondaryButton(
-                  text: 'Choisir fichier CSV',
-                  onPressed: _isLoading ? null : _selectFile,
-                ),
+              style: TextStyle(
+                fontFamily: 'Chivo',
+                fontSize: 16,
+                color: Colors.black54,
               ),
-              const SizedBox(width: 12),
+            ),
+          const SizedBox(height: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SecondaryButton(
+                text: 'CHOISIR FICHIER CSV',
+                onPressed: _isLoading ? null : _selectFile,
+              ),
+              const SizedBox(height: 12),
               if (_selectedFile != null)
-                Expanded(
-                  child: PrimaryButton(
-                    text: _isLoading ? 'Analyse...' : 'Analyser',
-                    onPressed: _isLoading ? null : _parseFile,
-                  ),
+                PrimaryButton(
+                  text: _isLoading ? 'ANALYSE...' : 'ANALYSER',
+                  onPressed: _isLoading ? null : _parseFile,
                 ),
             ],
           ),
@@ -163,30 +234,31 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
     if (_parseResult == null) return const SizedBox.shrink();
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFFFFE333),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: Colors.black, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Résultats de l\'analyse:',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+          const Text(
+            'RÉSULTATS DE L\'ANALYSE:',
+            style: TextStyle(
+              fontFamily: 'DelaGothicOne',
+              fontSize: 20,
+              color: Colors.black,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 20),
 
           // Statistiques
           Row(
             children: [
               Expanded(
                 child: _buildStatCard(
-                  'Valides',
+                  'VALIDES',
                   _parseResult!.validCount.toString(),
                   Colors.green,
                 ),
@@ -194,7 +266,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildStatCard(
-                  'Erreurs',
+                  'ERREURS',
                   _parseResult!.errorCount.toString(),
                   Colors.red,
                 ),
@@ -202,7 +274,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildStatCard(
-                  'Total',
+                  'TOTAL',
                   _parseResult!.totalLines.toString(),
                   Colors.blue,
                 ),
@@ -212,18 +284,24 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
 
           // Liste des erreurs (si il y en a)
           if (_parseResult!.hasErrors) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             const Text(
-              'Erreurs détectées:',
+              'ERREURS DÉTECTÉES:',
               style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
+                fontFamily: 'DelaGothicOne',
+                fontSize: 16,
                 color: Colors.red,
               ),
             ),
-            const SizedBox(height: 8),
-            SizedBox(
+            const SizedBox(height: 12),
+            Container(
               height: 120,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: Colors.red.withOpacity(0.3)),
+              ),
               child: ListView.builder(
                 itemCount: _parseResult!.errors.length,
                 itemBuilder: (context, index) {
@@ -233,7 +311,8 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
                     child: Text(
                       'Ligne ${error.lineNumber}: ${error.error}',
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontFamily: 'Chivo',
+                        fontSize: 14,
                         color: Colors.red,
                       ),
                     ),
@@ -260,16 +339,18 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
           Text(
             value,
             style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontFamily: 'DelaGothicOne',
+              fontSize: 24,
               color: color,
             ),
           ),
           Text(
             label,
             style: TextStyle(
+              fontFamily: 'Chivo',
               fontSize: 12,
               color: color,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -279,27 +360,45 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
 
   Widget _buildActions() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (_parseResult != null && _parseResult!.validCount > 0) ...[
           if (_isImporting) ...[
-            LinearProgressIndicator(
-              value: _parseResult!.validCount > 0
-                  ? _importProgress / _parseResult!.validCount
-                  : 0,
-              backgroundColor: Colors.grey.shade300,
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFE333),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.black, width: 1),
+              ),
+              child: Column(
+                children: [
+                  LinearProgressIndicator(
+                    value: _parseResult!.validCount > 0
+                        ? _importProgress / _parseResult!.validCount
+                        : 0,
+                    backgroundColor: Colors.black.withOpacity(0.2),
+                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'IMPORT EN COURS... $_importProgress/${_parseResult!.validCount}',
+                    style: const TextStyle(
+                      fontFamily: 'DelaGothicOne',
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Import en cours... $_importProgress/${_parseResult!.validCount}',
-              style: const TextStyle(fontSize: 14),
-            ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
           ],
           PrimaryButton(
             text: _isImporting
-                ? 'Import en cours...'
-                : 'Importer ${_parseResult!.validCount} objets',
+                ? 'IMPORT EN COURS...'
+                : 'IMPORTER ${_parseResult!.validCount} OBJETS',
             onPressed: _isImporting ? null : _importItems,
           ),
         ],
@@ -396,17 +495,34 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Exemple CSV'),
+        backgroundColor: const Color(0xFFFFE333),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: Colors.black, width: 1),
+        ),
+        title: const Text(
+          'EXEMPLE CSV',
+          style: TextStyle(
+            fontFamily: 'DelaGothicOne',
+            fontSize: 24,
+            color: Colors.black,
+          ),
+        ),
         content: SingleChildScrollView(
           child: Text(
             example,
-            style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+            style: const TextStyle(
+              fontFamily: 'Chivo',
+              fontSize: 12,
+              color: Colors.black,
+            ),
           ),
         ),
         actions: [
-          TextButton(
+          TertiaryButton(
+            text: 'FERMER',
             onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
+            iconPath: 'assets/images/cross_icon.png',
           ),
         ],
       ),
