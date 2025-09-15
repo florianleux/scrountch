@@ -1,9 +1,11 @@
 # Architecture Patterns & Design Decisions
-*Universal Flutter/Dart architectural patterns for any application*
+
+_Universal Flutter/Dart architectural patterns for any application_
 
 ## 1. OVERALL ARCHITECTURE
 
 ### Layered Architecture Pattern
+
 **Priority**: High
 **Applicability**: All Flutter applications
 **Benefits**: Clear separation of concerns, testability, maintainability
@@ -22,6 +24,7 @@
 ```
 
 **Implementation Template**:
+
 ```dart
 // Presentation Layer - UI components
 class FeatureScreen extends StatefulWidget {
@@ -35,9 +38,9 @@ class FeatureScreen extends StatefulWidget {
 // Business Logic Layer - Services
 class FeatureService {
   final ApiRepository _apiRepository;
-  
+
   FeatureService(this._apiRepository);
-  
+
   Future<Result> performAction() async {
     // Business rules and orchestration
     final data = await _apiRepository.fetchData();
@@ -48,7 +51,7 @@ class FeatureService {
 // Data Layer - Models and Repositories
 class ApiRepository {
   final ApiClient _apiClient;
-  
+
   Future<List<DataModel>> fetchData() async {
     final response = await _apiClient.get('/endpoint');
     return response.map((json) => DataModel.fromJson(json)).toList();
@@ -58,9 +61,9 @@ class ApiRepository {
 class DataModel {
   final String id;
   final String name;
-  
+
   DataModel({required this.id, required this.name});
-  
+
   factory DataModel.fromJson(Map<String, dynamic> json) {
     return DataModel(
       id: json['id'],
@@ -72,11 +75,47 @@ class DataModel {
 
 ## 2. SERVICE LAYER PATTERNS
 
+### Decision Tree: Choosing Service Patterns
+
+```
+What type of service are you implementing?
+
+├── External Integration (APIs, Databases, Device Hardware)
+│   ├── Needs persistent connection/state?
+│   │   └── ✅ SINGLETON SERVICE PATTERN
+│   │       ├── Examples: ApiService, DatabaseService, AuthService
+│   │       ├── Benefits: Shared state, connection pooling
+│   │       └── Trade-offs: Global state, harder testing
+│   └── Stateless operations only?
+│       └── ✅ STATIC UTILITY SERVICE PATTERN
+│           ├── Examples: ValidationService, FormatterService
+│           ├── Benefits: Simple, testable, no state
+│           └── Trade-offs: No shared resources
+│
+├── Business Logic Processing
+│   ├── Complex workflows with state?
+│   │   └── ✅ SINGLETON SERVICE PATTERN
+│   │       ├── Examples: WorkflowService, ProcessingService
+│   │       └── Benefits: State management, process coordination
+│   └── Pure business calculations?
+│       └── ✅ STATIC UTILITY SERVICE PATTERN
+│           ├── Examples: CalculationService, ValidationService
+│           └── Benefits: Predictable, easy testing
+│
+└── Utility Functions (Formatting, Validation, Calculations)
+    └── ✅ STATIC UTILITY SERVICE PATTERN (Always)
+        ├── Examples: DateUtils, StringUtils, MathUtils
+        ├── Benefits: No state, pure functions, easy testing
+        └── Trade-offs: None (recommended pattern)
+```
+
 ### Singleton Service Pattern
+
 **Priority**: High
 **Use Case**: Stateful external integrations (APIs, databases, device services)
 
 **Template**:
+
 ```dart
 class ExternalService {
   static final ExternalService _instance = ExternalService._internal();
@@ -86,14 +125,14 @@ class ExternalService {
   // Service state
   bool _isInitialized = false;
   final ApiClient _apiClient = ApiClient();
-  
+
   Future<void> initialize() async {
     if (!_isInitialized) {
       await _apiClient.configure();
       _isInitialized = true;
     }
   }
-  
+
   Future<Result> performOperation() async {
     await initialize();
     return await _apiClient.request();
@@ -101,29 +140,32 @@ class ExternalService {
 }
 ```
 
-**When to use**: 
+**When to use**:
+
 - External API services
 - Database connections
 - Device hardware access
 - Authentication services
 
 ### Static Utility Service Pattern
+
 **Priority**: High
 **Use Case**: Stateless operations, pure functions
 
 **Template**:
+
 ```dart
 class UtilityService {
   // No constructor - pure static utility
-  
+
   static String formatCurrency(double amount, {String currency = 'USD'}) {
     return NumberFormat.currency(symbol: currency).format(amount);
   }
-  
+
   static DateTime parseDate(String dateString) {
     return DateTime.parse(dateString);
   }
-  
+
   static bool validateEmail(String email) {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
@@ -135,12 +177,12 @@ class FileService {
       type: allowedExtensions != null ? FileType.custom : FileType.any,
       allowedExtensions: allowedExtensions,
     );
-    
-    return result?.files.single.path != null 
-        ? File(result!.files.single.path!) 
+
+    return result?.files.single.path != null
+        ? File(result!.files.single.path!)
         : null;
   }
-  
+
   static Future<String> readFileContent(File file) async {
     return await file.readAsString();
   }
@@ -148,6 +190,7 @@ class FileService {
 ```
 
 **When to use**:
+
 - File operations
 - Data formatting/validation
 - Calculations
@@ -155,7 +198,39 @@ class FileService {
 
 ## 3. STATE MANAGEMENT STRATEGIES
 
+### Decision Tree: Choosing State Management
+
+```
+Start Here: What type of application are you building?
+
+├── Simple App (1-5 screens, personal/family use)
+│   └── ✅ LOCAL STATE + SERVICE LAYER
+│       ├── Complexity: Low
+│       ├── Learning Curve: Minimal
+│       └── Maintenance: Easy
+│
+├── Medium App (5-15 screens, shared state needs)
+│   ├── Team Size < 3 developers?
+│   │   └── ✅ PROVIDER PATTERN
+│   │       ├── Complexity: Medium
+│   │       ├── Learning Curve: Moderate
+│   │       └── Maintenance: Good
+│   └── Team Size >= 3 developers?
+│       └── ✅ RIVERPOD PATTERN
+│           ├── Complexity: High
+│           ├── Learning Curve: Steep
+│           └── Maintenance: Excellent
+│
+└── Large App (15+ screens, complex business logic)
+    └── ✅ RIVERPOD PATTERN (Required)
+        ├── Complexity: High
+        ├── Learning Curve: Steep
+        ├── Maintenance: Excellent
+        └── Testing: Superior
+```
+
 ### Local State + Service Layer (Recommended for Small-Medium Apps)
+
 **Priority**: High
 **Complexity**: Low
 **Best for**: Simple apps, prototypes, family/personal apps
@@ -166,16 +241,16 @@ class _ScreenState extends State<Screen> {
   bool _isLoading = false;
   String? _errorMessage;
   List<DataModel> _items = [];
-  
+
   // Service dependencies
   final DataService _dataService = DataService();
-  
+
   Future<void> _loadData() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
-    
+
     try {
       final items = await _dataService.fetchItems();
       setState(() {
@@ -193,6 +268,7 @@ class _ScreenState extends State<Screen> {
 ```
 
 ### Provider Pattern (Recommended for Medium Apps)
+
 **Priority**: Medium
 **Complexity**: Medium
 **Best for**: Apps with shared state, user sessions, shopping carts
@@ -202,15 +278,15 @@ class _ScreenState extends State<Screen> {
 class UserState extends ChangeNotifier {
   User? _currentUser;
   bool _isLoading = false;
-  
+
   User? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
   bool get isLoggedIn => _currentUser != null;
-  
+
   Future<void> login(String email, String password) async {
     _isLoading = true;
     notifyListeners();
-    
+
     try {
       _currentUser = await AuthService().login(email, password);
     } catch (e) {
@@ -221,7 +297,7 @@ class UserState extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   void logout() {
     _currentUser = null;
     notifyListeners();
@@ -250,11 +326,11 @@ class ProfileScreen extends StatelessWidget {
         if (userState.isLoading) {
           return LoadingIndicator();
         }
-        
+
         if (!userState.isLoggedIn) {
           return LoginScreen();
         }
-        
+
         return ProfileContent(user: userState.currentUser!);
       },
     );
@@ -263,6 +339,7 @@ class ProfileScreen extends StatelessWidget {
 ```
 
 ### Riverpod Pattern (Recommended for Large Apps)
+
 **Priority**: Medium
 **Complexity**: High
 **Best for**: Large apps, complex business logic, team development
@@ -280,12 +357,12 @@ final currentUserProvider = StateNotifierProvider<UserNotifier, AsyncValue<User?
 // State notifier
 class UserNotifier extends StateNotifier<AsyncValue<User?>> {
   final UserRepository _repository;
-  
+
   UserNotifier(this._repository) : super(const AsyncValue.loading());
-  
+
   Future<void> login(String email, String password) async {
     state = const AsyncValue.loading();
-    
+
     try {
       final user = await _repository.login(email, password);
       state = AsyncValue.data(user);
@@ -300,11 +377,11 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userState = ref.watch(currentUserProvider);
-    
+
     return userState.when(
       loading: () => LoadingIndicator(),
       error: (error, stack) => ErrorDisplay(error.toString()),
-      data: (user) => user != null 
+      data: (user) => user != null
           ? ProfileContent(user: user)
           : LoginScreen(),
     );
@@ -315,28 +392,29 @@ class ProfileScreen extends ConsumerWidget {
 ## 4. NAVIGATION ARCHITECTURE
 
 ### Centralized Navigation Service
+
 **Priority**: High
 **Benefits**: Consistent behavior, easy to modify globally, type-safe
 
 ```dart
 class NavigationService {
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  
+
   static BuildContext get context => navigatorKey.currentContext!;
-  
+
   // Basic navigation
   static Future<T?> push<T>(Widget screen) {
     return Navigator.of(context).push<T>(
       MaterialPageRoute(builder: (_) => screen),
     );
   }
-  
+
   static Future<T?> pushReplacement<T>(Widget screen) {
     return Navigator.of(context).pushReplacement<T, void>(
       MaterialPageRoute(builder: (_) => screen),
     );
   }
-  
+
   static Future<T?> pushAndRemoveUntil<T>(
     Widget screen, {
     bool Function(Route<dynamic>)? predicate,
@@ -346,16 +424,16 @@ class NavigationService {
       predicate ?? (route) => false,
     );
   }
-  
+
   static void pop<T>([T? result]) {
     Navigator.of(context).pop(result);
   }
-  
+
   // Named routes
   static Future<T?> pushNamed<T>(String routeName, {Object? arguments}) {
     return Navigator.of(context).pushNamed<T>(routeName, arguments: arguments);
   }
-  
+
   // Dialog navigation
   static Future<T?> showDialogCustom<T>(Widget dialog) {
     return showDialog<T>(
@@ -363,7 +441,7 @@ class NavigationService {
       builder: (_) => dialog,
     );
   }
-  
+
   // Bottom sheet navigation
   static Future<T?> showBottomSheetCustom<T>(Widget sheet) {
     return showModalBottomSheet<T>(
@@ -390,6 +468,7 @@ class MyApp extends StatelessWidget {
 ```
 
 ### Route Generation Pattern
+
 **Priority**: Medium
 **Use Case**: Type-safe navigation with parameters
 
@@ -406,7 +485,7 @@ abstract class AppRoutes {
 class ProductDetailArguments {
   final String productId;
   final String? category;
-  
+
   ProductDetailArguments({
     required this.productId,
     this.category,
@@ -419,10 +498,10 @@ class RouteGenerator {
     switch (settings.name) {
       case AppRoutes.home:
         return MaterialPageRoute(builder: (_) => HomeScreen());
-        
+
       case AppRoutes.profile:
         return MaterialPageRoute(builder: (_) => ProfileScreen());
-        
+
       case AppRoutes.productDetail:
         if (settings.arguments is ProductDetailArguments) {
           final args = settings.arguments as ProductDetailArguments;
@@ -434,12 +513,12 @@ class RouteGenerator {
           );
         }
         return _errorRoute();
-        
+
       default:
         return _errorRoute();
     }
   }
-  
+
   static Route<dynamic> _errorRoute() {
     return MaterialPageRoute(
       builder: (_) => Scaffold(
@@ -464,6 +543,7 @@ NavigationService.pushNamed(
 ## 5. DEPENDENCY INJECTION PATTERNS
 
 ### Service Locator Pattern (Simple)
+
 **Priority**: Medium
 **Use Case**: Small to medium apps with clear service dependencies
 
@@ -513,12 +593,13 @@ class UserScreen extends StatefulWidget {
 
 class _UserScreenState extends State<UserScreen> {
   late final UserService _userService = ServiceLocator().get<UserService>();
-  
+
   // Use _userService...
 }
 ```
 
 ### Constructor Injection Pattern (Testable)
+
 **Priority**: High
 **Use Case**: Large apps, team development, high testability requirements
 
@@ -536,15 +617,15 @@ abstract class NotificationService {
 // Concrete implementations
 class ApiUserRepository implements UserRepository {
   final ApiClient _apiClient;
-  
+
   ApiUserRepository(this._apiClient);
-  
+
   @override
   Future<User> getUser(String id) async {
     final response = await _apiClient.get('/users/$id');
     return User.fromJson(response.data);
   }
-  
+
   @override
   Future<void> updateUser(User user) async {
     await _apiClient.put('/users/${user.id}', user.toJson());
@@ -555,9 +636,9 @@ class ApiUserRepository implements UserRepository {
 class UserService {
   final UserRepository _userRepository;
   final NotificationService _notificationService;
-  
+
   UserService(this._userRepository, this._notificationService);
-  
+
   Future<void> updateUserProfile(User user) async {
     await _userRepository.updateUser(user);
     await _notificationService.sendNotification('Profile updated');
@@ -567,12 +648,12 @@ class UserService {
 // Screen with dependency injection
 class UserProfileScreen extends StatefulWidget {
   final UserService userService;
-  
+
   const UserProfileScreen({
     super.key,
     required this.userService,
   });
-  
+
   @override
   State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
@@ -583,7 +664,7 @@ class MockUserRepository implements UserRepository {
   Future<User> getUser(String id) async {
     return User(id: id, name: 'Test User');
   }
-  
+
   @override
   Future<void> updateUser(User user) async {
     // Mock implementation
@@ -595,13 +676,13 @@ void main() {
     final mockRepo = MockUserRepository();
     final mockNotification = MockNotificationService();
     final userService = UserService(mockRepo, mockNotification);
-    
+
     await tester.pumpWidget(
       MaterialApp(
         home: UserProfileScreen(userService: userService),
       ),
     );
-    
+
     // Test interactions...
   });
 }
@@ -610,6 +691,7 @@ void main() {
 ## 6. ERROR HANDLING ARCHITECTURE
 
 ### Layered Error Handling
+
 **Priority**: High
 **Pattern**: Transform technical errors to user-friendly messages at each layer
 
@@ -619,9 +701,9 @@ abstract class AppException implements Exception {
   final String message;
   final String? code;
   final dynamic originalError;
-  
+
   AppException(this.message, {this.code, this.originalError});
-  
+
   @override
   String toString() => message;
 }
@@ -662,23 +744,23 @@ class ApiRepository {
 // Service layer - Business logic error handling
 class DataService {
   final ApiRepository _repository;
-  
+
   DataService(this._repository);
-  
+
   Future<ProcessedResult> processData(String input) async {
     // Validation
     if (input.isEmpty) {
       throw ValidationException('Input cannot be empty');
     }
-    
+
     try {
       final rawData = await _repository.fetchData();
-      
+
       // Business logic
       if (rawData.isEmpty) {
         throw BusinessLogicException('No data available for processing');
       }
-      
+
       return _processBusinessLogic(rawData, input);
     } catch (AppException) {
       rethrow; // Re-throw known exceptions
@@ -691,7 +773,7 @@ class DataService {
 // Presentation layer - UI error handling
 class _ScreenState extends State<Screen> {
   String? _errorMessage;
-  
+
   Future<void> _loadData() async {
     try {
       await _dataService.processData(input);
@@ -710,6 +792,7 @@ class _ScreenState extends State<Screen> {
 ```
 
 ### Global Error Handler
+
 **Priority**: Medium
 **Use Case**: Centralized error logging and crash reporting
 
@@ -721,31 +804,31 @@ class GlobalErrorHandler {
       FlutterError.presentError(details);
       _logError(details.exception, details.stack);
     };
-    
+
     // Handle async errors
     PlatformDispatcher.instance.onError = (error, stack) {
       _logError(error, stack);
       return true;
     };
   }
-  
+
   static void _logError(dynamic error, StackTrace? stack) {
     // Log to console
     debugPrint('Error: $error');
     if (stack != null) {
       debugPrint('Stack trace: $stack');
     }
-    
+
     // Send to crash reporting service
     // CrashReporting.recordError(error, stack);
-    
+
     // Send to analytics
     // Analytics.logError(error.toString());
   }
-  
+
   static void handleError(AppException error, {StackTrace? stack}) {
     _logError(error, stack);
-    
+
     // Additional handling based on error type
     if (error is NetworkException) {
       // Handle network errors
@@ -765,6 +848,7 @@ void main() {
 ## 7. DATA FLOW PATTERNS
 
 ### Unidirectional Data Flow
+
 **Priority**: High
 **Pattern**: User Action → Event Handler → Service Call → State Update → UI Rebuild
 
@@ -781,14 +865,14 @@ class FilterDataEvent extends UserEvent {
 // State management with events
 class DataScreenController {
   final DataService _dataService;
-  
+
   // State
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
   final ValueNotifier<List<DataModel>> items = ValueNotifier([]);
   final ValueNotifier<String?> error = ValueNotifier(null);
-  
+
   DataScreenController(this._dataService);
-  
+
   void handleEvent(UserEvent event) {
     switch (event.runtimeType) {
       case LoadDataEvent:
@@ -802,11 +886,11 @@ class DataScreenController {
         break;
     }
   }
-  
+
   Future<void> _loadData() async {
     isLoading.value = true;
     error.value = null;
-    
+
     try {
       final data = await _dataService.fetchData();
       items.value = data;
@@ -816,7 +900,7 @@ class DataScreenController {
       isLoading.value = false;
     }
   }
-  
+
   void dispose() {
     isLoading.dispose();
     items.dispose();
@@ -832,20 +916,20 @@ class DataScreen extends StatefulWidget {
 
 class _DataScreenState extends State<DataScreen> {
   late final DataScreenController _controller;
-  
+
   @override
   void initState() {
     super.initState();
     _controller = DataScreenController(DataService());
     _controller.handleEvent(LoadDataEvent());
   }
-  
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -855,12 +939,12 @@ class _DataScreenState extends State<DataScreen> {
           ValueListenableBuilder<bool>(
             valueListenable: _controller.isLoading,
             builder: (context, isLoading, child) {
-              return isLoading 
+              return isLoading
                   ? LinearProgressIndicator()
                   : SizedBox.shrink();
             },
           ),
-          
+
           // Error display
           ValueListenableBuilder<String?>(
             valueListenable: _controller.error,
@@ -873,7 +957,7 @@ class _DataScreenState extends State<DataScreen> {
                   : SizedBox.shrink();
             },
           ),
-          
+
           // Data list
           Expanded(
             child: ValueListenableBuilder<List<DataModel>>(
@@ -902,6 +986,7 @@ class _DataScreenState extends State<DataScreen> {
 ## 8. TESTING ARCHITECTURE
 
 ### Testing Strategy
+
 **Priority**: High
 **Layers**: Unit tests for services, Widget tests for UI, Integration tests for flows
 
@@ -1033,13 +1118,16 @@ void main() {
 ## ARCHITECTURAL DECISIONS FRAMEWORK
 
 ### Decision Template
+
 ```markdown
 ### Decision: [Title]
+
 **Date**: [Date]
 **Status**: [Proposed/Accepted/Deprecated]
 **Context**: [What is the issue that we're seeing?]
 **Decision**: [What is the change that we're proposing/doing?]
-**Consequences**: 
+**Consequences**:
+
 - ✅ Positive consequences
 - ❌ Negative consequences
 - 🔄 Neutral consequences
@@ -1048,27 +1136,33 @@ void main() {
 ### Common Architectural Decisions
 
 #### State Management Choice
+
 **Context**: Need to manage application state
 **Options**: setState, Provider, Riverpod, Bloc, Redux
 **Decision Factors**:
+
 - App complexity
 - Team size and experience
 - Testability requirements
 - Performance needs
 
 #### Navigation Strategy
+
 **Context**: Need to handle screen navigation
 **Options**: Navigator 1.0, Navigator 2.0, Auto Route, Go Router
 **Decision Factors**:
+
 - Deep linking requirements
 - Web support needs
 - Route complexity
 - Type safety requirements
 
 #### Dependency Injection
+
 **Context**: Need to manage service dependencies
 **Options**: Service Locator, Constructor Injection, Provider-based DI
 **Decision Factors**:
+
 - Testability requirements
 - App complexity
 - Team preferences
@@ -1076,5 +1170,5 @@ void main() {
 
 ---
 
-*Universal architectural patterns for Flutter/Dart applications*
-*Last updated: January 2025*
+_Universal architectural patterns for Flutter/Dart applications_
+_Last updated: January 2025_

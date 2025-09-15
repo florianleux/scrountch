@@ -1,9 +1,11 @@
 # Flutter Development Standards & Best Practices
-*Universal Flutter/Dart coding standards for any application*
+
+_Universal Flutter/Dart coding standards for any application_
 
 ## 1. PROJECT ARCHITECTURE
 
 ### Standard Folder Structure
+
 **Priority**: High
 **Rationale**: Consistent organization across all Flutter projects
 
@@ -32,6 +34,7 @@ lib/
 ```
 
 **Template for new features**:
+
 ```dart
 // New feature structure
 lib/
@@ -44,6 +47,7 @@ lib/
 ```
 
 ### File Naming Conventions
+
 **Priority**: High
 **Standard**: Use snake_case with descriptive suffixes
 
@@ -75,6 +79,7 @@ theme_constants.dart
 ```
 
 ### Import Organization
+
 **Priority**: Medium
 **Standard order**:
 
@@ -99,10 +104,12 @@ import '../widgets/custom_buttons.dart';
 ## 2. WIDGET PATTERNS
 
 ### StatefulWidget vs StatelessWidget Rules
+
 **Priority**: High
 **Rule**: Use StatelessWidget unless state is required
 
 **StatelessWidget Template**:
+
 ```dart
 /// Brief description of widget purpose
 class CustomWidget extends StatelessWidget {
@@ -132,6 +139,7 @@ class CustomWidget extends StatelessWidget {
 ```
 
 **StatefulWidget Only When Needed**:
+
 ```dart
 class InteractiveWidget extends StatefulWidget {
   const InteractiveWidget({super.key});
@@ -142,7 +150,7 @@ class InteractiveWidget extends StatefulWidget {
 
 class _InteractiveWidgetState extends State<InteractiveWidget> {
   bool _isExpanded = false;
-  
+
   @override
   Widget build(BuildContext context) {
     // Implementation with state management
@@ -158,10 +166,12 @@ class _InteractiveWidgetState extends State<InteractiveWidget> {
 ```
 
 ### Const Constructor Standards
+
 **Priority**: High
 **Rule**: Always use const constructors when possible
 
 **Template**:
+
 ```dart
 class ReusableWidget extends StatelessWidget {
   final String title;
@@ -187,14 +197,17 @@ class ReusableWidget extends StatelessWidget {
 ```
 
 ### Widget Extraction Guidelines
+
 **Priority**: High
 **Extraction Criteria**:
+
 - Used in 2+ places
 - Self-contained functionality
 - Clear single responsibility
 - Configurable through parameters
 
 **Before (duplicated code)**:
+
 ```dart
 // Repeated across multiple screens
 Row(
@@ -213,6 +226,7 @@ Row(
 ```
 
 **After (extracted reusable widget)**:
+
 ```dart
 class AppHeader extends StatelessWidget {
   final bool showBackButton;
@@ -256,9 +270,11 @@ const AppHeader(showBackButton: false), // Customized
 ## 3. CODE STYLE & CONVENTIONS
 
 ### Naming Conventions
+
 **Priority**: High
 
 **Classes**: PascalCase
+
 ```dart
 class UserService {}
 class CustomTextField {}
@@ -266,6 +282,7 @@ class ApiResponse {}
 ```
 
 **Variables/Methods**: camelCase
+
 ```dart
 bool isLoading = false;
 void performAction() {}
@@ -273,6 +290,7 @@ final TextEditingController userController;
 ```
 
 **Constants**: camelCase with descriptive prefixes
+
 ```dart
 // Theme constants
 static const double defaultPadding = 16.0;
@@ -285,16 +303,18 @@ static const Duration defaultTimeout = Duration(seconds: 30);
 ```
 
 **Private Members**: Leading underscore
+
 ```dart
 class _ScreenState extends State<Screen> {
   bool _isLoading = false;
-  
+
   Widget _buildContent() {}
   void _handleUserAction() {}
 }
 ```
 
 ### Method Organization
+
 **Priority**: Medium
 **Standard order within classes**:
 
@@ -311,59 +331,61 @@ class ExampleScreen extends StatefulWidget {
 class _ExampleScreenState extends State<ExampleScreen> {
   // 1. Static constants
   static const double _defaultPadding = 16.0;
-  
+
   // 2. Instance variables
   bool _isLoading = false;
   final TextEditingController _controller = TextEditingController();
-  
+
   // 3. Lifecycle methods
   @override
   void initState() {
     super.initState();
   }
-  
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
-  
+
   // 4. Build method
   @override
   Widget build(BuildContext context) {
     return Scaffold(/* ... */);
   }
-  
+
   // 5. Private build helper methods
   Widget _buildHeader() {}
   Widget _buildBody() {}
-  
+
   // 6. Event handlers
   void _onButtonPressed() {}
   void _onTextChanged(String value) {}
-  
+
   // 7. Navigation methods
   void _navigateToNextScreen() {}
 }
 ```
 
 ### Documentation Standards
+
 **Priority**: Medium
 
 **Widget Documentation**:
+
 ```dart
 /// Brief description of widget purpose and usage
-/// 
+///
 /// Used across multiple screens for consistent [functionality]
 class CustomWidget extends StatelessWidget {
   /// Description of important parameter
   final String title;
-  
+
   /// Optional callback for user interaction
   final VoidCallback? onPressed;
-  
+
   /// Creates a [CustomWidget] with the given [title]
-  /// 
+  ///
   /// The [onPressed] callback is called when user interacts with widget
   const CustomWidget({
     super.key,
@@ -374,15 +396,16 @@ class CustomWidget extends StatelessWidget {
 ```
 
 **Service Documentation**:
+
 ```dart
 /// Service for handling [domain] operations
-/// 
+///
 /// Provides methods for CRUD operations and business logic
 class DomainService {
   /// Performs [operation] with given [parameters]
-  /// 
+  ///
   /// Returns [ResultType] on success
-  /// 
+  ///
   /// Throws [ExceptionType] when [condition] occurs
   Future<ResultType> performOperation(Parameters params) async {
     // Implementation
@@ -393,14 +416,16 @@ class DomainService {
 ## 4. PERFORMANCE OPTIMIZATIONS
 
 ### Widget Optimization Techniques
+
 **Priority**: High
 
 **Use ValueListenableBuilder for localized updates**:
+
 ```dart
 // ❌ INEFFICIENT - Full widget rebuild
 class _FormState extends State<Form> {
   final TextEditingController _controller = TextEditingController();
-  
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -420,7 +445,7 @@ class _FormState extends State<Form> {
 // ✅ OPTIMIZED - Localized rebuild
 class _FormState extends State<Form> {
   final TextEditingController _controller = TextEditingController();
-  
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -441,16 +466,18 @@ class _FormState extends State<Form> {
 ```
 
 ### Memory Management Rules
+
 **Priority**: High
 
 **Controller Disposal Template**:
+
 ```dart
 class _ScreenState extends State<Screen> {
   final TextEditingController _textController = TextEditingController();
   final AnimationController _animController = AnimationController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
-  
+
   @override
   void dispose() {
     _textController.dispose();
@@ -463,13 +490,14 @@ class _ScreenState extends State<Screen> {
 ```
 
 **Async Operation Safety**:
+
 ```dart
 class _ScreenState extends State<Screen> {
   bool _isLoading = false;
 
   Future<void> _performAsyncOperation() async {
     setState(() => _isLoading = true);
-    
+
     try {
       await someAsyncOperation();
     } finally {
@@ -482,6 +510,7 @@ class _ScreenState extends State<Screen> {
 ```
 
 ### Const Widget Usage
+
 **Priority**: Medium
 
 ```dart
@@ -504,32 +533,35 @@ CustomWidget(title: 'Static Title'),  // Should be const
 ## 5. STATE MANAGEMENT
 
 ### Recommended Pattern
+
 **Priority**: High
 **Pattern**: Local State + Service Layer
 
 **Rationale**:
+
 - Simple and maintainable for most applications
 - Clear separation between UI state and business logic
 - Easy to test and understand
 - Scales well for small to medium applications
 
 **Implementation Template**:
+
 ```dart
 class _ScreenState extends State<Screen> {
   // UI state
   bool _isLoading = false;
   String? _errorMessage;
   List<DataModel> _items = [];
-  
+
   // Service dependency
   final ApiService _apiService = ApiService();
-  
+
   Future<void> _loadData() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
-    
+
     try {
       final items = await _apiService.fetchItems();
       setState(() {
@@ -547,7 +579,9 @@ class _ScreenState extends State<Screen> {
 ```
 
 ### Alternative Patterns
+
 **For larger applications, consider**:
+
 - **Provider**: For shared state across widgets
 - **Riverpod**: For dependency injection and state management
 - **Bloc**: For complex business logic and state transitions
@@ -555,6 +589,7 @@ class _ScreenState extends State<Screen> {
 ## 6. REUSABLE COMPONENTS
 
 ### Navigation Header Template
+
 ```dart
 /// Reusable header widget with navigation controls
 class AppHeader extends StatelessWidget {
@@ -593,6 +628,7 @@ class AppHeader extends StatelessWidget {
 ```
 
 ### Loading Indicator Template
+
 ```dart
 /// Reusable loading indicator with optional message
 class LoadingIndicator extends StatelessWidget {
@@ -628,6 +664,7 @@ class LoadingIndicator extends StatelessWidget {
 ```
 
 ### Error Display Template
+
 ```dart
 /// Reusable error display with retry functionality
 class ErrorDisplay extends StatelessWidget {
@@ -679,6 +716,7 @@ class ErrorDisplay extends StatelessWidget {
 ## 7. SERVICE LAYER PATTERNS
 
 ### API Service Template
+
 ```dart
 class ApiService {
   static final ApiService _instance = ApiService._internal();
@@ -736,13 +774,14 @@ class ApiService {
 class ApiException implements Exception {
   final String message;
   ApiException(this.message);
-  
+
   @override
   String toString() => message;
 }
 ```
 
 ### Navigation Service Template
+
 ```dart
 class NavigationService {
   /// Navigate to new screen
@@ -752,7 +791,7 @@ class NavigationService {
       MaterialPageRoute(builder: (context) => screen),
     );
   }
-  
+
   /// Replace current screen
   static Future<T?> pushReplacement<T>(BuildContext context, Widget screen) {
     return Navigator.pushReplacement<T, void>(
@@ -760,10 +799,10 @@ class NavigationService {
       MaterialPageRoute(builder: (context) => screen),
     );
   }
-  
+
   /// Clear stack and navigate
   static Future<T?> pushAndRemoveUntil<T>(
-    BuildContext context, 
+    BuildContext context,
     Widget screen, {
     bool Function(Route<dynamic>)? predicate,
   }) {
@@ -773,7 +812,7 @@ class NavigationService {
       predicate ?? (route) => false,
     );
   }
-  
+
   /// Go back
   static void pop<T>(BuildContext context, [T? result]) {
     Navigator.pop(context, result);
@@ -784,6 +823,7 @@ class NavigationService {
 ## 8. TESTING STANDARDS
 
 ### Widget Testing Template
+
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -793,7 +833,7 @@ void main() {
   group('CustomButton Tests', () {
     testWidgets('displays text and responds to tap', (tester) async {
       bool tapped = false;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -818,6 +858,7 @@ void main() {
 ```
 
 ### Service Testing Template
+
 ```dart
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -855,14 +896,15 @@ void main() {
 ## 9. ERROR HANDLING
 
 ### Exception Handling Pattern
+
 ```dart
 // Custom exception classes
 class AppException implements Exception {
   final String message;
   final String? code;
-  
+
   AppException(this.message, {this.code});
-  
+
   @override
   String toString() => message;
 }
@@ -906,6 +948,7 @@ try {
 ## 10. IMPLEMENTATION CHECKLIST
 
 ### For New Features:
+
 - [ ] Follow folder structure conventions
 - [ ] Use appropriate StatefulWidget vs StatelessWidget
 - [ ] Add const constructors where possible
@@ -918,6 +961,7 @@ try {
 - [ ] Add appropriate tests
 
 ### For Code Reviews:
+
 - [ ] Check for const constructor usage
 - [ ] Verify proper import organization
 - [ ] Ensure consistent naming conventions
@@ -930,6 +974,7 @@ try {
 - [ ] Validate test coverage
 
 ### Performance Checklist:
+
 - [ ] Use ValueListenableBuilder for localized updates
 - [ ] Dispose of all controllers and resources
 - [ ] Use const widgets where possible
@@ -939,5 +984,5 @@ try {
 
 ---
 
-*Universal Flutter/Dart standards - applicable to any application*
-*Last updated: January 2025*
+_Universal Flutter/Dart standards - applicable to any application_
+_Last updated: January 2025_

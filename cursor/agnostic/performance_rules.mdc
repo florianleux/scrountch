@@ -1,19 +1,22 @@
 # Performance Rules & Optimization Guidelines
-*Universal Flutter/Dart performance optimization patterns*
+
+_Universal Flutter/Dart performance optimization patterns_
 
 ## 1. WIDGET PERFORMANCE OPTIMIZATIONS
 
 ### ValueListenableBuilder Pattern
+
 **Priority**: High
 **Use Case**: Localized UI updates without full widget rebuilds
 **Performance Impact**: 70-90% reduction in rebuild scope
 
 **Problem**: Inefficient setState causing full widget rebuilds
+
 ```dart
 // ❌ INEFFICIENT - Full widget rebuild on every change
 class _CounterWidgetState extends State<CounterWidget> {
   int _counter = 0;
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -32,17 +35,18 @@ class _CounterWidgetState extends State<CounterWidget> {
 ```
 
 **Solution**: Use ValueListenableBuilder for localized updates
+
 ```dart
 // ✅ OPTIMIZED - Only counter text rebuilds
 class _CounterWidgetState extends State<CounterWidget> {
   final ValueNotifier<int> _counter = ValueNotifier(0);
-  
+
   @override
   void dispose() {
     _counter.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -66,12 +70,13 @@ class _CounterWidgetState extends State<CounterWidget> {
 ```
 
 **Template for Complex Forms**:
+
 ```dart
 class _FormState extends State<Form> {
   final ValueNotifier<bool> _isValid = ValueNotifier(false);
   final ValueNotifier<bool> _isLoading = ValueNotifier(false);
   final TextEditingController _controller = TextEditingController();
-  
+
   @override
   void dispose() {
     _isValid.dispose();
@@ -79,7 +84,7 @@ class _FormState extends State<Form> {
     _controller.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -103,7 +108,7 @@ class _FormState extends State<Form> {
             ),
           ),
         ),
-        
+
         // Dynamic submit button - only rebuilds when validation changes
         ValueListenableBuilder<bool>(
           valueListenable: _isValid,
@@ -128,10 +133,12 @@ class _FormState extends State<Form> {
 ```
 
 ### Const Constructor Optimization
+
 **Priority**: High
 **Performance Impact**: Prevents unnecessary widget creation and comparison
 
 **Const Usage Rules**:
+
 ```dart
 // ✅ GOOD - Static widgets with const
 const SizedBox(height: 16),
@@ -160,6 +167,7 @@ AppHeader(title: 'Title'),   // Should be const if title is static
 ```
 
 **Template for Const-Friendly Widgets**:
+
 ```dart
 class OptimizedWidget extends StatelessWidget {
   final String title;
@@ -184,16 +192,16 @@ class OptimizedWidget extends StatelessWidget {
           // ✅ Use const for static elements
           const Icon(Icons.star),
           const SizedBox(height: 8),
-          
+
           // Dynamic content
           Text(title),
-          
+
           // ✅ Conditional const widgets
           if (isEnabled)
             const Text('Enabled')
           else
             const Text('Disabled'),
-          
+
           // ✅ Static action buttons
           ElevatedButton(
             onPressed: onPressed,
@@ -207,10 +215,12 @@ class OptimizedWidget extends StatelessWidget {
 ```
 
 ### Widget Extraction for Performance
+
 **Priority**: High
 **Rule**: Extract static UI components to prevent unnecessary rebuilds
 
 **Before Optimization** (inline widgets causing rebuilds):
+
 ```dart
 class _SearchScreenState extends State<SearchScreen> {
   String _query = '';
@@ -243,11 +253,11 @@ class _SearchScreenState extends State<SearchScreen> {
               ],
             ),
           ),
-          
+
           TextField(
             onChanged: (value) => setState(() => _query = value),
           ),
-          
+
           Expanded(
             child: ListView.builder(
               itemCount: _results.length,
@@ -264,6 +274,7 @@ class _SearchScreenState extends State<SearchScreen> {
 ```
 
 **After Optimization** (extracted static widgets):
+
 ```dart
 class _SearchScreenState extends State<SearchScreen> {
   String _query = '';
@@ -275,11 +286,11 @@ class _SearchScreenState extends State<SearchScreen> {
       body: Column(
         children: [
           const SearchHeader(), // ✅ Const widget - never rebuilds
-          
+
           SearchField(
             onChanged: (value) => setState(() => _query = value),
           ),
-          
+
           Expanded(
             child: SearchResults(results: _results), // ✅ Only rebuilds when results change
           ),
@@ -323,10 +334,12 @@ class SearchHeader extends StatelessWidget {
 ## 2. MEMORY MANAGEMENT
 
 ### Resource Disposal Pattern
+
 **Priority**: High
 **Rule**: Always dispose of controllers, notifiers, and subscriptions
 
 **Complete Disposal Template**:
+
 ```dart
 class _ScreenState extends State<Screen> {
   // Controllers that need disposal
@@ -337,28 +350,28 @@ class _ScreenState extends State<Screen> {
     vsync: this,
   );
   final FocusNode _focusNode = FocusNode();
-  
+
   // Notifiers that need disposal
   final ValueNotifier<bool> _isLoading = ValueNotifier(false);
   final ValueNotifier<String> _status = ValueNotifier('Ready');
-  
+
   // Subscriptions that need cancellation
   StreamSubscription? _dataSubscription;
   Timer? _periodicTimer;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     _dataSubscription = _dataStream.listen((data) {
       // Handle data
     });
-    
+
     _periodicTimer = Timer.periodic(Duration(seconds: 30), (timer) {
       // Periodic task
     });
   }
-  
+
   @override
   void dispose() {
     // Dispose controllers
@@ -366,35 +379,36 @@ class _ScreenState extends State<Screen> {
     _scrollController.dispose();
     _animController.dispose();
     _focusNode.dispose();
-    
+
     // Dispose notifiers
     _isLoading.dispose();
     _status.dispose();
-    
+
     // Cancel subscriptions
     _dataSubscription?.cancel();
     _periodicTimer?.cancel();
-    
+
     super.dispose();
   }
 }
 ```
 
 **Memory Leak Detection Template**:
+
 ```dart
 class MemoryTracker {
   static final Map<String, int> _instanceCounts = {};
-  
+
   static void trackInstance(String className) {
     _instanceCounts[className] = (_instanceCounts[className] ?? 0) + 1;
     debugPrint('Created $className. Count: ${_instanceCounts[className]}');
   }
-  
+
   static void untrackInstance(String className) {
     _instanceCounts[className] = (_instanceCounts[className] ?? 1) - 1;
     debugPrint('Disposed $className. Count: ${_instanceCounts[className]}');
   }
-  
+
   static void printMemoryReport() {
     debugPrint('=== Memory Report ===');
     _instanceCounts.forEach((className, count) {
@@ -412,7 +426,7 @@ class _ScreenState extends State<Screen> {
     super.initState();
     MemoryTracker.trackInstance('Screen');
   }
-  
+
   @override
   void dispose() {
     MemoryTracker.untrackInstance('Screen');
@@ -422,10 +436,12 @@ class _ScreenState extends State<Screen> {
 ```
 
 ### Async Operation Safety
+
 **Priority**: High
 **Rule**: Always check `mounted` before setState in async operations
 
 **Safe Async Pattern**:
+
 ```dart
 class _ScreenState extends State<Screen> {
   bool _isLoading = false;
@@ -434,15 +450,15 @@ class _ScreenState extends State<Screen> {
 
   Future<void> _loadData() async {
     if (!mounted) return; // Early exit if widget disposed
-    
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
-    
+
     try {
       final data = await _apiService.fetchData();
-      
+
       // ✅ Check mounted before setState
       if (mounted) {
         setState(() {
@@ -460,14 +476,14 @@ class _ScreenState extends State<Screen> {
       }
     }
   }
-  
+
   Future<void> _performLongOperation() async {
     for (int i = 0; i < 100; i++) {
       await Future.delayed(Duration(milliseconds: 10));
-      
+
       // ✅ Check mounted during long operations
       if (!mounted) return;
-      
+
       // Update progress
       if (mounted) {
         setState(() => _progress = i / 100);
@@ -478,14 +494,15 @@ class _ScreenState extends State<Screen> {
 ```
 
 **Cancellable Async Operations**:
+
 ```dart
 class _ScreenState extends State<Screen> {
   CancelToken? _cancelToken;
-  
+
   Future<void> _loadData() async {
     _cancelToken?.cancel();
     _cancelToken = CancelToken();
-    
+
     try {
       final data = await _apiService.fetchData(cancelToken: _cancelToken);
       if (mounted) {
@@ -499,7 +516,7 @@ class _ScreenState extends State<Screen> {
       }
     }
   }
-  
+
   @override
   void dispose() {
     _cancelToken?.cancel();
@@ -511,10 +528,12 @@ class _ScreenState extends State<Screen> {
 ## 3. LIST PERFORMANCE
 
 ### ListView Optimization
+
 **Priority**: High
 **Rule**: Use ListView.builder for lists with more than 20-30 items
 
 **Small List (< 30 items)**:
+
 ```dart
 // ✅ ACCEPTABLE for small lists
 class SmallList extends StatelessWidget {
@@ -535,6 +554,7 @@ class SmallList extends StatelessWidget {
 ```
 
 **Large List (30+ items)**:
+
 ```dart
 // ✅ REQUIRED for large lists
 class LargeList extends StatelessWidget {
@@ -565,6 +585,7 @@ class LargeList extends StatelessWidget {
 ```
 
 **Infinite Scroll Pattern**:
+
 ```dart
 class InfiniteScrollList extends StatefulWidget {
   @override
@@ -605,7 +626,7 @@ class _InfiniteScrollListState extends State<InfiniteScrollList> {
 
     try {
       final newItems = await _apiService.fetchItems(page: _page);
-      
+
       if (mounted) {
         setState(() {
           _items.addAll(newItems);
@@ -645,6 +666,7 @@ class _InfiniteScrollListState extends State<InfiniteScrollList> {
 ```
 
 ### Key Usage for List Performance
+
 **Priority**: High
 **Rule**: Use stable, unique keys for list items
 
@@ -702,10 +724,12 @@ ListView.builder(
 ## 4. IMAGE & ASSET OPTIMIZATION
 
 ### Image Loading Performance
+
 **Priority**: Medium
 **Rule**: Always specify dimensions and use appropriate cache settings
 
 **Optimized Image Loading**:
+
 ```dart
 class OptimizedImage extends StatelessWidget {
   final String imagePath;
@@ -771,7 +795,7 @@ class OptimizedNetworkImage extends StatelessWidget {
       cacheHeight: height.toInt(),
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) return child;
-        
+
         return Container(
           width: width,
           height: height,
@@ -799,6 +823,7 @@ class OptimizedNetworkImage extends StatelessWidget {
 ```
 
 ### Asset Preloading
+
 **Priority**: Low
 **Use Case**: Critical images that should be loaded immediately
 
@@ -812,7 +837,7 @@ class AssetPreloader {
     ];
 
     await Future.wait(
-      imagesToPreload.map((imagePath) => 
+      imagesToPreload.map((imagePath) =>
         precacheImage(AssetImage(imagePath), context)
       ),
     );
@@ -835,9 +860,9 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _initializeApp() async {
     // Preload critical images
     await AssetPreloader.preloadImages(context);
-    
+
     // Other initialization...
-    
+
     // Navigate to main app
     if (mounted) {
       Navigator.pushReplacement(
@@ -852,10 +877,12 @@ class _SplashScreenState extends State<SplashScreen> {
 ## 5. BUILD METHOD OPTIMIZATION
 
 ### Build Method Structure
+
 **Priority**: High
 **Rule**: Separate static and dynamic content, use build helper methods
 
 **Optimized Build Method Pattern**:
+
 ```dart
 class _ScreenState extends State<Screen> {
   @override
@@ -911,6 +938,7 @@ class _ScreenState extends State<Screen> {
 ```
 
 ### Conditional Widget Optimization
+
 **Priority**: Medium
 **Rule**: Use efficient conditional rendering patterns
 
@@ -930,22 +958,22 @@ class ConditionalWidgets extends StatelessWidget {
     return Column(
       children: [
         const Text('Always visible'),
-        
+
         // ✅ GOOD - Efficient conditional widgets
         if (showAdvanced) ...[
           const SizedBox(height: 16),
           const Text('Advanced options'),
           const AdvancedSettingsWidget(),
         ],
-        
+
         // ✅ GOOD - Conditional widget with null fallback
         showAdvanced ? const AdvancedWidget() : null,
-        
+
         // ✅ GOOD - Empty container when needed
         showAdvanced ? const AdvancedWidget() : const SizedBox.shrink(),
-        
+
         // ❌ AVOID - Creating widgets that aren't used
-        showAdvanced 
+        showAdvanced
             ? Column(  // Creates Column even when not shown
                 children: [
                   const Text('Advanced'),
@@ -962,6 +990,7 @@ class ConditionalWidgets extends StatelessWidget {
 ## 6. THEME PERFORMANCE
 
 ### Theme Access Optimization
+
 **Priority**: Medium
 **Rule**: Cache theme references when used multiple times
 
@@ -973,7 +1002,7 @@ class _ScreenState extends State<Screen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    
+
     return Column(
       children: [
         Text('Title', style: textTheme.headlineLarge),
@@ -1020,6 +1049,7 @@ class _BadScreenState extends State<Screen> {
 ## 7. STATE MANAGEMENT PERFORMANCE
 
 ### Efficient setState Usage
+
 **Priority**: High
 **Rule**: Minimize setState scope and batch related updates
 
@@ -1039,7 +1069,7 @@ class _ScreenState extends State<Screen> {
 
     try {
       final data = await _apiService.fetchData();
-      
+
       // ✅ GOOD - Single setState for success state
       setState(() {
         _data = data;
@@ -1067,20 +1097,21 @@ class _ScreenState extends State<Screen> {
     if (_isLoading) {
       return const LoadingIndicator();
     }
-    
+
     if (_errorMessage != null) {
       return ErrorDisplay(
         message: _errorMessage!,
         onRetry: _loadData,
       );
     }
-    
+
     return DataList(data: _data);
   }
 }
 ```
 
 ### State Splitting for Performance
+
 **Priority**: Medium
 **Rule**: Split unrelated state to prevent unnecessary rebuilds
 
@@ -1168,17 +1199,18 @@ class _FilterSectionState extends State<FilterSection> {
 ## 8. PERFORMANCE MONITORING
 
 ### Performance Profiling
+
 **Priority**: Low
 **Use Case**: Identifying performance bottlenecks
 
 ```dart
 class PerformanceProfiler {
   static final Map<String, Stopwatch> _timers = {};
-  
+
   static void startTimer(String name) {
     _timers[name] = Stopwatch()..start();
   }
-  
+
   static void endTimer(String name) {
     final timer = _timers[name];
     if (timer != null) {
@@ -1187,7 +1219,7 @@ class PerformanceProfiler {
       _timers.remove(name);
     }
   }
-  
+
   static T profile<T>(String name, T Function() function) {
     startTimer(name);
     try {
@@ -1208,7 +1240,7 @@ class _ScreenState extends State<Screen> {
       );
     });
   }
-  
+
   Future<void> _loadData() async {
     PerformanceProfiler.startTimer('Data.load');
     try {
@@ -1222,6 +1254,7 @@ class _ScreenState extends State<Screen> {
 ```
 
 ### Widget Rebuild Tracking
+
 **Priority**: Low
 **Use Case**: Identifying unnecessary rebuilds during development
 
@@ -1269,6 +1302,7 @@ class _ScreenState extends State<Screen> {
 ## 9. PERFORMANCE TESTING
 
 ### Performance Test Commands
+
 ```bash
 # Profile widget rebuilds
 flutter run --profile --trace-widget-rebuilds
@@ -1287,6 +1321,7 @@ flutter run --profile --trace-systrace
 ```
 
 ### Automated Performance Tests
+
 **Priority**: Low
 **Use Case**: Regression testing for performance
 
@@ -1296,15 +1331,15 @@ import 'package:integration_test/integration_test.dart';
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  
+
   group('Performance Tests', () {
     testWidgets('List scrolling performance', (tester) async {
       await tester.pumpWidget(MyApp());
-      
+
       // Navigate to list screen
       await tester.tap(find.text('View List'));
       await tester.pumpAndSettle();
-      
+
       // Measure scroll performance
       await binding.traceAction(
         () async {
@@ -1315,10 +1350,10 @@ void main() {
         reportKey: 'list_scroll_performance',
       );
     });
-    
+
     testWidgets('Screen transition performance', (tester) async {
       await tester.pumpWidget(MyApp());
-      
+
       await binding.traceAction(
         () async {
           await tester.tap(find.text('Next Screen'));
@@ -1336,6 +1371,7 @@ void main() {
 ## PERFORMANCE CHECKLIST
 
 ### Before Committing New Code:
+
 - [ ] Use const constructors where possible
 - [ ] Extract static widgets to prevent unnecessary rebuilds
 - [ ] Dispose of all controllers, notifiers, and subscriptions
@@ -1348,6 +1384,7 @@ void main() {
 - [ ] Extract build helper methods for complex widgets
 
 ### Performance Red Flags:
+
 - [ ] setState(() {}) with empty body
 - [ ] Missing const on static widgets
 - [ ] Controllers without disposal
@@ -1359,6 +1396,7 @@ void main() {
 - [ ] Unnecessary widget rebuilds (use RebuildTracker to identify)
 
 ### Performance Optimization Opportunities:
+
 - [ ] ValueListenableBuilder instead of setState
 - [ ] Widget extraction for reused/static components
 - [ ] Const widget usage for static content
@@ -1373,6 +1411,7 @@ void main() {
 ## PERFORMANCE TARGETS
 
 ### Recommended Performance Goals:
+
 - **Frame Rate**: Maintain 60fps during normal operation
 - **Build Time**: Widget build methods < 16ms
 - **Memory Usage**: No memory leaks, efficient resource cleanup
@@ -1382,6 +1421,7 @@ void main() {
 - **Screen Transitions**: < 300ms transition animations
 
 ### Performance Metrics to Monitor:
+
 - Widget rebuild frequency
 - Memory usage patterns
 - Frame rendering times
@@ -1389,5 +1429,5 @@ void main() {
 - Network request durations
 - Database query performance
 
-*Universal Flutter/Dart performance optimization guidelines*
-*Last updated: January 2025*
+_Universal Flutter/Dart performance optimization guidelines_
+_Last updated: January 2025_
