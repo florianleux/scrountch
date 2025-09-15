@@ -18,10 +18,11 @@ This collection contains customizations and configurations specific to the Scrou
 
 ## 📁 Documentation Structure
 
-| Document                               | Purpose                                   | Language       | Priority |
-| -------------------------------------- | ----------------------------------------- | -------------- | -------- |
-| [`design-rules.mdc`](design-rules.mdc) | UI design system and visual standards     | French/English | **High** |
-| [`build-rules.mdc`](build-rules.mdc)   | Build processes and development workflows | French         | **High** |
+| Document                                       | Purpose                                           | Language       | Priority |
+| ---------------------------------------------- | ------------------------------------------------- | -------------- | -------- |
+| [`design-rules.mdc`](design-rules.mdc)         | UI design system and visual standards             | French/English | **High** |
+| [`build-rules.mdc`](build-rules.mdc)           | Build processes and development workflows         | French         | **High** |
+| [`versioning-rules.mdc`](versioning-rules.mdc) | Automatic version management and release workflow | French         | **High** |
 
 ## 🎨 Design System ([`design-rules.mdc`](design-rules.mdc))
 

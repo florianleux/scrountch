@@ -1,0 +1,327 @@
+---
+alwaysApply: true
+---
+
+# Gestion des Versions - Scrountch Family Inventory
+
+## Format de Versioning
+
+### Semantic Versioning (SemVer)
+
+**Format**: `MAJOR.MINOR.PATCH+BUILD`
+**Exemple**: `1.2.3+45`
+
+- **MAJOR** (1) : Changements majeurs, breaking changes
+- **MINOR** (2) : Nouvelles fonctionnalités, améliorations UI
+- **PATCH** (3) : Corrections de bugs, améliorations mineures
+- **BUILD** (45) : Numéro de build auto-incrémenté
+
+## Scripts de Versioning
+
+### 🔄 Auto-increment Build (Automatique)
+
+Intégré dans `build_apk_simple.sh` :
+
+```bash
+#!/bin/bash
+# increment_build.sh
+
+echo "📦 Incrémentation du numéro de build..."
+
+# Lire la version actuelle
+CURRENT_VERSION=$(grep '^version:' pubspec.yaml | cut -d' ' -f2)
+VERSION_NAME=$(echo $CURRENT_VERSION | cut -d'+' -f1)
+BUILD_NUMBER=$(echo $CURRENT_VERSION | cut -d'+' -f2)
+
+# Incrémenter le build
+NEW_BUILD=$((BUILD_NUMBER + 1))
+NEW_VERSION="${VERSION_NAME}+${NEW_BUILD}"
+
+# Mettre à jour pubspec.yaml
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  sed -i '' "s/^version:.*/version: ${NEW_VERSION}/" pubspec.yaml
+else
+  sed -i "s/^version:.*/version: ${NEW_VERSION}/" pubspec.yaml
+fi
+
+echo "✅ Version mise à jour: ${CURRENT_VERSION} -> ${NEW_VERSION}"
+
+# Commit automatique de la version
+git add pubspec.yaml
+git commit -m "build: increment version to ${NEW_VERSION}"
+```
+
+### 📈 Bump Version (Manuel)
+
+Script `bump_version.sh` :
+
+```bash
+#!/bin/bash
+# bump_version.sh - Usage: ./bump_version.sh [major|minor|patch]
+
+TYPE=$1
+
+if [ -z "$TYPE" ]; then
+  echo "❌ Usage: ./bump_version.sh [major|minor|patch]"
+  echo ""
+  echo "Types de version :"
+  echo "  🚀 major  : Changements majeurs (breaking changes)"
+  echo "  ✨ minor  : Nouvelles fonctionnalités"
+  echo "  🐛 patch  : Corrections de bugs"
+  echo ""
+  echo "Exemples :"
+  echo "  ./bump_version.sh minor   # 1.0.0 -> 1.1.0"
+  echo "  ./bump_version.sh patch   # 1.1.0 -> 1.1.1"
+  exit 1
+fi
+
+# Lire la version actuelle
+CURRENT_VERSION=$(grep '^version:' pubspec.yaml | cut -d' ' -f2)
+VERSION_NAME=$(echo $CURRENT_VERSION | cut -d'+' -f1)
+BUILD_NUMBER=$(echo $CURRENT_VERSION | cut -d'+' -f2)
+
+# Parser les numéros de version
+MAJOR=$(echo $VERSION_NAME | cut -d'.' -f1)
+MINOR=$(echo $VERSION_NAME | cut -d'.' -f2)
+PATCH=$(echo $VERSION_NAME | cut -d'.' -f3)
+
+# Incrémenter selon le type
+case $TYPE in
+  "major")
+    MAJOR=$((MAJOR + 1))
+    MINOR=0
+    PATCH=0
+    echo "🚀 Bump MAJOR version (breaking changes)"
+    COMMIT_MSG="BREAKING CHANGE: bump major version to"
+    ;;
+  "minor")
+    MINOR=$((MINOR + 1))
+    PATCH=0
+    echo "✨ Bump MINOR version (nouvelles fonctionnalités)"
+    COMMIT_MSG="feat: bump minor version to"
+    ;;
+  "patch")
+    PATCH=$((PATCH + 1))
+    echo "🐛 Bump PATCH version (corrections de bugs)"
+    COMMIT_MSG="fix: bump patch version to"
+    ;;
+  *)
+    echo "❌ Type invalide: $TYPE"
+    echo "Types valides: major, minor, patch"
+    exit 1
+    ;;
+esac
+
+NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}+${BUILD_NUMBER}"
+
+# Mettre à jour pubspec.yaml
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  sed -i '' "s/^version:.*/version: ${NEW_VERSION}/" pubspec.yaml
+else
+  sed -i "s/^version:.*/version: ${NEW_VERSION}/" pubspec.yaml
+fi
+
+echo "✅ Version bumped: ${CURRENT_VERSION} -> ${NEW_VERSION}"
+
+# Commit et tag
+git add pubspec.yaml
+git commit -m "${COMMIT_MSG} ${NEW_VERSION}"
+git tag -a "v${MAJOR}.${MINOR}.${PATCH}" -m "Release version ${MAJOR}.${MINOR}.${PATCH}"
+
+echo "🏷️  Tag créé: v${MAJOR}.${MINOR}.${PATCH}"
+echo "💡 N'oubliez pas de push: git push && git push --tags"
+```
+
+## Workflow de Versioning
+
+### 🔄 Build de Routine
+
+```bash
+# Auto-incrémente le build number
+./build_apk_simple.sh
+```
+
+### ✨ Nouvelle Fonctionnalité
+
+```bash
+# 1. Bump version mineure
+./bump_version.sh minor
+
+# 2. Build avec nouvelle version
+./build_apk_simple.sh
+
+# 3. Push avec tags
+git push && git push --tags
+```
+
+### 🐛 Correction de Bug
+
+```bash
+# 1. Bump version patch
+./bump_version.sh patch
+
+# 2. Build avec nouvelle version
+./build_apk_simple.sh
+
+# 3. Push avec tags
+git push && git push --tags
+```
+
+### 🚀 Changement Majeur
+
+```bash
+# 1. Bump version majeure
+./bump_version.sh major
+
+# 2. Build avec nouvelle version
+./build_apk_simple.sh
+
+# 3. Push avec tags
+git push && git push --tags
+```
+
+## Intégration avec build_apk_simple.sh
+
+Modifier le script existant pour inclure l'auto-increment :
+
+```bash
+#!/bin/bash
+# build_apk_simple.sh - Version avec versioning automatique
+
+set -e  # Exit on any error
+
+echo "🧹 Nettoyage préalable..."
+flutter clean
+
+echo "📦 Incrémentation automatique du build number..."
+# Auto-increment build number
+CURRENT_VERSION=$(grep '^version:' pubspec.yaml | cut -d' ' -f2)
+VERSION_NAME=$(echo $CURRENT_VERSION | cut -d'+' -f1)
+BUILD_NUMBER=$(echo $CURRENT_VERSION | cut -d'+' -f2)
+
+NEW_BUILD=$((BUILD_NUMBER + 1))
+NEW_VERSION="${VERSION_NAME}+${NEW_BUILD}"
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  sed -i '' "s/^version:.*/version: ${NEW_VERSION}/" pubspec.yaml
+else
+  sed -i "s/^version:.*/version: ${NEW_VERSION}/" pubspec.yaml
+fi
+
+echo "✅ Version: ${CURRENT_VERSION} -> ${NEW_VERSION}"
+
+echo "🔧 Configuration Android NDK..."
+export ANDROID_NDK_ROOT="$ANDROID_HOME/ndk/26.1.10909125"
+
+echo "📱 Build APK Release..."
+flutter build apk --release
+
+echo "📦 APK généré avec succès !"
+echo "📍 Localisation: build/app/outputs/flutter-apk/app-release.apk"
+echo "🏷️  Version: ${NEW_VERSION}"
+
+# Commit automatique de la version
+git add pubspec.yaml
+git commit -m "build: increment version to ${NEW_VERSION}"
+
+echo "✅ Build terminé et version commitée !"
+```
+
+## Affichage de la Version dans l'App
+
+### Widget d'affichage de version
+
+```dart
+// lib/widgets/version_display.dart
+import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
+class VersionDisplay extends StatelessWidget {
+  final bool showBuildNumber;
+  final TextStyle? textStyle;
+  final Color? textColor;
+
+  const VersionDisplay({
+    super.key,
+    this.showBuildNumber = true,
+    this.textStyle,
+    this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<PackageInfo>(
+      future: PackageInfo.fromPlatform(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final packageInfo = snapshot.data!;
+          final version = showBuildNumber
+              ? 'v${packageInfo.version} (${packageInfo.buildNumber})'
+              : 'v${packageInfo.version}';
+
+          return Text(
+            version,
+            style: textStyle ?? TextStyle(
+              fontFamily: 'Chivo',
+              fontSize: 12,
+              color: textColor ?? Colors.black54,
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+}
+```
+
+### Utilisation dans les écrans
+
+```dart
+// Dans un écran de paramètres ou about
+Column(
+  children: [
+    const Text('Scrountch Family Inventory'),
+    const SizedBox(height: 8),
+    const VersionDisplay(), // Affiche "v1.2.3 (45)"
+  ],
+)
+
+// Dans un drawer ou footer
+const VersionDisplay(
+  showBuildNumber: false, // Affiche seulement "v1.2.3"
+  textColor: Colors.grey,
+)
+```
+
+## Dépendance Requise
+
+Ajouter dans `pubspec.yaml` :
+
+```yaml
+dependencies:
+  package_info_plus: ^4.0.0 # Pour accéder aux infos de version runtime
+```
+
+## Historique des Versions
+
+### Exemple de changelog automatique
+
+```bash
+#!/bin/bash
+# generate_changelog.sh
+
+echo "# Changelog - Scrountch" > CHANGELOG.md
+echo "" >> CHANGELOG.md
+
+# Générer depuis les tags git
+git tag -l --sort=-version:refname | head -10 | while read tag; do
+  echo "## $tag" >> CHANGELOG.md
+  git log --oneline --since="$(git log -1 --format=%ai $tag^)" --until="$(git log -1 --format=%ai $tag)" >> CHANGELOG.md
+  echo "" >> CHANGELOG.md
+done
+```
+
+---
+
+**IMPORTANT** : Ces scripts de versioning garantissent une traçabilité complète des releases et une gestion cohérente des versions pour la famille Scrountch.

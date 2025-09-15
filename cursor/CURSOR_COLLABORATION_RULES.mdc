@@ -572,6 +572,72 @@ Documentation: "## Patterns de Gestion d'Erreur"
 - ❌ Ignoring human feedback or preferences
 - ❌ Rushing through complex tasks
 
+## Intelligent Version Bump Analysis
+
+### Rule
+
+**Priority**: High
+**Behavior**: When asked to build, automatically analyze recent changes to determine appropriate version bump (major/minor/patch) before executing build process.
+
+### Analysis Process
+
+1. **Examine Recent Changes**: Analyze git commits, file modifications, and code changes since last version
+2. **Categorize Impact**: Determine change severity based on modification types
+3. **Propose Version Bump**: Suggest appropriate version increment with reasoning
+4. **Execute Build**: Run version bump + build process after human confirmation
+
+### Version Bump Criteria
+
+**MAJOR Version (Breaking Changes)**:
+
+- API changes that break backward compatibility
+- Database schema changes requiring migration
+- Removal of public methods/classes
+- Changes to core application architecture
+- UI/UX complete redesigns
+
+**MINOR Version (New Features)**:
+
+- New screens or major UI components
+- New functionality or features
+- Significant UI improvements or enhancements
+- New API endpoints or services
+- Performance improvements with user impact
+
+**PATCH Version (Bug Fixes)**:
+
+- Bug fixes and error corrections
+- Minor UI tweaks or adjustments
+- Performance optimizations without user impact
+- Code refactoring without functional changes
+- Documentation updates
+
+### Implementation Example
+
+**When User Says "build"**:
+
+```
+1. Analyze: git log --oneline --since="last version tag"
+2. Examine: Modified files and their impact
+3. Propose: "Based on new search functionality, I recommend MINOR bump (1.0.0 -> 1.1.0)"
+4. Execute: ./bump_version.sh minor && ./build_apk_simple.sh
+```
+
+**Analysis Output Format**:
+
+```
+📊 Version Bump Analysis:
+- Files changed: lib/screens/search_screen.dart, lib/services/search_service.dart
+- Change type: New feature (advanced search functionality)
+- Impact: New user-facing functionality
+- Recommendation: MINOR version bump (1.0.0 -> 1.1.0)
+- Reason: Added new search capabilities without breaking existing features
+
+Proceed with MINOR bump? (y/n)
+```
+
+This ensures consistent and logical version management based on actual code changes rather than manual guesswork.
+
 ---
 
 _These collaboration rules ensure productive, efficient, and respectful human-AI partnerships in software development projects._

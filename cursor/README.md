@@ -69,6 +69,7 @@ Contains project-specific configurations, design systems, build processes, and i
 - **Reusable Components**: Navigation, loading, and error display templates
 - **Service Layer Patterns**: API service and navigation service templates
 - **Testing Standards**: Widget and service testing templates with examples
+- **Version Management**: Semantic versioning with automated build number increments
 
 **When to Use**: Establishing coding standards for any Flutter development team
 
@@ -115,8 +116,21 @@ Contains project-specific configurations, design systems, build processes, and i
 - **Troubleshooting**: Common build issues and resolution steps
 - **Performance Metrics**: Expected build times and APK sizes
 - **Maintenance**: Dependency updates and cleanup procedures
+- **Version Management**: Automated build number increments and semantic versioning
 
 **When to Use**: Setting up development environment for Scrountch project
+
+### [`versioning-rules.mdc`](specific/versioning-rules.mdc)
+
+**Scrountch automatic version management and release workflow**
+
+- **Semantic Versioning**: MAJOR.MINOR.PATCH+BUILD format with clear increment rules
+- **Automated Scripts**: Build number auto-increment and manual version bumping
+- **Git Integration**: Automatic tagging and commit workflows
+- **Release Management**: Version display widgets and changelog generation
+- **Build Integration**: Seamless integration with existing build scripts
+
+**When to Use**: Managing releases and version tracking for Scrountch application
 
 ### [`design-rules.mdc`](specific/design-rules.mdc)
 

@@ -713,7 +713,173 @@ class ErrorDisplay extends StatelessWidget {
 }
 ```
 
-## 7. SERVICE LAYER PATTERNS
+## 7. VERSION MANAGEMENT
+
+### Semantic Versioning Strategy
+
+**Priority**: High
+**Rule**: Follow semantic versioning (SemVer) with automated build number increments
+
+**Version Format**: `MAJOR.MINOR.PATCH+BUILD`
+
+```yaml
+# pubspec.yaml
+version: 1.2.3+45
+# Where:
+# 1 = MAJOR version (breaking changes)
+# 2 = MINOR version (new features, backward compatible)
+# 3 = PATCH version (bug fixes, backward compatible)
+# 45 = BUILD number (auto-incremented on each build)
+```
+
+**Version Increment Rules**:
+
+- **MAJOR**: Breaking changes, API changes, major architecture updates
+- **MINOR**: New features, UI improvements, non-breaking functionality
+- **PATCH**: Bug fixes, performance improvements, minor tweaks
+- **BUILD**: Auto-incremented on every build/release
+
+**Implementation Template**:
+
+```dart
+// lib/constants/app_constants.dart
+class AppConstants {
+  static const String appName = 'Your App Name';
+  static const String version = '1.2.3';
+  static const String buildNumber = '45';
+  static const String fullVersion = '$version+$buildNumber';
+
+  // Display version in UI
+  static String get displayVersion => 'v$version ($buildNumber)';
+}
+
+// Usage in About screen or settings
+Text('Version: ${AppConstants.displayVersion}')
+```
+
+**Automated Build Scripts**:
+
+```bash
+#!/bin/bash
+# increment_version.sh - Auto-increment build number
+
+# Read current version from pubspec.yaml
+CURRENT_VERSION=$(grep '^version:' pubspec.yaml | cut -d' ' -f2)
+VERSION_NAME=$(echo $CURRENT_VERSION | cut -d'+' -f1)
+BUILD_NUMBER=$(echo $CURRENT_VERSION | cut -d'+' -f2)
+
+# Increment build number
+NEW_BUILD=$((BUILD_NUMBER + 1))
+NEW_VERSION="${VERSION_NAME}+${NEW_BUILD}"
+
+# Update pubspec.yaml
+sed -i "s/^version:.*/version: ${NEW_VERSION}/" pubspec.yaml
+
+echo "Version updated: ${CURRENT_VERSION} -> ${NEW_VERSION}"
+```
+
+**Manual Version Bump**:
+
+```bash
+#!/bin/bash
+# bump_version.sh - Manual version increment
+
+TYPE=$1 # major, minor, or patch
+
+if [ -z "$TYPE" ]; then
+  echo "Usage: ./bump_version.sh [major|minor|patch]"
+  exit 1
+fi
+
+CURRENT_VERSION=$(grep '^version:' pubspec.yaml | cut -d' ' -f2)
+VERSION_NAME=$(echo $CURRENT_VERSION | cut -d'+' -f1)
+BUILD_NUMBER=$(echo $CURRENT_VERSION | cut -d'+' -f2)
+
+# Parse version numbers
+MAJOR=$(echo $VERSION_NAME | cut -d'.' -f1)
+MINOR=$(echo $VERSION_NAME | cut -d'.' -f2)
+PATCH=$(echo $VERSION_NAME | cut -d'.' -f3)
+
+case $TYPE in
+  "major")
+    MAJOR=$((MAJOR + 1))
+    MINOR=0
+    PATCH=0
+    ;;
+  "minor")
+    MINOR=$((MINOR + 1))
+    PATCH=0
+    ;;
+  "patch")
+    PATCH=$((PATCH + 1))
+    ;;
+esac
+
+NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}+${BUILD_NUMBER}"
+sed -i "s/^version:.*/version: ${NEW_VERSION}/" pubspec.yaml
+
+echo "Version bumped: ${CURRENT_VERSION} -> ${NEW_VERSION}"
+```
+
+**Git Integration**:
+
+```bash
+# Tag releases with version
+git tag -a v1.2.3 -m "Release version 1.2.3"
+git push origin v1.2.3
+
+# Auto-generate changelog from commits
+git log --oneline --since="2 weeks ago" > CHANGELOG_RECENT.md
+```
+
+**Version Display Widget**:
+
+```dart
+class VersionDisplay extends StatelessWidget {
+  final bool showBuildNumber;
+  final TextStyle? textStyle;
+
+  const VersionDisplay({
+    super.key,
+    this.showBuildNumber = true,
+    this.textStyle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<PackageInfo>(
+      future: PackageInfo.fromPlatform(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final packageInfo = snapshot.data!;
+          final version = showBuildNumber
+              ? '${packageInfo.version} (${packageInfo.buildNumber})'
+              : packageInfo.version;
+
+          return Text(
+            'Version $version',
+            style: textStyle ?? Theme.of(context).textTheme.bodySmall,
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+}
+```
+
+**Dependencies Required**:
+
+```yaml
+# pubspec.yaml
+dependencies:
+  package_info_plus: ^4.0.0 # For runtime version access
+
+dev_dependencies:
+  build_runner: ^2.0.0 # For code generation (optional)
+```
+
+## 8. SERVICE LAYER PATTERNS
 
 ### API Service Template
 
