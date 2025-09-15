@@ -295,7 +295,7 @@ class CsvService {
     }
 
     // Validation de la sous-catégorie
-    if (sousCategorie != null && categoriePrincipale != null) {
+    if (sousCategorie != null) {
       final availableSubCategories =
           AppConstants.subcategories[categoriePrincipale] ?? [];
       if (!availableSubCategories.contains(sousCategorie)) {

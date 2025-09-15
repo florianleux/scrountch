@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/unified_theme.dart';
 
 /// Widget dropdown personnalisé sans icône
 class CustomDropdown<T> extends StatelessWidget {

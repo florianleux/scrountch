@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/navigation_service.dart';
 import '../theme/unified_theme.dart';
-import '../constants/app_constants.dart';
 import 'search_screen.dart';
 import 'item_form_screen.dart';
 import 'csv_import_screen.dart';
@@ -145,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildVersionDisplay() {
     return Center(
       child: Text(
-        'v${AppConstants.version}',
+        'v3.5.0',
         style: const TextStyle(
           fontFamily: 'Chivo',
           fontSize: 12,

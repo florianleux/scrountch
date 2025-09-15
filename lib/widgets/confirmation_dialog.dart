@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'custom_buttons.dart';
+import '../theme/unified_theme.dart';
 
 /// Widget réutilisable pour les dialogues de confirmation
 /// Suit le style standardisé de l'application
