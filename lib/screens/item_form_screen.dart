@@ -59,6 +59,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
   // Loading state
   bool _isLoading = false;
   bool _hasUnsavedChanges = false;
+  bool _isFormValid = false;
 
   @override
   void initState() {
@@ -99,12 +100,33 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
     _nameController.addListener(_onFormChanged);
     _descriptionController.addListener(_onFormChanged);
     _customSubcategoryController.addListener(_onFormChanged);
+    
+    // Valider le formulaire initial
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _validateForm();
+    });
   }
 
   void _onFormChanged() {
     if (!_hasUnsavedChanges) {
       setState(() {
         _hasUnsavedChanges = true;
+      });
+    }
+    _validateForm();
+  }
+
+  void _validateForm() {
+    // Vérifier les champs obligatoires
+    final isNameValid = _nameController.text.trim().isNotEmpty;
+    final isRoomValid = _selectedRoom != null;
+    final isCategoryValid = _selectedMainCategory != null;
+    
+    final newIsFormValid = isNameValid && isRoomValid && isCategoryValid;
+    
+    if (_isFormValid != newIsFormValid) {
+      setState(() {
+        _isFormValid = newIsFormValid;
       });
     }
   }
@@ -387,6 +409,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                                   _hasUnsavedChanges = true;
                                 });
                                 _updateSubCategoriesForMainCategory(value);
+                                _validateForm();
                               },
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
@@ -510,6 +533,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                                 if (value != null) {
                                   _updateLocationsForRoom(value);
                                 }
+                                _validateForm();
                               },
                               validator: (value) {
                                 if (value == null) {
@@ -706,7 +730,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
 
                             // Boutons
                             PrimaryButton(
-                              onPressed: _isLoading ? null : _saveItem,
+                              onPressed: (_isLoading || !_isFormValid) ? null : _saveItem,
                               text: _isLoading
                                   ? 'ENREGISTREMENT...'
                                   : 'ENREGISTRER',
