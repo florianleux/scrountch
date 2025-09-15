@@ -1,12 +1,45 @@
 import 'package:flutter/material.dart';
 import '../theme/unified_theme.dart';
 
+/// Calcule la hauteur optimale d'un bouton en fonction du nombre de lignes du texte
+class ButtonHeightCalculator {
+  static const double baseHeight = 75.0; // Hauteur de base pour une ligne
+  static const double lineHeight = 30.0; // Hauteur supplémentaire par ligne
+  static const double minHeight = 50.0; // Hauteur minimum
+  static const double maxWidth = 297.0; // Largeur maximum des boutons (depuis UnifiedTheme)
+  
+  /// Calcule le nombre de lignes qu'occupera un texte donné
+  static int calculateLines(String text, TextStyle textStyle, double maxWidth) {
+    final textPainter = TextPainter(
+      text: TextSpan(text: text, style: textStyle),
+      textDirection: TextDirection.ltr,
+      maxLines: null,
+    );
+    textPainter.layout(maxWidth: maxWidth - 32); // Padding horizontal
+    
+    final lines = (textPainter.height / textPainter.preferredLineHeight).ceil();
+    return lines.clamp(1, 4); // Maximum 4 lignes pour éviter des boutons trop hauts
+  }
+  
+  /// Calcule la hauteur optimale du bouton
+  static double calculateHeight(String text, TextStyle textStyle, {double? customMaxWidth}) {
+    final width = customMaxWidth ?? maxWidth;
+    final lines = calculateLines(text, textStyle, width);
+    
+    if (lines == 1) {
+      return baseHeight;
+    } else {
+      return (baseHeight + ((lines - 1) * lineHeight)).clamp(minHeight, baseHeight + (3 * lineHeight));
+    }
+  }
+}
+
 /// Bouton Primary: Fond noir, texte/icône jaunes
 class PrimaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final String text;
   final String? iconPath;
-  final double height;
+  final double? height; // Optionnel, calculé automatiquement si null
   final double iconSize;
 
   const PrimaryButton({
@@ -14,18 +47,22 @@ class PrimaryButton extends StatelessWidget {
     required this.onPressed,
     required this.text,
     this.iconPath,
-    this.height = 75,
+    this.height,
     this.iconSize = 45,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Calculer la hauteur automatiquement si non spécifiée
+    final calculatedHeight = height ?? 
+        ButtonHeightCalculator.calculateHeight(text, UnifiedTheme.buttonTextStyle);
+    
     return SizedBox(
-      height: height,
+      height: calculatedHeight,
       child: ElevatedButton(
         onPressed: onPressed,
         style: UnifiedTheme.primaryButtonStyle.copyWith(
-          minimumSize: WidgetStateProperty.all(Size(double.infinity, height)),
+          minimumSize: WidgetStateProperty.all(Size(double.infinity, calculatedHeight)),
         ),
         child: iconPath != null
             ? UnifiedTheme.buildButtonContent(
@@ -34,7 +71,13 @@ class PrimaryButton extends StatelessWidget {
                 iconColor: UnifiedTheme.primaryYellow,
                 iconSize: iconSize,
               )
-            : Text(text, style: UnifiedTheme.buttonTextStyle),
+            : Text(
+                text, 
+                style: UnifiedTheme.buttonTextStyle,
+                textAlign: TextAlign.center,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+              ),
       ),
     );
   }
@@ -45,7 +88,7 @@ class SecondaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final String text;
   final String? iconPath;
-  final double height;
+  final double? height; // Optionnel, calculé automatiquement si null
   final double iconSize;
 
   const SecondaryButton({
@@ -53,18 +96,22 @@ class SecondaryButton extends StatelessWidget {
     required this.onPressed,
     required this.text,
     this.iconPath,
-    this.height = 75,
+    this.height,
     this.iconSize = 45,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Calculer la hauteur automatiquement si non spécifiée
+    final calculatedHeight = height ?? 
+        ButtonHeightCalculator.calculateHeight(text, UnifiedTheme.buttonTextStyle);
+    
     return SizedBox(
-      height: height,
+      height: calculatedHeight,
       child: ElevatedButton(
         onPressed: onPressed,
         style: UnifiedTheme.secondaryButtonStyle.copyWith(
-          minimumSize: WidgetStateProperty.all(Size(double.infinity, height)),
+          minimumSize: WidgetStateProperty.all(Size(double.infinity, calculatedHeight)),
         ),
         child: iconPath != null
             ? UnifiedTheme.buildButtonContent(
@@ -73,7 +120,13 @@ class SecondaryButton extends StatelessWidget {
                 iconColor: UnifiedTheme.textBlack,
                 iconSize: iconSize,
               )
-            : Text(text, style: UnifiedTheme.buttonTextStyle),
+            : Text(
+                text, 
+                style: UnifiedTheme.buttonTextStyle,
+                textAlign: TextAlign.center,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+              ),
       ),
     );
   }
@@ -84,7 +137,7 @@ class TertiaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final String text;
   final String? iconPath;
-  final double height;
+  final double? height; // Optionnel, calculé automatiquement si null
   final double iconSize;
 
   const TertiaryButton({
@@ -92,7 +145,7 @@ class TertiaryButton extends StatelessWidget {
     required this.onPressed,
     required this.text,
     this.iconPath,
-    this.height = 50,
+    this.height,
     this.iconSize = 40,
   });
 
@@ -104,13 +157,18 @@ class TertiaryButton extends StatelessWidget {
           UnifiedTheme.buttonTextStyle.fontSize! * 0.8, // 24 * 0.8 = 19.2px
     );
 
+    // Calculer la hauteur automatiquement si non spécifiée
+    // Pour les boutons tertiary, on utilise une hauteur de base plus petite (50 au lieu de 75)
+    final calculatedHeight = height ?? 
+        (ButtonHeightCalculator.calculateHeight(text, tertiaryTextStyle) * 0.67).clamp(50.0, 135.0);
+
     return SizedBox(
-      height: height,
+      height: calculatedHeight,
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
         style: UnifiedTheme.tertiaryButtonStyle.copyWith(
-          minimumSize: WidgetStateProperty.all(Size(double.infinity, height)),
+          minimumSize: WidgetStateProperty.all(Size(double.infinity, calculatedHeight)),
         ),
         child: iconPath != null
             ? Row(
@@ -123,10 +181,14 @@ class TertiaryButton extends StatelessWidget {
                     color: UnifiedTheme.textBlack,
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    text,
-                    style: tertiaryTextStyle,
-                    textAlign: TextAlign.center,
+                  Flexible(
+                    child: Text(
+                      text,
+                      style: tertiaryTextStyle,
+                      textAlign: TextAlign.center,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               )
@@ -134,6 +196,8 @@ class TertiaryButton extends StatelessWidget {
                 text,
                 style: tertiaryTextStyle,
                 textAlign: TextAlign.center,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
               ),
       ),
     );

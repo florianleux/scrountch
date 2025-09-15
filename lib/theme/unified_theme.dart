@@ -264,7 +264,7 @@ class UnifiedTheme {
     double iconSize = UnifiedTheme.iconSize, // Default to theme's iconSize
   }) {
     return Row(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Image.asset(
           iconPath,
@@ -273,7 +273,15 @@ class UnifiedTheme {
           color: iconColor,
         ),
         const SizedBox(width: 12),
-        Text(text, style: buttonTextStyle.copyWith(color: iconColor)),
+        Flexible(
+          child: Text(
+            text, 
+            style: buttonTextStyle.copyWith(color: iconColor),
+            textAlign: TextAlign.center,
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
       ],
     );
   }
