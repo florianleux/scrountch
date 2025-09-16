@@ -28,31 +28,34 @@ class CustomDropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField<T>(
-      value: value,
-      isExpanded: isExpanded,
-      style: TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.w500,
-        fontSize: fontSize,
-      ),
-      iconEnabledColor: Colors.black,
-      dropdownColor: UnifiedTheme.primaryYellow, // Couleur de fond du dropdown
-      decoration: InputDecoration(
-        labelText: isRequired ? '$labelText *' : labelText,
-        labelStyle: const TextStyle(
-          fontSize: 18,
-          color: Colors.black,
+    return SizedBox(
+      height: UnifiedTheme.inputHeight,
+      child: DropdownButtonFormField<T>(
+        value: value,
+        isExpanded: isExpanded,
+        style: TextStyle(
+          color: UnifiedTheme.textBlack,
           fontWeight: FontWeight.w500,
+          fontSize: fontSize ?? UnifiedTheme.inputFontSize,
         ),
-        suffixIcon: suffixIcon,
-        filled: true,
-        fillColor: UnifiedTheme.primaryYellow, // Couleur de fond du champ
-        // Le contentPadding vient du thème global
+        iconEnabledColor: UnifiedTheme.textBlack,
+        dropdownColor: UnifiedTheme.primaryYellow,
+        decoration: InputDecoration(
+          labelText: isRequired ? '$labelText *' : labelText,
+          labelStyle: const TextStyle(
+            fontSize: UnifiedTheme.inputLabelFontSize,
+            color: UnifiedTheme.textBlack,
+            fontWeight: FontWeight.w500,
+          ),
+          suffixIcon: suffixIcon,
+          filled: true,
+          fillColor: UnifiedTheme.primaryYellow,
+          contentPadding: UnifiedTheme.inputContentPadding,
+        ),
+        items: items,
+        onChanged: onChanged,
+        validator: validator,
       ),
-      items: items,
-      onChanged: onChanged,
-      validator: validator,
     );
   }
 }
@@ -86,44 +89,43 @@ class CustomIconDropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField<T>(
-      value: value,
-      isExpanded: isExpanded,
-      style: TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.w500,
-        fontSize: fontSize,
-      ),
-      iconEnabledColor: Colors.black,
-      dropdownColor: UnifiedTheme.primaryYellow, // Couleur de fond du dropdown
-      decoration: InputDecoration(
-        labelText: isRequired ? '$labelText *' : labelText,
-        labelStyle: const TextStyle(
-          fontSize: 18,
-          color: Colors.black,
+    return SizedBox(
+      height: UnifiedTheme.inputHeight,
+      child: DropdownButtonFormField<T>(
+        value: value,
+        isExpanded: isExpanded,
+        style: TextStyle(
+          color: UnifiedTheme.textBlack,
           fontWeight: FontWeight.w500,
+          fontSize: fontSize ?? UnifiedTheme.inputFontSize,
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 20,
-          horizontal: 12,
-        ),
-        prefixIcon: Padding(
-          padding: const EdgeInsets.all(
-              2.0), // Réduit pour uniformiser la hauteur avec les autres champs
-          child: Image.asset(
-            iconAsset,
-            width: 32,
-            height: 32,
-            color: Colors.black, // Couleur de l'icône
+        iconEnabledColor: UnifiedTheme.textBlack,
+        dropdownColor: UnifiedTheme.primaryYellow,
+        decoration: InputDecoration(
+          labelText: isRequired ? '$labelText *' : labelText,
+          labelStyle: const TextStyle(
+            fontSize: UnifiedTheme.inputLabelFontSize,
+            color: UnifiedTheme.textBlack,
+            fontWeight: FontWeight.w500,
           ),
+          contentPadding: UnifiedTheme.inputContentPadding,
+          prefixIcon: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset(
+              iconAsset,
+              width: UnifiedTheme.inputIconSize,
+              height: UnifiedTheme.inputIconSize,
+              color: UnifiedTheme.textBlack,
+            ),
+          ),
+          suffixIcon: suffixIcon,
+          filled: true,
+          fillColor: UnifiedTheme.primaryYellow,
         ),
-        suffixIcon: suffixIcon,
-        filled: true,
-        fillColor: UnifiedTheme.primaryYellow, // Couleur de fond du champ
+        items: items,
+        onChanged: onChanged,
+        validator: validator,
       ),
-      items: items,
-      onChanged: onChanged,
-      validator: validator,
     );
   }
 }

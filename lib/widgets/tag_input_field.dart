@@ -72,18 +72,21 @@ class _TagInputFieldState extends State<TagInputField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Champ de saisie
-        TextFormField(
-          controller: _controller,
-          focusNode: _focusNode,
-          style: Theme.of(context).textTheme.bodySmall,
-          textAlign: TextAlign.left, // Alignement à gauche explicite
-          decoration: InputDecoration(
-            labelText: widget.labelText,
-            labelStyle: const TextStyle(
-              fontSize: 18,
-              color: Colors.black,
-              fontWeight: FontWeight.w500,
-            ),
+        SizedBox(
+          height: UnifiedTheme.inputHeight,
+          child: TextFormField(
+            controller: _controller,
+            focusNode: _focusNode,
+            style: UnifiedTheme.textFieldStyle,
+            textAlign: TextAlign.left,
+            decoration: InputDecoration(
+              labelText: widget.labelText,
+              labelStyle: const TextStyle(
+                fontSize: UnifiedTheme.inputLabelFontSize,
+                color: UnifiedTheme.textBlack,
+                fontWeight: FontWeight.w500,
+              ),
+              contentPadding: UnifiedTheme.inputContentPadding,
             hintText: _tags.length < widget.maxTags
                 ? 'Tapez un tag et appuyez sur Entrée'
                 : 'Maximum ${widget.maxTags} tags atteint',
@@ -97,23 +100,24 @@ class _TagInputFieldState extends State<TagInputField> {
                     ? IconButton(
                         icon: Image.asset(
                           'assets/images/plus_icon.png',
-                          width: 20,
-                          height: 20,
-                          color: Colors.black,
+                          width: UnifiedTheme.inputIconSize,
+                          height: UnifiedTheme.inputIconSize,
+                          color: UnifiedTheme.textBlack,
                         ),
                         onPressed: () => _addTag(_controller.text),
                       )
                     : const SizedBox.shrink();
               },
             ),
-            filled: true,
-            fillColor: UnifiedTheme.primaryYellow,
+              filled: true,
+              fillColor: UnifiedTheme.primaryYellow,
+            ),
+            enabled: _tags.length < widget.maxTags,
+            onFieldSubmitted: _onSubmitted,
+            onChanged: (value) {
+              // L'icône plus se met à jour automatiquement via _controller.text.isNotEmpty
+            },
           ),
-          enabled: _tags.length < widget.maxTags,
-          onFieldSubmitted: _onSubmitted,
-          onChanged: (value) {
-            // L'icône plus se met à jour automatiquement via _controller.text.isNotEmpty
-          },
         ),
 
         // Affichage des tags existants

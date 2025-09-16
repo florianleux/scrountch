@@ -44,7 +44,7 @@ class UnifiedTheme {
   static const TextStyle textFieldStyle = TextStyle(
     fontFamily: bodyFont,
     color: textBlack,
-    fontSize: 12,
+    fontSize: inputFontSize,
     fontWeight: FontWeight.normal,
   );
 
@@ -77,6 +77,13 @@ class UnifiedTheme {
   static const double verticalPadding = 24.0;
   static const double borderRadius = 8.0;
   static const double borderWidth = 1.0;
+  
+  // =================== INPUT STANDARDIZATION ===================
+  static const double inputHeight = 56.0; // Hauteur standardisée pour tous les inputs
+  static const double inputFontSize = 16.0; // Taille de police standardisée
+  static const double inputLabelFontSize = 14.0; // Taille de police des labels
+  static const double inputIconSize = 24.0; // Taille des icônes dans les inputs
+  static const EdgeInsets inputContentPadding = EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0);
 
   // =================== STYLES DE BOUTONS ===================
   static ButtonStyle get primaryButtonStyle => ElevatedButton.styleFrom(
@@ -116,19 +123,16 @@ class UnifiedTheme {
 
   // =================== THÈME D'INPUT ===================
   static InputDecorationTheme get inputDecorationTheme => InputDecorationTheme(
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 12,
-          horizontal: 16,
-        ),
+        contentPadding: inputContentPadding,
         labelStyle: const TextStyle(
           fontFamily: bodyFont,
-          fontSize: 18,
+          fontSize: inputLabelFontSize,
           fontWeight: FontWeight.w500,
           color: textBlack,
         ),
         hintStyle: const TextStyle(
           fontFamily: bodyFont,
-          fontSize: 18,
+          fontSize: inputFontSize,
           fontWeight: FontWeight.w300,
           color: textBlack,
         ),

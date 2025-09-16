@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/unified_theme.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
@@ -30,21 +31,25 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      style: Theme.of(context).textTheme.bodySmall, // Style global des inputs
-      maxLength: maxLength,
-      maxLines: maxLines,
-      validator: validator,
-      textInputAction: textInputAction,
-      onFieldSubmitted: onFieldSubmitted,
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        labelText: labelText,
-        hintText: hintText,
-        filled: filled,
-        fillColor: fillColor,
-        // Le reste du style vient du thème global inputDecorationTheme
+    return SizedBox(
+      height: UnifiedTheme.inputHeight,
+      child: TextFormField(
+        controller: controller,
+        style: UnifiedTheme.textFieldStyle,
+        maxLength: maxLength,
+        maxLines: maxLines,
+        validator: validator,
+        textInputAction: textInputAction,
+        onFieldSubmitted: onFieldSubmitted,
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          labelText: labelText,
+          hintText: hintText,
+          filled: filled,
+          fillColor: fillColor ?? UnifiedTheme.primaryYellow,
+          contentPadding: UnifiedTheme.inputContentPadding,
+          // Le reste du style vient du thème global inputDecorationTheme
+        ),
       ),
     );
   }
