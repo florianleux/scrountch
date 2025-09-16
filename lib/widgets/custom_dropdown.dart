@@ -36,14 +36,14 @@ class CustomDropdown<T> extends StatelessWidget {
         style: TextStyle(
           color: UnifiedTheme.textBlack,
           fontWeight: FontWeight.w500,
-          fontSize: fontSize ?? UnifiedTheme.inputFontSize,
+          fontSize: fontSize ?? UnifiedTheme.inputUnifiedFontSize,
         ),
         iconEnabledColor: UnifiedTheme.textBlack,
         dropdownColor: UnifiedTheme.primaryYellow,
         decoration: InputDecoration(
           labelText: isRequired ? '$labelText *' : labelText,
           labelStyle: const TextStyle(
-            fontSize: UnifiedTheme.inputLabelFontSize,
+            fontSize: UnifiedTheme.inputUnifiedFontSize,
             color: UnifiedTheme.textBlack,
             fontWeight: FontWeight.w500,
           ),
@@ -97,14 +97,14 @@ class CustomIconDropdown<T> extends StatelessWidget {
         style: TextStyle(
           color: UnifiedTheme.textBlack,
           fontWeight: FontWeight.w500,
-          fontSize: fontSize ?? UnifiedTheme.inputFontSize,
+          fontSize: fontSize ?? UnifiedTheme.inputUnifiedFontSize,
         ),
         iconEnabledColor: UnifiedTheme.textBlack,
         dropdownColor: UnifiedTheme.primaryYellow,
         decoration: InputDecoration(
           labelText: isRequired ? '$labelText *' : labelText,
           labelStyle: const TextStyle(
-            fontSize: UnifiedTheme.inputLabelFontSize,
+            fontSize: UnifiedTheme.inputUnifiedFontSize,
             color: UnifiedTheme.textBlack,
             fontWeight: FontWeight.w500,
           ),

@@ -82,7 +82,7 @@ class _TagInputFieldState extends State<TagInputField> {
             decoration: InputDecoration(
               labelText: widget.labelText,
               labelStyle: const TextStyle(
-                fontSize: UnifiedTheme.inputLabelFontSize,
+                fontSize: UnifiedTheme.inputUnifiedFontSize,
                 color: UnifiedTheme.textBlack,
                 fontWeight: FontWeight.w500,
               ),
