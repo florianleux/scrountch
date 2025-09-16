@@ -546,7 +546,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
         }
 
         if (directory != null) {
-          final fileName = 'exemple_scrountch.csv';
+          const fileName = 'exemple_scrountch.csv';
           final file = File('${directory.path}/$fileName');
           await file.writeAsString(csvContent, encoding: utf8);
           
@@ -569,7 +569,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
   Future<void> _downloadOnIOS(String csvContent) async {
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final fileName = 'exemple_scrountch.csv';
+      const fileName = 'exemple_scrountch.csv';
       final file = File('${directory.path}/$fileName');
       
       await file.writeAsString(csvContent, encoding: utf8);
@@ -582,7 +582,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
   Future<void> _downloadOnDesktop(String csvContent) async {
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final fileName = 'exemple_scrountch.csv';
+      const fileName = 'exemple_scrountch.csv';
       final file = File('${directory.path}/$fileName');
       
       await file.writeAsString(csvContent, encoding: utf8);
