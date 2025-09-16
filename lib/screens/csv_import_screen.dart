@@ -8,6 +8,7 @@ import '../services/csv_service.dart';
 import '../services/firebase_service.dart';
 import '../widgets/custom_buttons.dart';
 import '../theme/unified_theme.dart';
+import '../constants/app_constants.dart';
 
 class CsvImportScreen extends StatefulWidget {
   const CsvImportScreen({super.key});
@@ -467,7 +468,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
               child: Text(
                 _isImporting
                     ? 'IMPORT EN COURS...'
-                    : 'IMPORTER ${_parseResult!.validCount} OBJETS',
+                    : 'IMPORTER ${_parseResult!.validCount} ${AppConstants.pluralObjet(_parseResult!.validCount)}',
                 style: TextStyle(
                   fontFamily: 'DelaGothicOne',
                   fontSize: 18, // Plus petit pour permettre 2 lignes lisibles

@@ -5,6 +5,7 @@ import '../services/navigation_service.dart';
 import '../theme/unified_theme.dart';
 import 'home_screen.dart';
 import 'item_form_screen.dart';
+import 'results_screen.dart';
 import '../widgets/custom_buttons.dart';
 import '../widgets/confirmation_dialog.dart';
 import '../widgets/app_header.dart';
@@ -180,24 +181,31 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           spacing: 8.0,
                           runSpacing: 8.0,
                           children: widget.item.tags!
-                              .map((tag) => Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12.0,
-                                      vertical: 6.0,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: UnifiedTheme.primaryYellow,
-                                      border: Border.all(
-                                          color: Colors.black, width: 1.0),
-                                      borderRadius: BorderRadius.circular(20.0),
-                                    ),
-                                    child: Text(
-                                      tag,
-                                      style: const TextStyle(
-                                        fontFamily: 'Chivo',
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w500,
+                              .map((tag) => GestureDetector(
+                                    onTap: () => _searchByTag(tag),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12.0,
+                                        vertical: 6.0,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: UnifiedTheme.primaryYellow,
+                                        border: Border.all(
+                                            color: Colors.black,
+                                            width:
+                                                2.0), // Bordure plus épaisse pour indiquer qu'on peut cliquer
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                      ),
+                                      child: Text(
+                                        tag,
+                                        style: const TextStyle(
+                                          fontFamily: 'Chivo',
+                                          fontSize: 14,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight
+                                              .w600, // Plus gras pour indiquer qu'on peut cliquer
+                                        ),
                                       ),
                                     ),
                                   ))
@@ -294,5 +302,15 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         );
       }
     }
+  }
+
+  void _searchByTag(String tag) {
+    NavigationService.push(
+      context,
+      ResultsScreen(
+        searchQuery: tag,
+        isTagSearch: true,
+      ),
+    );
   }
 }

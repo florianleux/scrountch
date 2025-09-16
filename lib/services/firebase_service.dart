@@ -117,6 +117,26 @@ class FirebaseService {
     }
   }
 
+  // Search items by tag
+  Future<List<Item>> searchItemsByTag(String tag) async {
+    try {
+      await _ensureAuthenticated();
+
+      final querySnapshot = await _firestore
+          .collection('items')
+          .where('tags', arrayContains: tag)
+          .get();
+
+      final items = querySnapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
+
+      debugPrint("FirebaseService: Search found ${items.length} items for tag: $tag");
+      return items;
+    } catch (e) {
+      debugPrint("FirebaseService: Search by tag error - $e");
+      throw Exception(AppConstants.errorLoadFailed);
+    }
+  }
+
   // Search items by name
   Future<List<Item>> searchItems(String query) async {
     try {

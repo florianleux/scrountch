@@ -3,6 +3,7 @@ import '../models/item.dart';
 import '../services/firebase_service.dart';
 import '../services/navigation_service.dart';
 import '../theme/unified_theme.dart';
+import '../constants/app_constants.dart';
 import 'no_results_screen.dart';
 import 'item_detail_screen.dart';
 import '../widgets/item_card.dart';
@@ -10,10 +11,12 @@ import '../widgets/app_header.dart';
 
 class ResultsScreen extends StatefulWidget {
   final String searchQuery;
+  final bool isTagSearch;
 
   const ResultsScreen({
     super.key,
     required this.searchQuery,
+    this.isTagSearch = false,
   });
 
   @override
@@ -51,7 +54,9 @@ class _ResultsScreenState extends State<ResultsScreen>
     });
 
     try {
-      final results = await _firebaseService.searchItems(widget.searchQuery);
+      final results = widget.isTagSearch
+          ? await _firebaseService.searchItemsByTag(widget.searchQuery)
+          : await _firebaseService.searchItems(widget.searchQuery);
 
       if (mounted) {
         setState(() {
@@ -75,7 +80,8 @@ class _ResultsScreenState extends State<ResultsScreen>
   void _handleSearchResults(List<Item> results) {
     // Logic as specified:
     // - If 0 results → NoResultsScreen
-    // - If 1 result → Navigate directly to ItemDetailScreen
+    // - If 1 result (text search only) → Navigate directly to ItemDetailScreen
+    // - If 1 result (tag search) → Show results page
     // - If multiple → ListView of results
 
     if (results.isEmpty) {
@@ -83,11 +89,14 @@ class _ResultsScreenState extends State<ResultsScreen>
       WidgetsBinding.instance.addPostFrameCallback((_) {
         NavigationService.pushReplacement(
           context,
-          NoResultsScreen(searchQuery: widget.searchQuery),
+          NoResultsScreen(
+            searchQuery: widget.searchQuery,
+            isTagSearch: widget.isTagSearch,
+          ),
         );
       });
-    } else if (results.length == 1) {
-      // Navigate directly to ItemDetailScreen
+    } else if (results.length == 1 && !widget.isTagSearch) {
+      // Navigate directly to ItemDetailScreen (only for text search, not tag search)
       WidgetsBinding.instance.addPostFrameCallback((_) {
         NavigationService.pushReplacement(
           context,
@@ -133,7 +142,7 @@ class _ResultsScreenState extends State<ResultsScreen>
                     child: Text(
                       _isLoading
                           ? 'RECHERCHE...'
-                          : '${_searchResults?.length ?? 0} OBJETS',
+                          : '${_searchResults?.length ?? 0} ${AppConstants.pluralObjet(_searchResults?.length ?? 0)}',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontFamily: 'DelaGothicOne',
@@ -148,7 +157,9 @@ class _ResultsScreenState extends State<ResultsScreen>
                   Padding(
                     padding: EdgeInsets.zero,
                     child: Text(
-                      'pour "${widget.searchQuery}"',
+                      widget.isTagSearch
+                          ? 'avec le tag "${widget.searchQuery}"'
+                          : 'pour "${widget.searchQuery}"',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontFamily: 'Chivo',
@@ -230,8 +241,9 @@ class _ResultsScreenState extends State<ResultsScreen>
 
     final results = _searchResults!;
 
-    // This should only be reached if there are multiple results
-    if (results.length > 1) {
+    // This should be reached if there are results to display
+    // (multiple results OR single result from tag search)
+    if (results.isNotEmpty) {
       return ListView.builder(
         itemCount: results.length,
         itemBuilder: (context, index) {

@@ -1,7 +1,7 @@
 class AppConstants {
   // App Information
   static const String appName = 'Scrountch';
-  
+
   // Note: Version info is managed in pubspec.yaml
   // Use PackageInfo.fromPlatform() to get version at runtime if needed
 
@@ -262,4 +262,13 @@ class AppConstants {
   static const String errorDeleteFailed = "Erreur lors de la suppression";
   static const String errorNoConnection =
       "Pas de connexion internet. Vérifiez votre réseau.";
+
+  // FONCTION UTILITAIRE POUR PLURIEL
+  static String pluralObjet(int count) {
+    return count <= 1 ? 'OBJET' : 'OBJETS';
+  }
+
+  static String pluralAucun(int count) {
+    return count <= 1 ? 'AUCUN OBJET' : 'AUCUN OBJETS';
+  }
 }

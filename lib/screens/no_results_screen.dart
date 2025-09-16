@@ -8,10 +8,12 @@ import '../widgets/app_header.dart';
 
 class NoResultsScreen extends StatelessWidget {
   final String searchQuery;
+  final bool isTagSearch;
 
   const NoResultsScreen({
     super.key,
     required this.searchQuery,
+    this.isTagSearch = false,
   });
 
   @override
@@ -44,7 +46,7 @@ class NoResultsScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: Text(
-                      'AUCUN RÉSULTAT',
+                      isTagSearch ? 'AUCUN OBJET\nAVEC CE TAG' : 'AUCUN RÉSULTAT',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontFamily: 'DelaGothicOne',
