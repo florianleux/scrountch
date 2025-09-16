@@ -32,6 +32,10 @@ class ItemFormScreen extends StatefulWidget {
 class _ItemFormScreenState extends State<ItemFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final FirebaseService _firebaseService = FirebaseService();
+  final ScrollController _scrollController = ScrollController();
+
+  // Focus nodes pour gérer le clavier
+  final FocusNode _descriptionFocusNode = FocusNode();
 
   // Form controllers
   final TextEditingController _nameController = TextEditingController();
@@ -65,6 +69,21 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
   void initState() {
     super.initState();
     _initializeForm();
+
+    // Listener pour scroll automatique quand le champ description reçoit le focus
+    _descriptionFocusNode.addListener(() {
+      if (_descriptionFocusNode.hasFocus) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (_scrollController.hasClients) {
+            _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+            );
+          }
+        });
+      }
+    });
   }
 
   void _initializeForm() {
@@ -100,7 +119,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
     _nameController.addListener(_onFormChanged);
     _descriptionController.addListener(_onFormChanged);
     _customSubcategoryController.addListener(_onFormChanged);
-    
+
     // Valider le formulaire initial
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _validateForm();
@@ -121,9 +140,9 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
     final isNameValid = _nameController.text.trim().isNotEmpty;
     final isRoomValid = _selectedRoom != null;
     final isCategoryValid = _selectedMainCategory != null;
-    
+
     final newIsFormValid = isNameValid && isRoomValid && isCategoryValid;
-    
+
     if (_isFormValid != newIsFormValid) {
       setState(() {
         _isFormValid = newIsFormValid;
@@ -317,6 +336,8 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
     _nameController.dispose();
     _descriptionController.dispose();
     _customSubcategoryController.dispose();
+    _scrollController.dispose();
+    _descriptionFocusNode.dispose();
     super.dispose();
   }
 
@@ -334,6 +355,8 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
       },
       child: Scaffold(
         backgroundColor: UnifiedTheme.primaryYellow,
+        resizeToAvoidBottomInset:
+            true, // IMPORTANT: Redimensionne pour éviter le clavier
         body: Stack(
           children: [
             // Image de fond par-dessus le fond jaune
@@ -349,6 +372,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
             // Contenu principal
             SafeArea(
               child: SingleChildScrollView(
+                controller: _scrollController,
                 padding: const EdgeInsets.symmetric(vertical: 24.0),
                 child: Column(
                   children: [
@@ -734,18 +758,52 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                             const SizedBox(height: 20),
 
                             // Description
-                            CustomTextField(
-                              controller: _descriptionController,
-                              labelText: 'Description',
-                              maxLines: 4,
-                              maxLength: AppConstants.maxDescriptionLength,
+                            SizedBox(
+                              height: 300, // HAUTEUR FORCÉE
+                              child: TextFormField(
+                                controller: _descriptionController,
+                                focusNode: _descriptionFocusNode,
+                                style: UnifiedTheme.textFieldStyle,
+                                maxLines: 15,
+                                maxLength: AppConstants.maxDescriptionLength,
+                                decoration: InputDecoration(
+                                  labelText: 'Description',
+                                  filled: true,
+                                  fillColor: UnifiedTheme.primaryYellow,
+                                  contentPadding:
+                                      UnifiedTheme.inputContentPadding,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        UnifiedTheme.borderRadius),
+                                    borderSide: const BorderSide(
+                                        color: UnifiedTheme.textBlack,
+                                        width: UnifiedTheme.borderWidth),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        UnifiedTheme.borderRadius),
+                                    borderSide: const BorderSide(
+                                        color: UnifiedTheme.textBlack,
+                                        width: UnifiedTheme.borderWidth),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        UnifiedTheme.borderRadius),
+                                    borderSide: const BorderSide(
+                                        color: UnifiedTheme.textBlack,
+                                        width: UnifiedTheme.borderWidth),
+                                  ),
+                                ),
+                              ),
                             ),
 
                             const SizedBox(height: 30),
 
                             // Boutons
                             PrimaryButton(
-                              onPressed: (_isLoading || !_isFormValid) ? null : _saveItem,
+                              onPressed: (_isLoading || !_isFormValid)
+                                  ? null
+                                  : _saveItem,
                               text: _isLoading
                                   ? 'ENREGISTREMENT...'
                                   : 'ENREGISTRER',

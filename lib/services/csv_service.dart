@@ -204,7 +204,8 @@ class CsvService {
       }
       if (categoriePrincipale == null || categoriePrincipale.isEmpty) {
         return CsvParseResult(
-            error: 'La catégorie principale est obligatoire', lineNumber: lineNumber);
+            error: 'La catégorie principale est obligatoire',
+            lineNumber: lineNumber);
       }
 
       // Validation des valeurs
@@ -335,9 +336,9 @@ class CsvService {
       expectedHeaders,
       [
         'Fer à repasser',
-        'Buanderie',
-        'Étagère métallique',
-        'Étagère 2',
+        'Petit cabanon de jardin',
+        'Étagère métallique gauche',
+        'Étage 2',
         'Électronique',
         'Électroménager',
         'Marie',

@@ -76,6 +76,8 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: UnifiedTheme.primaryYellow,
+      resizeToAvoidBottomInset:
+          true, // IMPORTANT: Redimensionne pour éviter le clavier
       body: Stack(
         children: [
           // Image de fond par-dessus le fond jaune
@@ -93,7 +95,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   // Header avec retour et logo
                   const AppHeader(),
 
-                  SizedBox(height: 140),
+                  const SizedBox(height: 80),
                   // Titre centré
                   Center(
                     child: Text(
@@ -105,7 +107,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 80),
+                  const SizedBox(height: 80),
                   // Champ de recherche
                   CustomTextField(
                     controller: _searchController,
@@ -124,6 +126,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     iconPath:
                         _isLoading ? null : 'assets/images/search_icon.png',
                   ),
+                  const Spacer(), // Pousse le contenu vers le haut
                 ],
               ),
             ),

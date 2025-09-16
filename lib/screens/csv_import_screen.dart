@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:share_plus/share_plus.dart';
 import '../services/csv_service.dart';
 import '../services/firebase_service.dart';
 import '../widgets/custom_buttons.dart';
@@ -21,11 +22,20 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
   bool _isLoading = false;
   bool _isImporting = false;
   int _importProgress = 0;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: UnifiedTheme.primaryYellow,
+      resizeToAvoidBottomInset:
+          true, // IMPORTANT: Redimensionne pour éviter le clavier
       body: Stack(
         children: [
           // Image de fond avec opacité
@@ -99,6 +109,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
                   // Contenu scrollable
                   Expanded(
                     child: SingleChildScrollView(
+                      controller: _scrollController,
                       padding: const EdgeInsets.symmetric(horizontal: 24.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -227,9 +238,38 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
               ),
               const SizedBox(height: 12),
               if (_selectedFile != null)
-                PrimaryButton(
-                  text: _isLoading ? 'ANALYSE...' : 'ANALYSER',
-                  onPressed: _isLoading ? null : _parseFile,
+                SizedBox(
+                  height: 75,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _parseFile,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _isLoading
+                          ? UnifiedTheme.textBlack.withOpacity(0.6)
+                          : UnifiedTheme.textBlack,
+                      foregroundColor: _isLoading
+                          ? UnifiedTheme.primaryYellow.withOpacity(0.9)
+                          : UnifiedTheme.primaryYellow,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(UnifiedTheme.borderRadius),
+                      ),
+                      elevation: 0,
+                      textStyle: UnifiedTheme.buttonTextStyle,
+                      minimumSize: const Size(double.infinity, 75),
+                    ),
+                    child: Text(
+                      _isLoading ? 'ANALYSE...' : 'ANALYSER',
+                      style: TextStyle(
+                        fontFamily: 'DelaGothicOne',
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: _isLoading
+                            ? UnifiedTheme.primaryYellow.withOpacity(0.9)
+                            : UnifiedTheme.primaryYellow,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ),
             ],
           ),
@@ -308,7 +348,8 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
               decoration: BoxDecoration(
                 color: UnifiedTheme.errorRed.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: UnifiedTheme.errorRed.withOpacity(0.3)),
+                border:
+                    Border.all(color: UnifiedTheme.errorRed.withOpacity(0.3)),
               ),
               child: ListView.builder(
                 itemCount: _parseResult!.errors.length,
@@ -386,8 +427,8 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
                         ? _importProgress / _parseResult!.validCount
                         : 0,
                     backgroundColor: UnifiedTheme.textBlack.withOpacity(0.2),
-                    valueColor:
-                        const AlwaysStoppedAnimation<Color>(UnifiedTheme.successGreen),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                        UnifiedTheme.successGreen),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -404,11 +445,41 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
             ),
             const SizedBox(height: 20),
           ],
-          PrimaryButton(
-            text: _isImporting
-                ? 'IMPORT EN COURS...'
-                : 'IMPORTER ${_parseResult!.validCount} OBJETS',
-            onPressed: _isImporting ? null : _importItems,
+          SizedBox(
+            height: 75,
+            child: ElevatedButton(
+              onPressed: _isImporting ? null : _importItems,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _isImporting
+                    ? UnifiedTheme.textBlack.withOpacity(0.6)
+                    : UnifiedTheme.textBlack,
+                foregroundColor: _isImporting
+                    ? UnifiedTheme.primaryYellow.withOpacity(0.9)
+                    : UnifiedTheme.primaryYellow,
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(UnifiedTheme.borderRadius),
+                ),
+                elevation: 0,
+                textStyle: UnifiedTheme.buttonTextStyle,
+                minimumSize: const Size(double.infinity, 75),
+              ),
+              child: Text(
+                _isImporting
+                    ? 'IMPORT EN COURS...'
+                    : 'IMPORTER ${_parseResult!.validCount} OBJETS',
+                style: TextStyle(
+                  fontFamily: 'DelaGothicOne',
+                  fontSize: 18, // Plus petit pour permettre 2 lignes lisibles
+                  fontWeight: FontWeight.bold,
+                  color: _isImporting
+                      ? UnifiedTheme.primaryYellow.withOpacity(0.9)
+                      : UnifiedTheme.primaryYellow,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2, // Permet 2 lignes comme souhaité
+              ),
+            ),
           ),
         ],
       ],
@@ -440,6 +511,17 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
       final result = await CsvService.parseCsvFile(_selectedFile!);
       setState(() {
         _parseResult = result;
+      });
+
+      // Scroll automatique vers les résultats après l'analyse (UX améliorée)
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        }
       });
     } catch (e) {
       _showError('Erreur lors de l\'analyse: $e');
@@ -499,7 +581,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
     try {
       // Générer le contenu CSV d'exemple
       final example = CsvService.generateExampleCsv();
-      
+
       if (Platform.isAndroid) {
         // Sur Android, demander les permissions et télécharger
         await _downloadOnAndroid(example);
@@ -517,50 +599,17 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
 
   Future<void> _downloadOnAndroid(String csvContent) async {
     try {
-      // Vérifier et demander les permissions de stockage
-      PermissionStatus permission = await Permission.storage.status;
-      
-      if (permission.isDenied) {
-        // Demander la permission avec un dialogue explicatif
-        final bool shouldRequest = await _showPermissionDialog();
-        if (!shouldRequest) {
-          _showError('PERMISSION REQUISE POUR TÉLÉCHARGER LE FICHIER');
-          return;
-        }
-        
-        permission = await Permission.storage.request();
-      }
+      // Approche moderne pour Android 11+ : créer dans le répertoire de l'app
+      // puis proposer de partager le fichier (pas de permissions spéciales nécessaires)
 
-      if (permission.isGranted) {
-        // Permission accordée, procéder au téléchargement
-        Directory? directory;
-        
-        // Essayer d'abord le dossier Downloads
-        try {
-          directory = Directory('/storage/emulated/0/Download');
-          if (!await directory.exists()) {
-            directory = await getExternalStorageDirectory();
-          }
-        } catch (e) {
-          directory = await getApplicationDocumentsDirectory();
-        }
+      final directory = await getApplicationDocumentsDirectory();
+      const fileName = 'exemple_scrountch.csv';
+      final file = File('${directory.path}/$fileName');
 
-        if (directory != null) {
-          const fileName = 'exemple_scrountch.csv';
-          final file = File('${directory.path}/$fileName');
-          await file.writeAsString(csvContent, encoding: utf8);
-          
-          if (directory.path.contains('Download')) {
-            _showSuccess('FICHIER TÉLÉCHARGÉ DANS TÉLÉCHARGEMENTS: $fileName');
-          } else {
-            _showSuccess('FICHIER CRÉÉ: ${file.path}');
-          }
-        }
-      } else if (permission.isPermanentlyDenied) {
-        _showPermissionDeniedDialog();
-      } else {
-        _showError('PERMISSION DE STOCKAGE REFUSÉE');
-      }
+      await file.writeAsString(csvContent, encoding: utf8);
+
+      // Proposer de partager le fichier
+      await _shareFile(file);
     } catch (e) {
       _showError('ERREUR ANDROID: $e');
     }
@@ -571,7 +620,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
       final directory = await getApplicationDocumentsDirectory();
       const fileName = 'exemple_scrountch.csv';
       final file = File('${directory.path}/$fileName');
-      
+
       await file.writeAsString(csvContent, encoding: utf8);
       _showSuccess('FICHIER CSV CRÉÉ: ${file.path}');
     } catch (e) {
@@ -584,7 +633,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
       final directory = await getApplicationDocumentsDirectory();
       const fileName = 'exemple_scrountch.csv';
       final file = File('${directory.path}/$fileName');
-      
+
       await file.writeAsString(csvContent, encoding: utf8);
       _showSuccess('FICHIER CSV CRÉÉ: ${file.path}');
     } catch (e) {
@@ -592,48 +641,72 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
     }
   }
 
+  Future<void> _shareFile(File file) async {
+    try {
+      // Partager le fichier via le système de partage d'Android
+      final result = await Share.shareXFiles(
+        [XFile(file.path)],
+        text: 'Exemple de fichier CSV pour Scrountch',
+        subject: 'exemple_scrountch.csv',
+      );
+
+      if (result.status == ShareResultStatus.success) {
+        _showSuccess(
+            'FICHIER PARTAGÉ AVEC SUCCÈS!\nVous pouvez l\'enregistrer dans Téléchargements depuis l\'app de partage.');
+      } else {
+        _showSuccess(
+            'FICHIER CRÉÉ: ${file.path}\nUtilisez un gestionnaire de fichiers pour y accéder.');
+      }
+    } catch (e) {
+      // Fallback : afficher juste le chemin
+      _showSuccess(
+          'FICHIER CRÉÉ: ${file.path}\nUtilisez un gestionnaire de fichiers pour y accéder.');
+    }
+  }
+
   Future<bool> _showPermissionDialog() async {
     return await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: UnifiedTheme.primaryYellow,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: const BorderSide(color: UnifiedTheme.textBlack, width: 1),
-          ),
-          title: const Text(
-            'PERMISSION REQUISE',
-            style: TextStyle(
-              fontFamily: 'DelaGothicOne',
-              fontSize: 20,
-              color: UnifiedTheme.textBlack,
-            ),
-          ),
-          content: const Text(
-            'Cette application a besoin d\'accéder au stockage pour télécharger le fichier CSV d\'exemple.\n\nVoulez-vous autoriser l\'accès ?',
-            style: TextStyle(
-              fontFamily: 'Chivo',
-              fontSize: 16,
-              color: UnifiedTheme.textBlack,
-            ),
-          ),
-          actions: [
-            TertiaryButton(
-              text: 'REFUSER',
-              onPressed: () => Navigator.of(context).pop(false),
-              iconPath: 'assets/images/cross_icon.png',
-            ),
-            const SizedBox(height: 8),
-            TertiaryButton(
-              text: 'AUTORISER',
-              onPressed: () => Navigator.of(context).pop(true),
-              iconPath: 'assets/images/check_icon.png',
-            ),
-          ],
-        );
-      },
-    ) ?? false;
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: UnifiedTheme.primaryYellow,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: const BorderSide(color: UnifiedTheme.textBlack, width: 1),
+              ),
+              title: const Text(
+                'PERMISSION REQUISE',
+                style: TextStyle(
+                  fontFamily: 'DelaGothicOne',
+                  fontSize: 20,
+                  color: UnifiedTheme.textBlack,
+                ),
+              ),
+              content: const Text(
+                'Cette application a besoin d\'accéder au stockage pour télécharger le fichier CSV d\'exemple.\n\nVoulez-vous autoriser l\'accès ?',
+                style: TextStyle(
+                  fontFamily: 'Chivo',
+                  fontSize: 16,
+                  color: UnifiedTheme.textBlack,
+                ),
+              ),
+              actions: [
+                TertiaryButton(
+                  text: 'REFUSER',
+                  onPressed: () => Navigator.of(context).pop(false),
+                  iconPath: 'assets/images/cross_icon.png',
+                ),
+                const SizedBox(height: 8),
+                TertiaryButton(
+                  text: 'AUTORISER',
+                  onPressed: () => Navigator.of(context).pop(true),
+                  iconPath: 'assets/images/check_icon.png',
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
   }
 
   void _showPermissionDeniedDialog() {

@@ -77,15 +77,19 @@ class UnifiedTheme {
   static const double verticalPadding = 24.0;
   static const double borderRadius = 8.0;
   static const double borderWidth = 1.0;
-  
+
   // =================== INPUT STANDARDIZATION ===================
-  static const double inputHeight = 56.0; // Hauteur standardisée pour tous les inputs
-  static const double inputUnifiedFontSize = 16.0; // Taille de police UNIFIÉE pour labels, hints, values
+  static const double inputHeight =
+      74; // Hauteur standardisée pour tous les inputs
+  static const double inputUnifiedFontSize =
+      16.0; // Taille de police UNIFIÉE pour labels, hints, values
   static const double inputIconSize = 24.0; // Taille des icônes dans les inputs
-  static const EdgeInsets inputContentPadding = EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0);
-  
+  static const EdgeInsets inputContentPadding =
+      EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0);
+
   // Aliases pour clarté (tous identiques maintenant)
-  static const double inputFontSize = inputUnifiedFontSize; // Valeurs des champs
+  static const double inputFontSize =
+      inputUnifiedFontSize; // Valeurs des champs
   static const double inputLabelFontSize = inputUnifiedFontSize; // Labels
   static const double inputHintFontSize = inputUnifiedFontSize; // Hint texts
 
@@ -99,6 +103,20 @@ class UnifiedTheme {
         elevation: 0,
         textStyle: buttonTextStyle,
         minimumSize: const Size(buttonWidth, buttonHeight),
+      ).copyWith(
+        // CORRECTION FINALE: Styles pour les boutons désactivés
+        backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return textBlack.withOpacity(0.6); // Noir plus clair
+          }
+          return textBlack; // Noir normal
+        }),
+        foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return primaryYellow.withOpacity(0.9); // Jaune visible
+          }
+          return primaryYellow; // Jaune normal
+        }),
       );
 
   static ButtonStyle get secondaryButtonStyle => ElevatedButton.styleFrom(
@@ -128,6 +146,11 @@ class UnifiedTheme {
   // =================== THÈME D'INPUT ===================
   static InputDecorationTheme get inputDecorationTheme => InputDecorationTheme(
         contentPadding: inputContentPadding,
+        isDense: false,
+        constraints: BoxConstraints(
+          minHeight: inputHeight,
+          maxHeight: inputHeight,
+        ),
         labelStyle: const TextStyle(
           fontFamily: bodyFont,
           fontSize: inputUnifiedFontSize,
@@ -283,7 +306,7 @@ class UnifiedTheme {
         const SizedBox(width: 12),
         Flexible(
           child: Text(
-            text, 
+            text,
             style: buttonTextStyle.copyWith(color: iconColor),
             textAlign: TextAlign.center,
             maxLines: 4,

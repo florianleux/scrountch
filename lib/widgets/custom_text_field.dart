@@ -31,26 +31,36 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: UnifiedTheme.inputHeight,
-      child: TextFormField(
-        controller: controller,
-        style: UnifiedTheme.textFieldStyle,
-        maxLength: maxLength,
-        maxLines: maxLines,
-        validator: validator,
-        textInputAction: textInputAction,
-        onFieldSubmitted: onFieldSubmitted,
-        onChanged: onChanged,
-        decoration: InputDecoration(
-          labelText: labelText,
-          hintText: hintText,
-          filled: filled,
-          fillColor: fillColor ?? UnifiedTheme.primaryYellow,
-          contentPadding: UnifiedTheme.inputContentPadding,
-          // Le reste du style vient du thème global inputDecorationTheme
-        ),
+    final textField = TextFormField(
+      controller: controller,
+      style: UnifiedTheme.textFieldStyle,
+      maxLength: maxLength,
+      maxLines: maxLines,
+      validator: validator,
+      textInputAction: textInputAction,
+      onFieldSubmitted: onFieldSubmitted,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: labelText,
+        hintText: hintText,
+        filled: filled,
+        fillColor: fillColor ?? UnifiedTheme.primaryYellow,
+        contentPadding: UnifiedTheme.inputContentPadding,
       ),
     );
+
+    // Pour les champs multilignes, on contourne le thème global
+    if (maxLines != null && maxLines! > 1) {
+      return Theme(
+        data: Theme.of(context).copyWith(
+          inputDecorationTheme: UnifiedTheme.inputDecorationTheme.copyWith(
+            constraints: null, // Supprimer les contraintes de hauteur
+          ),
+        ),
+        child: textField,
+      );
+    }
+
+    return textField;
   }
 }

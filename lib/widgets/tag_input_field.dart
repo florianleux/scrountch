@@ -72,27 +72,18 @@ class _TagInputFieldState extends State<TagInputField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Champ de saisie
-        SizedBox(
-          height: UnifiedTheme.inputHeight,
-          child: TextFormField(
-            controller: _controller,
-            focusNode: _focusNode,
-            style: UnifiedTheme.textFieldStyle,
-            textAlign: TextAlign.left,
-            decoration: InputDecoration(
-              labelText: widget.labelText,
-              labelStyle: const TextStyle(
-                fontSize: UnifiedTheme.inputUnifiedFontSize,
-                color: UnifiedTheme.textBlack,
-                fontWeight: FontWeight.w500,
-              ),
-              contentPadding: UnifiedTheme.inputContentPadding,
+        TextFormField(
+          controller: _controller,
+          focusNode: _focusNode,
+          style: UnifiedTheme.textFieldStyle,
+          textAlign: TextAlign.left,
+          decoration: InputDecoration(
+            labelText: widget.labelText,
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 13.0, horizontal: 17.0),
             hintText: _tags.length < widget.maxTags
                 ? 'Tapez un tag et appuyez sur Entrée'
                 : 'Maximum ${widget.maxTags} tags atteint',
-            hintStyle: UnifiedTheme.hintStyle.copyWith(
-              fontWeight: FontWeight.w500, // Encore plus en gras
-            ),
             suffixIcon: ValueListenableBuilder<TextEditingValue>(
               valueListenable: _controller,
               builder: (context, value, child) {
@@ -109,15 +100,14 @@ class _TagInputFieldState extends State<TagInputField> {
                     : const SizedBox.shrink();
               },
             ),
-              filled: true,
-              fillColor: UnifiedTheme.primaryYellow,
-            ),
-            enabled: _tags.length < widget.maxTags,
-            onFieldSubmitted: _onSubmitted,
-            onChanged: (value) {
-              // L'icône plus se met à jour automatiquement via _controller.text.isNotEmpty
-            },
+            filled: true,
+            fillColor: UnifiedTheme.primaryYellow,
           ),
+          enabled: _tags.length < widget.maxTags,
+          onFieldSubmitted: _onSubmitted,
+          onChanged: (value) {
+            // L'icône plus se met à jour automatiquement via _controller.text.isNotEmpty
+          },
         ),
 
         // Affichage des tags existants
