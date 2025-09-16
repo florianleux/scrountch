@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildVersionDisplay() {
     return Center(
       child: Text(
-        'v3.5.0',
+        'v3.6.0',
         style: const TextStyle(
           fontFamily: 'Chivo',
           fontSize: 12,
